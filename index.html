@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Letters</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+        .letter {
+            position: absolute;
+            color: #333;
+            font-weight: bold;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function getRandomLetter() {
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+            return letters.charAt(Math.floor(Math.random() * letters.length));
+        }
+
+        function createRandomLetter() {
+            const letter = document.createElement('div');
+            letter.className = 'letter';
+            letter.innerText = getRandomLetter();
+            letter.style.fontSize = getRandomInt(10, 100) + 'px';
+            letter.style.top = getRandomInt(0, window.innerHeight) + 'px';
+            letter.style.left = getRandomInt(0, window.innerWidth) + 'px';
+            document.body.appendChild(letter);
+        }
+
+        setInterval(createRandomLetter, 100);
+    </script>
+</body>
+</html>
