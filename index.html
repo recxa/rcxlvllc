@@ -3,45 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>recxa lovelace</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
-            position: relative;
-        }
-        .letter {
-            position: absolute;
-            color: #ff00cc33;
-            font-weight: bold;
-            pointer-events: none;
-        }
-    </style>
+    <title>Fake MacOS Window System</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <script>
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        function getRandomLetter() {
-            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-            return letters.charAt(Math.floor(Math.random() * letters.length));
-        }
-
-        function createRandomLetter() {
-            const letter = document.createElement('div');
-            letter.className = 'letter';
-            letter.innerText = getRandomLetter();
-            letter.style.fontSize = getRandomInt(10, 100) + 'px';
-            letter.style.top = getRandomInt(0, window.innerHeight) + 'px';
-            letter.style.left = getRandomInt(0, window.innerWidth) + 'px';
-            document.body.appendChild(letter);
-        }
-
-        setInterval(createRandomLetter, 100);
-    </script>
+    <div class="window" id="window1">
+        <div class="header">Window 1</div>
+        <div class="content"></div>
+        <div class="resize-handle"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

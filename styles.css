@@ -1,0 +1,33 @@
+body {
+    margin: 0;
+    background-color: #f0f0f0;
+}
+.window {
+    position: absolute;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: white;
+    width: 300px;
+    height: 200px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.header {
+    background-color: #ddd;
+    padding: 8px;
+    cursor: move;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+.content {
+    padding: 16px;
+}
+.resize-handle {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    bottom: 0;
+    right: 0;
+    cursor: se-resize;
+    background-color: #ccc;
+    border-bottom-right-radius: 8px;
+}
