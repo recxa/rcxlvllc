@@ -25,9 +25,26 @@ body {
     position: absolute;
     width: 16px;
     height: 16px;
+    background-color: #ccc;
+    z-index: 10;
+}
+.resize-nw {
+    top: 0;
+    left: 0;
+    cursor: nw-resize;
+}
+.resize-ne {
+    top: 0;
+    right: 0;
+    cursor: ne-resize;
+}
+.resize-sw {
+    bottom: 0;
+    left: 0;
+    cursor: sw-resize;
+}
+.resize-se {
     bottom: 0;
     right: 0;
     cursor: se-resize;
-    background-color: #ccc;
-    border-bottom-right-radius: 8px;
 }

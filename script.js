@@ -1,10 +1,22 @@
 let isDragging = false;
 let isResizing = false;
+let resizeDirection = null;
 let offsetX, offsetY;
 
 const windowElement = document.getElementById('window1');
 const headerElement = windowElement.querySelector('.header');
-const resizeHandle = windowElement.querySelector('.resize-handle');
+const resizeHandles = {
+    nw: document.createElement('div'),
+    ne: document.createElement('div'),
+    sw: document.createElement('div'),
+    se: document.createElement('div')
+};
+
+// Initialize resize handles
+for (const [direction, handle] of Object.entries(resizeHandles)) {
+    handle.className = `resize-handle resize-${direction}`;
+    windowElement.appendChild(handle);
+}
 
 // Function to handle dragging
 headerElement.addEventListener('mousedown', (e) => {
@@ -29,20 +41,45 @@ function stopDrag() {
 }
 
 // Function to handle resizing
-resizeHandle.addEventListener('mousedown', (e) => {
-    isResizing = true;
-    offsetX = e.clientX;
-    offsetY = e.clientY;
-    document.addEventListener('mousemove', handleResize);
-    document.addEventListener('mouseup', stopResize);
-});
+for (const [direction, handle] of Object.entries(resizeHandles)) {
+    handle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        resizeDirection = direction;
+        offsetX = e.clientX;
+        offsetY = e.clientY;
+        document.addEventListener('mousemove', handleResize);
+        document.addEventListener('mouseup', stopResize);
+    });
+}
 
 function handleResize(e) {
     if (isResizing) {
-        const width = windowElement.offsetWidth + (e.clientX - offsetX);
-        const height = windowElement.offsetHeight + (e.clientY - offsetY);
-        windowElement.style.width = `${width}px`;
-        windowElement.style.height = `${height}px`;
+        const dx = e.clientX - offsetX;
+        const dy = e.clientY - offsetY;
+
+        switch (resizeDirection) {
+            case 'nw':
+                windowElement.style.width = `${windowElement.offsetWidth - dx}px`;
+                windowElement.style.height = `${windowElement.offsetHeight - dy}px`;
+                windowElement.style.left = `${windowElement.offsetLeft + dx}px`;
+                windowElement.style.top = `${windowElement.offsetTop + dy}px`;
+                break;
+            case 'ne':
+                windowElement.style.width = `${windowElement.offsetWidth + dx}px`;
+                windowElement.style.height = `${windowElement.offsetHeight - dy}px`;
+                windowElement.style.top = `${windowElement.offsetTop + dy}px`;
+                break;
+            case 'sw':
+                windowElement.style.width = `${windowElement.offsetWidth - dx}px`;
+                windowElement.style.height = `${windowElement.offsetHeight + dy}px`;
+                windowElement.style.left = `${windowElement.offsetLeft + dx}px`;
+                break;
+            case 'se':
+                windowElement.style.width = `${windowElement.offsetWidth + dx}px`;
+                windowElement.style.height = `${windowElement.offsetHeight + dy}px`;
+                break;
+        }
+
         offsetX = e.clientX;
         offsetY = e.clientY;
     }
@@ -50,6 +87,7 @@ function handleResize(e) {
 
 function stopResize() {
     isResizing = false;
+    resizeDirection = null;
     document.removeEventListener('mousemove', handleResize);
     document.removeEventListener('mouseup', stopResize);
 }
