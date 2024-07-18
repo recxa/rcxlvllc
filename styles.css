@@ -1,6 +1,7 @@
 body {
     margin: 0;
     background-color: #f0f0f0;
+    user-select: none; /* Prevent text selection */
 }
 .window {
     position: absolute;
@@ -8,16 +9,49 @@ body {
     border-radius: 8px;
     background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    user-select: none; /* Prevent text selection */
 }
 .header {
+    position: relative;
     background-color: #ddd;
     padding: 8px;
     cursor: move;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none; /* Prevent text selection */
+}
+.title {
+    flex-grow: 1;
+    text-align: center;
+}
+.bubble-buttons {
+    position: absolute;
+    left: 8px;
+    display: flex;
+    gap: 8px;
+}
+.bubble-button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: gray;
+    cursor: pointer;
+}
+.bubble-button.close {
+    background-color: #ff5f56;
+}
+.bubble-button.minimize {
+    background-color: #ffbd2e;
+}
+.bubble-button.maximize {
+    background-color: #27c93f;
 }
 .content {
     padding: 16px;
+    user-select: none; /* Prevent text selection */
 }
 .resize-handle {
     position: absolute;
@@ -45,4 +79,27 @@ body {
     bottom: 0;
     right: 0;
     cursor: se-resize;
+}
+.taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background-color: #333;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+.taskbar-button {
+    background-color: #555;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.taskbar-button:hover {
+    background-color: #777;
 }
