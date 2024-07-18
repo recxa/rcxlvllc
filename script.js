@@ -33,6 +33,7 @@ class Window {
         this.element.style.top = `${this.y}px`;
         this.element.style.width = `${this.width}px`;
         this.element.style.height = `${this.height}px`;
+        this.element.style.display = 'none'; // Start hidden
 
         this.header = document.createElement('div');
         this.header.className = 'header';
@@ -75,15 +76,7 @@ class Window {
             this.element.appendChild(handle);
         }
 
-        document.body.appendChild(this.element);
-
-        // Create a taskbar button
-        this.taskbarButton = document.createElement('div');
-        this.taskbarButton.className = 'taskbar-button';
-        this.taskbarButton.innerText = this.title;
-        document.getElementById('taskbar').appendChild(this.taskbarButton);
-
-        this.taskbarButton.addEventListener('click', () => this.restore());
+        document.getElementById('desktop').appendChild(this.element);
     }
 
     addEventListeners() {
@@ -185,7 +178,6 @@ class Window {
 
     close() {
         this.element.style.display = 'none';
-        this.taskbarButton.style.display = 'inline-block';
     }
 
     minimize() {
@@ -210,7 +202,6 @@ class Window {
 
     restore() {
         this.element.style.display = 'block';
-        this.taskbarButton.style.display = 'none';
     }
 
     setContent(htmlContent) {
@@ -218,11 +209,70 @@ class Window {
     }
 }
 
-// Create instances of the Window class
+class App {
+    constructor(name, iconPath, hoverIconPath, openIconPath, windows) {
+        this.name = name;
+        this.iconPath = iconPath;
+        this.hoverIconPath = hoverIconPath;
+        this.openIconPath = openIconPath;
+        this.windows = windows;
+        this.isOpen = false;
+
+        this.createIcon();
+    }
+
+    createIcon() {
+        this.iconElement = document.createElement('div');
+        this.iconElement.className = 'app-icon';
+        this.iconElement.innerHTML = `<img src="${this.iconPath}" alt="${this.name}"><div class="app-title">${this.name}</div>`;
+        this.iconElement.style.right = '10px';
+        this.iconElement.style.top = `${App.nextIconPosition}px`;
+
+        this.iconElement.addEventListener('click', () => this.toggleWindows());
+        this.iconElement.addEventListener('mouseover', () => this.handleMouseOver());
+        this.iconElement.addEventListener('mouseout', () => this.handleMouseOut());
+
+        document.getElementById('desktop').appendChild(this.iconElement);
+
+        // Update next icon position
+        App.nextIconPosition += 100; // Increased for buffer
+    }
+
+    toggleWindows() {
+        this.isOpen = !this.isOpen;
+        this.windows.forEach(window => window.element.style.display = this.isOpen ? 'block' : 'none');
+        this.updateIcon();
+    }
+
+    handleMouseOver() {
+        if (!this.isOpen) {
+            this.iconElement.querySelector('img').src = this.hoverIconPath;
+        }
+    }
+
+    handleMouseOut() {
+        if (!this.isOpen) {
+            this.iconElement.querySelector('img').src = this.iconPath;
+        }
+    }
+
+    updateIcon() {
+        this.iconElement.querySelector('img').src = this.isOpen ? this.openIconPath : this.iconPath;
+    }
+}
+
+// Static property to track next icon position
+App.nextIconPosition = 10;
+
+// Create windows
 const window1 = new Window('window1', 50, 50, 300, 200, 'Window 1');
 window1.setContent('<p>This is the content of window 1.</p>');
 
-const window2 = new Window('window2', 400, 100, 350, 250, 'Window 2', 200, 150, 500, 400);
+const window2 = new Window('window2', 400, 100, 350, 250, 'Window 2');
 window2.setContent('<p>This is the content of window 2.</p>');
 
-// You can create more windows as needed
+// Create apps
+const app1 = new App('App 1', 'icons/app1b.png', 'icons/app1d.png', 'icons/app1a.png', [window1]);
+const app2 = new App('App 2', 'icons/app1b.png', 'icons/app1d.png', 'icons/app1a.png', [window2]);
+
+// You can create more apps as needed

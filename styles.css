@@ -3,6 +3,12 @@ body {
     background-color: #f0f0f0;
     user-select: none; /* Prevent text selection */
 }
+.desktop {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
 .window {
     position: absolute;
     border: 1px solid #ccc;
@@ -80,26 +86,25 @@ body {
     right: 0;
     cursor: se-resize;
 }
-.taskbar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 40px;
-    background-color: #333;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-}
-.taskbar-button {
-    background-color: #555;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    margin-right: 10px;
+.app-icon {
+    position: absolute;
+    width: 50px;
+    height: 50px;
     cursor: pointer;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-.taskbar-button:hover {
-    background-color: #777;
+.app-icon img {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+}
+.app-title {
+    font-size: 12px;
+    margin-top: 5px;
+    text-align: center;
+    width: 60px;
+    white-space: nowrap;
 }
