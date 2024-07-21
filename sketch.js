@@ -6,9 +6,11 @@ let activatedCount = 0;
 let activationThreshold = 20;
 let backgroundLayer;
 let brushColor;
+let isMobile;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  isMobile = /Mobi|Android/i.test(navigator.userAgent);
   initializeSimulation(randomResolution());
   backgroundLayer = createGraphics(windowWidth, windowHeight);
   backgroundLayer.background(0);
@@ -17,10 +19,12 @@ function setup() {
   // Prevent the context menu from appearing
   canvas.oncontextmenu = () => false;
 
-  // Prevent default touch behavior
-  canvas.addEventListener('touchstart', preventDefaultTouch, {passive: false});
-  canvas.addEventListener('touchmove', preventDefaultTouch, {passive: false});
-  canvas.addEventListener('touchend', preventDefaultTouch, {passive: false});
+  // Prevent default touch behavior for mobile
+  if (isMobile) {
+    canvas.addEventListener('touchstart', preventDefaultTouch, {passive: false});
+    canvas.addEventListener('touchmove', preventDefaultTouch, {passive: false});
+    canvas.addEventListener('touchend', preventDefaultTouch, {passive: false});
+  }
 }
 
 function draw() {
