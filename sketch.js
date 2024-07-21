@@ -7,7 +7,8 @@ let activationThreshold = 20;
 let backgroundLayer;
 let brushColor;
 let isMobile;
-let undoStack = [];
+let buttonBarHeight = 40;
+let randomizeButton;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -16,17 +17,19 @@ function setup() {
   backgroundLayer = createGraphics(windowWidth, windowHeight);
   backgroundLayer.background(0);
   brushColor = color(random(255), random(255), random(255));
-
+  
   // Prevent the context menu from appearing
   canvas.oncontextmenu = () => false;
 
   // Prevent default touch behavior for mobile
   if (isMobile) {
-    createMobileUI();
-    canvas.addEventListener('touchstart', preventDefaultTouch, { passive: false });
-    canvas.addEventListener('touchmove', preventDefaultTouch, { passive: false });
-    canvas.addEventListener('touchend', preventDefaultTouch, { passive: false });
+    canvas.addEventListener('touchstart', preventDefaultTouch, {passive: false});
+    canvas.addEventListener('touchmove', preventDefaultTouch, {passive: false});
+    canvas.addEventListener('touchend', preventDefaultTouch, {passive: false});
   }
+  
+  createButtonBar();
+  updateButtonColors();
 }
 
 function draw() {
@@ -45,56 +48,57 @@ function draw() {
       }
     }
   }
-
+  
   // Turn on squares under the mouse or touch
-  let touchPos = getTouchPos();
-  let touchCol = floor(touchPos.x / resolution);
-  let touchRow = floor(touchPos.y / resolution);
-  if (touchCol >= 0 && touchCol < cols && touchRow >= 0 && touchRow < rows) {
-    if (grid[touchCol][touchRow] == 0) {
-      grid[touchCol][touchRow] = 1;
-      activatedCount++;
+  if (mouseY > buttonBarHeight) {
+    let touchPos = getTouchPos();
+    let touchCol = floor(touchPos.x / resolution);
+    let touchRow = floor(touchPos.y / resolution);
+    if (touchCol >= 0 && touchCol < cols && touchRow >= 0 && touchRow < rows) {
+      if (grid[touchCol][touchRow] == 0) {
+        grid[touchCol][touchRow] = 1;
+        activatedCount++;
+      }
     }
   }
-
+  
   // Progress the simulation based on activation threshold
   if (activatedCount >= activationThreshold) {
-    saveState();
     applyGameOfLifeRules();
     activatedCount = 0;
   }
 }
 
 function mousePressed() {
-  if (mouseButton === LEFT) {
-    saveState();
+  if (mouseButton === LEFT && mouseY > buttonBarHeight) {
     saveStateToBackground();
     initializeSimulation(randomResolution());
-  } else if (mouseButton === RIGHT) {
-    brushColor = color(random(255), random(255), random(255));
+  } else if (mouseButton === RIGHT && mouseY > buttonBarHeight) {
+    randomizeBrushColor();
     initializeSimulation(randomResolution());
     return false; // Prevent default context menu
   }
 }
 
 function touchStarted() {
-  let touchCount = touches.length;
-  if (touchCount === 1) {
-    saveState();
-    saveStateToBackground();
-    initializeSimulation(randomResolution());
-  } else if (touchCount === 2) {
-    brushColor = color(random(255), random(255), random(255));
-    initializeSimulation(randomResolution());
+  if (touches.length > 0 && touches[0].y > buttonBarHeight) {
+    let touchCount = touches.length;
+    if (touchCount === 1) {
+      saveStateToBackground();
+      initializeSimulation(randomResolution());
+    } else if (touchCount === 2) {
+      randomizeBrushColor();
+      initializeSimulation(randomResolution());
+    }
+    return false; // Prevent default touch behavior
   }
-  return false; // Prevent default touch behavior
 }
 
 function keyPressed() {
   if (keyCode === ENTER) {
     saveCanvas('canvas', 'png');
-    backgroundLayer.background(0);
-    background(0);
+  } else if (keyCode === DELETE || keyCode === BACKSPACE) {
+    resetCanvas();
   }
 }
 
@@ -123,6 +127,16 @@ function saveStateToBackground() {
   }
 }
 
+function randomizeBrushColor() {
+  brushColor = color(random(255), random(255), random(255));
+  updateButtonColors();
+}
+
+function resetCanvas() {
+  backgroundLayer.background(0);
+  background(0);
+}
+
 function randomResolution() {
   return floor(random(8, 33));
 }
@@ -149,7 +163,7 @@ function applyGameOfLifeRules() {
     for (let j = 0; j < rows; j++) {
       let state = grid[i][j];
       let neighbors = countNeighbors(grid, i, j);
-
+      
       if (state == 0 && neighbors == 3) {
         next[i][j] = 1;
       } else if (state == 1 && (neighbors < 2 || neighbors > 3)) {
@@ -159,7 +173,7 @@ function applyGameOfLifeRules() {
       }
     }
   }
-
+  
   // Swap grids
   let temp = grid;
   grid = next;
@@ -189,67 +203,37 @@ function countNeighbors(grid, x, y) {
   return sum;
 }
 
-function createMobileUI() {
-  let bar = createDiv();
-  bar.position(0, 0);
-  bar.style('width', '100%');
-  bar.style('height', '60px');
-  bar.style('background-color', '#333');
-  bar.style('color', 'white');
-  bar.style('display', 'flex');
-  bar.style('justify-content', 'space-around');
-  bar.style('align-items', 'center');
-  bar.style('z-index', '1000'); // Ensure the bar is on top
-
-  let buttonStyles = `
-    color: white;
-    background: #555;
-    border: none;
-    padding: 15px;
-    font-size: 16px;
-    border-radius: 5px;
-    transition: background 0.3s;
-  `;
-
-  let randomColorButton = createButton('Random Color');
-  randomColorButton.attribute('style', buttonStyles);
-  randomColorButton.mousePressed(() => {
-    brushColor = color(random(255), random(255), random(255));
-    randomColorButton.style('background', '#777'); // Visual feedback
-    setTimeout(() => randomColorButton.style('background', '#555'), 200);
-  });
-
-  let undoButton = createButton('Undo');
-  undoButton.attribute('style', buttonStyles);
-  undoButton.mousePressed(() => {
-    if (undoStack.length > 0) {
-      let prevState = undoStack.pop();
-      grid = prevState.grid;
-      backgroundLayer = prevState.backgroundLayer;
-      undoButton.style('background', '#777'); // Visual feedback
-      setTimeout(() => undoButton.style('background', '#555'), 200);
-    }
-  });
-
-  let resetButton = createButton('Reset');
-  resetButton.attribute('style', buttonStyles);
-  resetButton.mousePressed(() => {
-    backgroundLayer.background(0);
-    background(0);
+function createButtonBar() {
+  let buttonBar = createDiv();
+  buttonBar.style('position', 'absolute');
+  buttonBar.style('top', '0');
+  buttonBar.style('width', '100%');
+  buttonBar.style('background', '#333');
+  buttonBar.style('color', '#fff');
+  buttonBar.style('padding', '10px');
+  buttonBar.style('text-align', 'center');
+  buttonBar.style('display', 'flex');
+  buttonBar.style('justify-content', 'space-around');
+  
+  randomizeButton = createButton('Randomize Brush Color');
+  randomizeButton.style('flex', '1');
+  randomizeButton.mousePressed(() => {
+    randomizeBrushColor();
     initializeSimulation(randomResolution());
-    resetButton.style('background', '#777'); // Visual feedback
-    setTimeout(() => resetButton.style('background', '#555'), 200);
   });
+  randomizeButton.parent(buttonBar);
 
-  bar.child(randomColorButton);
-  bar.child(undoButton);
-  bar.child(resetButton);
+  let resetButton = createButton('Reset Canvas');
+  resetButton.style('flex', '1');
+  resetButton.mousePressed(resetCanvas);
+  resetButton.parent(buttonBar);
+
+  let saveButton = createButton('Save Canvas');
+  saveButton.style('flex', '1');
+  saveButton.mousePressed(() => saveCanvas('canvas', 'png'));
+  saveButton.parent(buttonBar);
 }
 
-function saveState() {
-  let currentState = {
-    grid: grid.map(row => row.slice()),
-    backgroundLayer: backgroundLayer.get()
-  };
-  undoStack.push(currentState);
+function updateButtonColors() {
+  randomizeButton.style('background-color', brushColor.toString());
 }
