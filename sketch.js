@@ -16,6 +16,11 @@ function setup() {
   
   // Prevent the context menu from appearing
   canvas.oncontextmenu = () => false;
+
+  // Prevent default touch behavior
+  canvas.addEventListener('touchstart', preventDefaultTouch, {passive: false});
+  canvas.addEventListener('touchmove', preventDefaultTouch, {passive: false});
+  canvas.addEventListener('touchend', preventDefaultTouch, {passive: false});
 }
 
 function draw() {
@@ -35,12 +40,13 @@ function draw() {
     }
   }
   
-  // Turn on squares under the mouse
-  let mouseCol = floor(mouseX / resolution);
-  let mouseRow = floor(mouseY / resolution);
-  if (mouseCol >= 0 && mouseCol < cols && mouseRow >= 0 && mouseRow < rows) {
-    if (grid[mouseCol][mouseRow] == 0) {
-      grid[mouseCol][mouseRow] = 1;
+  // Turn on squares under the mouse or touch
+  let touchPos = getTouchPos();
+  let touchCol = floor(touchPos.x / resolution);
+  let touchRow = floor(touchPos.y / resolution);
+  if (touchCol >= 0 && touchCol < cols && touchRow >= 0 && touchRow < rows) {
+    if (grid[touchCol][touchRow] == 0) {
+      grid[touchCol][touchRow] = 1;
       activatedCount++;
     }
   }
@@ -54,26 +60,57 @@ function draw() {
 
 function mousePressed() {
   if (mouseButton === LEFT) {
-    // Save current simulation state to background layer
-    backgroundLayer.noStroke();
-    for (let i = 0; i < cols; i++) {
-      for (let j = 0; j < rows; j++) {
-        if (grid[i][j] == 1) {
-          let x = i * resolution;
-          let y = j * resolution;
-          backgroundLayer.fill(brushColor);
-          backgroundLayer.rect(x, y, resolution, resolution);
-        }
-      }
-    }
-
-    // Reset simulation with a new randomized resolution
+    saveStateToBackground();
     initializeSimulation(randomResolution());
   } else if (mouseButton === RIGHT) {
-    // Randomize the brush color and reset the foreground
     brushColor = color(random(255), random(255), random(255));
     initializeSimulation(randomResolution());
     return false; // Prevent default context menu
+  }
+}
+
+function touchStarted() {
+  let touchCount = touches.length;
+  if (touchCount === 1) {
+    saveStateToBackground();
+    initializeSimulation(randomResolution());
+  } else if (touchCount === 2) {
+    brushColor = color(random(255), random(255), random(255));
+    initializeSimulation(randomResolution());
+  }
+  return false; // Prevent default touch behavior
+}
+
+function keyPressed() {
+  if (keyCode === ENTER) {
+    saveCanvas('canvas', 'png');
+    backgroundLayer.background(0);
+    background(0);
+  }
+}
+
+function preventDefaultTouch(event) {
+  event.preventDefault();
+}
+
+function getTouchPos() {
+  if (touches.length > 0) {
+    return { x: touches[0].x, y: touches[0].y };
+  }
+  return { x: mouseX, y: mouseY };
+}
+
+function saveStateToBackground() {
+  backgroundLayer.noStroke();
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      if (grid[i][j] == 1) {
+        let x = i * resolution;
+        let y = j * resolution;
+        backgroundLayer.fill(brushColor);
+        backgroundLayer.rect(x, y, resolution, resolution);
+      }
+    }
   }
 }
 
