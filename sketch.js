@@ -7,6 +7,7 @@ let activationThreshold = 20;
 let backgroundLayer;
 let brushColor;
 let isMobile;
+let undoStack = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -15,15 +16,16 @@ function setup() {
   backgroundLayer = createGraphics(windowWidth, windowHeight);
   backgroundLayer.background(0);
   brushColor = color(random(255), random(255), random(255));
-  
+
   // Prevent the context menu from appearing
   canvas.oncontextmenu = () => false;
 
   // Prevent default touch behavior for mobile
   if (isMobile) {
-    canvas.addEventListener('touchstart', preventDefaultTouch, {passive: false});
-    canvas.addEventListener('touchmove', preventDefaultTouch, {passive: false});
-    canvas.addEventListener('touchend', preventDefaultTouch, {passive: false});
+    createMobileUI();
+    canvas.addEventListener('touchstart', preventDefaultTouch, { passive: false });
+    canvas.addEventListener('touchmove', preventDefaultTouch, { passive: false });
+    canvas.addEventListener('touchend', preventDefaultTouch, { passive: false });
   }
 }
 
@@ -43,7 +45,7 @@ function draw() {
       }
     }
   }
-  
+
   // Turn on squares under the mouse or touch
   let touchPos = getTouchPos();
   let touchCol = floor(touchPos.x / resolution);
@@ -54,7 +56,7 @@ function draw() {
       activatedCount++;
     }
   }
-  
+
   // Progress the simulation based on activation threshold
   if (activatedCount >= activationThreshold) {
     applyGameOfLifeRules();
@@ -144,7 +146,7 @@ function applyGameOfLifeRules() {
     for (let j = 0; j < rows; j++) {
       let state = grid[i][j];
       let neighbors = countNeighbors(grid, i, j);
-      
+
       if (state == 0 && neighbors == 3) {
         next[i][j] = 1;
       } else if (state == 1 && (neighbors < 2 || neighbors > 3)) {
@@ -154,7 +156,7 @@ function applyGameOfLifeRules() {
       }
     }
   }
-  
+
   // Swap grids
   let temp = grid;
   grid = next;
@@ -182,4 +184,61 @@ function countNeighbors(grid, x, y) {
   }
   sum -= grid[x][y];
   return sum;
+}
+
+function createMobileUI() {
+  let bar = createDiv();
+  bar.position(0, 0);
+  bar.style('width', '100%');
+  bar.style('height', '40px');
+  bar.style('background-color', '#333');
+  bar.style('color', 'white');
+  bar.style('display', 'flex');
+  bar.style('justify-content', 'space-around');
+  bar.style('align-items', 'center');
+
+  let randomColorButton = createButton('Random Color');
+  randomColorButton.style('color', 'white');
+  randomColorButton.style('background', '#555');
+  randomColorButton.style('border', 'none');
+  randomColorButton.style('padding', '10px');
+  randomColorButton.mousePressed(() => {
+    brushColor = color(random(255), random(255), random(255));
+  });
+
+  let undoButton = createButton('Undo');
+  undoButton.style('color', 'white');
+  undoButton.style('background', '#555');
+  undoButton.style('border', 'none');
+  undoButton.style('padding', '10px');
+  undoButton.mousePressed(() => {
+    if (undoStack.length > 0) {
+      let prevState = undoStack.pop();
+      grid = prevState.grid;
+      backgroundLayer = prevState.backgroundLayer;
+    }
+  });
+
+  let resetButton = createButton('Reset');
+  resetButton.style('color', 'white');
+  resetButton.style('background', '#555');
+  resetButton.style('border', 'none');
+  resetButton.style('padding', '10px');
+  resetButton.mousePressed(() => {
+    backgroundLayer.background(0);
+    background(0);
+    initializeSimulation(randomResolution());
+  });
+
+  bar.child(randomColorButton);
+  bar.child(undoButton);
+  bar.child(resetButton);
+}
+
+function saveState() {
+  let currentState = {
+    grid: grid.map(row => row.slice()),
+    backgroundLayer: backgroundLayer.get()
+  };
+  undoStack.push(currentState);
 }
