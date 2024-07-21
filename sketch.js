@@ -7,7 +7,7 @@ let activationThreshold = 20;
 let backgroundLayer;
 let brushColor;
 let isMobile;
-let buttonBarHeight = 40;
+let buttonBarHeight = 80; // 3x the original height
 let randomizeButton;
 
 function setup() {
@@ -210,13 +210,12 @@ function createButtonBar() {
   buttonBar.style('width', '100%');
   buttonBar.style('background', '#333');
   buttonBar.style('color', '#fff');
-  buttonBar.style('padding', '10px');
-  buttonBar.style('text-align', 'center');
   buttonBar.style('display', 'flex');
   buttonBar.style('justify-content', 'space-around');
   
   randomizeButton = createButton('Randomize Brush Color');
   randomizeButton.style('flex', '1');
+  randomizeButton.style('height', buttonBarHeight + 'px');
   randomizeButton.mousePressed(() => {
     randomizeBrushColor();
     initializeSimulation(randomResolution());
@@ -225,11 +224,13 @@ function createButtonBar() {
 
   let resetButton = createButton('Reset Canvas');
   resetButton.style('flex', '1');
+  resetButton.style('height', buttonBarHeight + 'px');
   resetButton.mousePressed(resetCanvas);
   resetButton.parent(buttonBar);
 
   let saveButton = createButton('Save Canvas');
   saveButton.style('flex', '1');
+  saveButton.style('height', buttonBarHeight + 'px');
   saveButton.mousePressed(() => saveCanvas('canvas', 'png'));
   saveButton.parent(buttonBar);
 }
