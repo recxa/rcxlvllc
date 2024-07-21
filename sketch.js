@@ -193,7 +193,7 @@ function createMobileUI() {
   let bar = createDiv();
   bar.position(0, 0);
   bar.style('width', '100%');
-  bar.style('height', '40px');
+  bar.style('height', '60px');
   bar.style('background-color', '#333');
   bar.style('color', 'white');
   bar.style('display', 'flex');
@@ -201,37 +201,44 @@ function createMobileUI() {
   bar.style('align-items', 'center');
   bar.style('z-index', '1000'); // Ensure the bar is on top
 
+  let buttonStyles = `
+    color: white;
+    background: #555;
+    border: none;
+    padding: 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background 0.3s;
+  `;
+
   let randomColorButton = createButton('Random Color');
-  randomColorButton.style('color', 'white');
-  randomColorButton.style('background', '#555');
-  randomColorButton.style('border', 'none');
-  randomColorButton.style('padding', '10px');
+  randomColorButton.attribute('style', buttonStyles);
   randomColorButton.mousePressed(() => {
     brushColor = color(random(255), random(255), random(255));
+    randomColorButton.style('background', '#777'); // Visual feedback
+    setTimeout(() => randomColorButton.style('background', '#555'), 200);
   });
 
   let undoButton = createButton('Undo');
-  undoButton.style('color', 'white');
-  undoButton.style('background', '#555');
-  undoButton.style('border', 'none');
-  undoButton.style('padding', '10px');
+  undoButton.attribute('style', buttonStyles);
   undoButton.mousePressed(() => {
     if (undoStack.length > 0) {
       let prevState = undoStack.pop();
       grid = prevState.grid;
       backgroundLayer = prevState.backgroundLayer;
+      undoButton.style('background', '#777'); // Visual feedback
+      setTimeout(() => undoButton.style('background', '#555'), 200);
     }
   });
 
   let resetButton = createButton('Reset');
-  resetButton.style('color', 'white');
-  resetButton.style('background', '#555');
-  resetButton.style('border', 'none');
-  resetButton.style('padding', '10px');
+  resetButton.attribute('style', buttonStyles);
   resetButton.mousePressed(() => {
     backgroundLayer.background(0);
     background(0);
     initializeSimulation(randomResolution());
+    resetButton.style('background', '#777'); // Visual feedback
+    setTimeout(() => resetButton.style('background', '#555'), 200);
   });
 
   bar.child(randomColorButton);
