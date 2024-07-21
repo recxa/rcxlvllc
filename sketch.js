@@ -59,6 +59,7 @@ function draw() {
 
   // Progress the simulation based on activation threshold
   if (activatedCount >= activationThreshold) {
+    saveState();
     applyGameOfLifeRules();
     activatedCount = 0;
   }
@@ -66,6 +67,7 @@ function draw() {
 
 function mousePressed() {
   if (mouseButton === LEFT) {
+    saveState();
     saveStateToBackground();
     initializeSimulation(randomResolution());
   } else if (mouseButton === RIGHT) {
@@ -78,6 +80,7 @@ function mousePressed() {
 function touchStarted() {
   let touchCount = touches.length;
   if (touchCount === 1) {
+    saveState();
     saveStateToBackground();
     initializeSimulation(randomResolution());
   } else if (touchCount === 2) {
@@ -196,6 +199,7 @@ function createMobileUI() {
   bar.style('display', 'flex');
   bar.style('justify-content', 'space-around');
   bar.style('align-items', 'center');
+  bar.style('z-index', '1000'); // Ensure the bar is on top
 
   let randomColorButton = createButton('Random Color');
   randomColorButton.style('color', 'white');
