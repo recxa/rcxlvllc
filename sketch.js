@@ -7,8 +7,7 @@ let activationThreshold = 20;
 let backgroundLayer;
 let brushColor;
 let isMobile;
-let buttonBarHeight = 80; // 3x the original height
-let randomizeButton;
+let bottomBarHeight = 80;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -27,9 +26,6 @@ function setup() {
     canvas.addEventListener('touchmove', preventDefaultTouch, {passive: false});
     canvas.addEventListener('touchend', preventDefaultTouch, {passive: false});
   }
-  
-  createButtonBar();
-  updateButtonColors();
 }
 
 function draw() {
@@ -48,9 +44,14 @@ function draw() {
       }
     }
   }
+
+  // Draw the bottom bar
+  fill(brushColor);
+  noStroke();
+  rect(0, height - bottomBarHeight, width, bottomBarHeight);
   
   // Turn on squares under the mouse or touch
-  if (mouseY > buttonBarHeight) {
+  if (mouseY < height - bottomBarHeight) {
     let touchPos = getTouchPos();
     let touchCol = floor(touchPos.x / resolution);
     let touchRow = floor(touchPos.y / resolution);
@@ -70,23 +71,33 @@ function draw() {
 }
 
 function mousePressed() {
-  if (mouseButton === LEFT && mouseY > buttonBarHeight) {
-    saveStateToBackground();
-    initializeSimulation(randomResolution());
-  } else if (mouseButton === RIGHT && mouseY > buttonBarHeight) {
+  if (mouseY < height - bottomBarHeight) {
+    if (mouseButton === LEFT) {
+      saveStateToBackground();
+      initializeSimulation(randomResolution());
+    } else if (mouseButton === RIGHT) {
+      randomizeBrushColor();
+      initializeSimulation(randomResolution());
+      return false; // Prevent default context menu
+    }
+  } else {
     randomizeBrushColor();
     initializeSimulation(randomResolution());
-    return false; // Prevent default context menu
   }
 }
 
 function touchStarted() {
-  if (touches.length > 0 && touches[0].y > buttonBarHeight) {
-    let touchCount = touches.length;
-    if (touchCount === 1) {
-      saveStateToBackground();
-      initializeSimulation(randomResolution());
-    } else if (touchCount === 2) {
+  if (touches.length > 0) {
+    if (touches[0].y < height - bottomBarHeight) {
+      let touchCount = touches.length;
+      if (touchCount === 1) {
+        saveStateToBackground();
+        initializeSimulation(randomResolution());
+      } else if (touchCount === 2) {
+        randomizeBrushColor();
+        initializeSimulation(randomResolution());
+      }
+    } else {
       randomizeBrushColor();
       initializeSimulation(randomResolution());
     }
@@ -129,7 +140,6 @@ function saveStateToBackground() {
 
 function randomizeBrushColor() {
   brushColor = color(random(255), random(255), random(255));
-  updateButtonColors();
 }
 
 function resetCanvas() {
@@ -201,40 +211,4 @@ function countNeighbors(grid, x, y) {
   }
   sum -= grid[x][y];
   return sum;
-}
-
-function createButtonBar() {
-  let buttonBar = createDiv();
-  buttonBar.style('position', 'absolute');
-  buttonBar.style('top', '0');
-  buttonBar.style('width', '100%');
-  buttonBar.style('background', '#333');
-  buttonBar.style('color', '#fff');
-  buttonBar.style('display', 'flex');
-  buttonBar.style('justify-content', 'space-around');
-  
-  randomizeButton = createButton('Randomize Brush Color');
-  randomizeButton.style('flex', '1');
-  randomizeButton.style('height', buttonBarHeight + 'px');
-  randomizeButton.mousePressed(() => {
-    randomizeBrushColor();
-    initializeSimulation(randomResolution());
-  });
-  randomizeButton.parent(buttonBar);
-
-  let resetButton = createButton('Reset Canvas');
-  resetButton.style('flex', '1');
-  resetButton.style('height', buttonBarHeight + 'px');
-  resetButton.mousePressed(resetCanvas);
-  resetButton.parent(buttonBar);
-
-  let saveButton = createButton('Save Canvas');
-  saveButton.style('flex', '1');
-  saveButton.style('height', buttonBarHeight + 'px');
-  saveButton.mousePressed(() => saveCanvas('canvas', 'png'));
-  saveButton.parent(buttonBar);
-}
-
-function updateButtonColors() {
-  randomizeButton.style('background-color', brushColor.toString());
 }
