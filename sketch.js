@@ -4,17 +4,55 @@ let grid;
 let next;
 let activatedCount = 0;
 let activationThreshold = 20;
-let backgroundLayer;
+let layers = []; // List of LifeLayer objects
 let brushColor;
 let isMobile;
 let bottomBarHeight = 80;
+
+class LifeLayer {
+  constructor(grid, resolution, color) {
+    this.grid = grid.map(arr => arr.slice()); // Deep copy the grid
+    this.resolution = resolution;
+    this.color = color;
+  }
+
+  draw() {
+    for (let i = 0; i < this.grid.length; i++) {
+      for (let j = 0; j < this.grid[i].length; j++) {
+        if (this.grid[i][j] == 1) {
+          let x = i * this.resolution;
+          let y = j * this.resolution;
+          fill(this.color);
+          noStroke();
+          rect(x, y, this.resolution, this.resolution);
+        }
+      }
+    }
+  }
+
+  stepForward() {
+    let nextGrid = make2DArray(this.grid.length, this.grid[0].length);
+    for (let i = 0; i < this.grid.length; i++) {
+      for (let j = 0; j < this.grid[i].length; j++) {
+        let state = this.grid[i][j];
+        let neighbors = countNeighbors(this.grid, i, j);
+        if (state == 0 && neighbors == 3) {
+          nextGrid[i][j] = 1;
+        } else if (state == 1 && (neighbors < 2 || neighbors > 3)) {
+          nextGrid[i][j] = 0;
+        } else {
+          nextGrid[i][j] = state;
+        }
+      }
+    }
+    this.grid = nextGrid;
+  }
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   isMobile = /Mobi|Android/i.test(navigator.userAgent);
   initializeSimulation(randomResolution());
-  backgroundLayer = createGraphics(windowWidth, windowHeight);
-  backgroundLayer.background(0);
   brushColor = color(random(255), random(255), random(255));
   
   // Prevent the context menu from appearing
@@ -30,7 +68,11 @@ function setup() {
 
 function draw() {
   background(0);
-  image(backgroundLayer, 0, 0);
+
+  // Draw all background layers
+  for (let layer of layers) {
+    layer.draw();
+  }
 
   // Draw the grid
   for (let i = 0; i < cols; i++) {
@@ -45,13 +87,15 @@ function draw() {
     }
   }
 
-  // Draw the bottom bar
-  fill(brushColor);
-  noStroke();
-  rect(0, height - bottomBarHeight, width, bottomBarHeight);
+  // Draw the bottom bar for mobile
+  if (isMobile) {
+    fill(brushColor);
+    noStroke();
+    rect(0, height - bottomBarHeight, width, bottomBarHeight);
+  }
   
   // Turn on squares under the mouse or touch
-  if (mouseY < height - bottomBarHeight) {
+  if (!isMobile || mouseY < height - bottomBarHeight) {
     let touchPos = getTouchPos();
     let touchCol = floor(touchPos.x / resolution);
     let touchRow = floor(touchPos.y / resolution);
@@ -71,9 +115,9 @@ function draw() {
 }
 
 function mousePressed() {
-  if (mouseY < height - bottomBarHeight) {
+  if (!isMobile || mouseY < height - bottomBarHeight) {
     if (mouseButton === LEFT) {
-      saveStateToBackground();
+      saveStateToLayers();
       initializeSimulation(randomResolution());
     } else if (mouseButton === RIGHT) {
       randomizeBrushColor();
@@ -88,10 +132,10 @@ function mousePressed() {
 
 function touchStarted() {
   if (touches.length > 0) {
-    if (touches[0].y < height - bottomBarHeight) {
+    if (!isMobile || touches[0].y < height - bottomBarHeight) {
       let touchCount = touches.length;
       if (touchCount === 1) {
-        saveStateToBackground();
+        saveStateToLayers();
         initializeSimulation(randomResolution());
       } else if (touchCount === 2) {
         randomizeBrushColor();
@@ -110,6 +154,11 @@ function keyPressed() {
     saveCanvas('canvas', 'png');
   } else if (keyCode === DELETE || keyCode === BACKSPACE) {
     resetCanvas();
+  } else if (keyCode === 32) { // Spacebar
+    randomizeBrushColor();
+    initializeSimulation(randomResolution());
+  } else if (keyCode === UP_ARROW) {
+    progressLayers();
   }
 }
 
@@ -124,18 +173,9 @@ function getTouchPos() {
   return { x: mouseX, y: mouseY };
 }
 
-function saveStateToBackground() {
-  backgroundLayer.noStroke();
-  for (let i = 0; i < cols; i++) {
-    for (let j = 0; j < rows; j++) {
-      if (grid[i][j] == 1) {
-        let x = i * resolution;
-        let y = j * resolution;
-        backgroundLayer.fill(brushColor);
-        backgroundLayer.rect(x, y, resolution, resolution);
-      }
-    }
-  }
+function saveStateToLayers() {
+  let newLayer = new LifeLayer(grid, resolution, brushColor);
+  layers.push(newLayer); // Add the new layer to the list
 }
 
 function randomizeBrushColor() {
@@ -143,8 +183,14 @@ function randomizeBrushColor() {
 }
 
 function resetCanvas() {
-  backgroundLayer.background(0);
+  layers = []; // Clear all background layers
   background(0);
+}
+
+function progressLayers() {
+  for (let layer of layers) {
+    layer.stepForward();
+  }
 }
 
 function randomResolution() {
