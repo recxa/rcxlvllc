@@ -1,5 +1,5 @@
-// Function to toggle folder visibility for expandable items
-document.querySelectorAll('.expandable').forEach(item => {
+// Function to toggle visibility for expandable items, including folders without triangles
+document.querySelectorAll('.folder, .expandable').forEach(item => {
     item.addEventListener('click', (event) => {
       const nested = item.querySelector('.nested');
       if (nested) {
