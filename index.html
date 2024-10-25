@@ -1,16 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/addons/p5.sound.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <meta charset="utf-8" />
-    <title>recxa lovelace</title>
-
-  </head>
-  <body>
-    <main>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <nav class="sidebar">
+      <ul>
+        <li data-content="tool1">[ Tool 1 ]</li>
+        <li data-content="tool2">[ Tool 2 ]</li>
+        <li data-content="about">[ About ]</li>
+        <li data-content="contact">[ Contact ]</li>
+      </ul>
+    </nav>
+    <main class="content">
+      <div id="viewer">
+        <p>Select an item from the sidebar to view content.</p>
+      </div>
     </main>
-    <script src="sketch.js"></script>
-  </body>
+  </div>
+  <script src="script.js"></script>
+</body>
 </html>
