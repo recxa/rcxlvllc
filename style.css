@@ -4,19 +4,23 @@ body, html {
     background-color: black;
     color: white;
     font-family: monospace;
+    overflow: hidden; /* Prevent scrolling of the entire page */
   }
   
   .container {
     display: flex;
+    height: 100vh; /* Ensure it spans the entire viewport */
   }
   
   .sidebar {
     width: 250px;
     background: #000;
-    height: 100vh;
     padding: 10px;
     border-right: 1px solid #444;
-    overflow-y: auto;
+    overflow-y: auto; /* Allows scrolling if the sidebar content exceeds its height */
+    position: fixed; /* Keeps the sidebar locked to the left side */
+    height: 100%;
+    user-select: none; /* Disable text selection in the sidebar */
   }
   
   .sidebar ul {
@@ -55,9 +59,15 @@ body, html {
   
   .content {
     flex: 1;
+    margin-left: 250px; /* Offset content to the right of the sidebar */
     padding: 10px;
     background: #000;
     border-left: 1px solid #444;
+    overflow-y: auto; /* Allows vertical scrolling within the content */
+    overflow-x: hidden; /* Prevents horizontal scrolling */
+    max-height: 100vh; /* Limits content height to the viewport */
+    overscroll-behavior-y: contain; /* Prevents bounce at the top and bottom */
+    overscroll-behavior-x: none; /* Prevents any horizontal bounce */
   }
   
   #viewer {
