@@ -11,11 +11,12 @@ body, html {
   }
   
   .sidebar {
-    width: 200px;
+    width: 250px;
     background: #000;
     height: 100vh;
     padding: 10px;
     border-right: 1px solid #444;
+    overflow-y: auto;
   }
   
   .sidebar ul {
@@ -25,9 +26,13 @@ body, html {
   }
   
   .sidebar ul li {
-    padding: 5px;
-    margin: 0;
+    padding: 3px 0;
+    margin-left: 15px;
     cursor: pointer;
+  }
+  
+  .sidebar ul ul {
+    margin-left: 15px; /* Indentation for sub-items */
   }
   
   .content {
