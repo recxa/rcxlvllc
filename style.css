@@ -19,73 +19,34 @@ body, html {
     overflow-y: auto;
   }
   
-  .file-tree {
+  .sidebar ul {
     list-style: none;
     padding: 0;
     margin: 0;
   }
   
-  .file-tree li {
-    position: relative;
-    padding: 2px 0;
+  .sidebar ul li {
+    padding: 3px 0;
     margin-left: 15px;
     cursor: pointer;
   }
   
-  .file-tree li::before {
-    content: "";
-    position: absolute;
-    left: -15px;
-    top: 0;
-    bottom: 0;
-    border-left: 1px solid #444; /* Vertical line */
+  .sidebar ul ul {
+    margin-left: 15px; /* Indentation for sub-items */
   }
   
-  .file-tree .nested {
-    display: none; /* Initially hidden */
-    margin-left: 20px; /* Indentation for nested items */
+  .nested {
+    display: none; /* Hide nested lists by default */
   }
   
-  .file-tree .folder::before {
-    border-left: none; /* Remove line for folder items */
-  }
-  
-  .file-tree .folder-label::before {
-    content: "";
-    position: absolute;
-    left: -15px;
-    top: 0;
-    border-left: 1px solid #444; /* Vertical line */
-  }
-  
-  .file-tree li::after {
-    content: "";
-    position: absolute;
-    left: -15px;
-    top: 50%;
+  .folder::before {
+    content: '▶ ';
+    display: inline-block;
     width: 15px;
-    border-top: 1px solid #444; /* Horizontal line */
   }
   
-  .folder-label::after {
-    content: "";
-    position: absolute;
-    left: -15px;
-    top: 50%;
-    width: 15px;
-    border-top: 1px solid #444; /* Horizontal line for folders */
-  }
-  
-  .file-tree li:last-child::after {
-    border-top: none; /* No horizontal line for the last item */
-  }
-  
-  .file-tree .folder.open > .nested {
-    display: block; /* Show nested items when the folder is open */
-  }
-  
-  .file-tree .folder.open > .folder-label::before {
-    border-left: 1px solid #444; /* Line continues for open folders */
+  .folder.open::before {
+    content: '▼ ';
   }
   
   .content {

@@ -1,17 +1,20 @@
-document.querySelectorAll('.folder-label').forEach(label => {
-    label.addEventListener('click', () => {
-      const parent = label.parentElement;
-      parent.classList.toggle('open'); // Toggle open/close class on folder
+// Function to toggle folder visibility
+document.querySelectorAll('.folder').forEach(folder => {
+    folder.addEventListener('click', () => {
+      const nested = folder.nextElementSibling;
+      if (nested && nested.classList.contains('nested')) {
+        nested.classList.toggle('active');
+        folder.classList.toggle('open');
+      }
     });
   });
   
-  document.querySelectorAll('.file-tree li[data-content]').forEach(item => {
+  // Show content when clicking on files
+  document.querySelectorAll('[data-content]').forEach(item => {
     item.addEventListener('click', (event) => {
-      event.stopPropagation(); // Prevent event from bubbling up to folder click
+      event.stopPropagation(); // Prevent triggering folder toggling
       const contentId = item.getAttribute('data-content');
-      if (contentId) {
-        showContent(contentId);
-      }
+      showContent(contentId);
     });
   });
   
@@ -24,23 +27,20 @@ document.querySelectorAll('.folder-label').forEach(label => {
       case 'cv':
         viewer.innerText = 'CV: Here is my CV with all relevant information and history.';
         break;
-      case 'rcx':
-        viewer.innerText = 'RCX Experiments:\n\n01: Experiment details.\n02: More experiment details.';
+      case '01-readme':
+        viewer.innerText = 'README for Experiment 01: Overview and purpose.';
         break;
-      case '01':
-        viewer.innerText = 'Experiment 01: Initial findings and analysis.';
+      case '02-readme':
+        viewer.innerText = 'README for Experiment 02: Initial setup and goals.';
         break;
-      case '02':
-        viewer.innerText = 'Experiment 02: Deeper insights and results.';
+      case '03-readme':
+        viewer.innerText = 'README for Experiment 03: Methodology and approach.';
         break;
-      case '03':
-        viewer.innerText = 'Experiment 03: Adjustments and further tests.';
+      case '04-readme':
+        viewer.innerText = 'README for Experiment 04: Analysis of results.';
         break;
-      case '04':
-        viewer.innerText = 'Experiment 04: Breakthroughs and setbacks.';
-        break;
-      case '05':
-        viewer.innerText = 'Experiment 05: Final conclusions.';
+      case '05-readme':
+        viewer.innerText = 'README for Experiment 05: Summary and final thoughts.';
         break;
       case 'music':
         viewer.innerText = '♪ Music: A collection of my audio projects and soundscapes.';
