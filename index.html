@@ -9,13 +9,15 @@
 <body>
   <div class="container">
     <nav class="sidebar">
-      <ul>
-        <li data-content="home">📁 home</li>
-        <li data-content="cv">📁 cv</li>
-        <li>📁 experiments
-          <ul>
-            <li data-content="rcx">📁 rcx
-              <ul>
+      <ul class="file-tree">
+        <li data-content="home">📄 home</li>
+        <li data-content="cv">📄 cv</li>
+        <li class="folder">
+          <span class="folder-label">📁 experiments</span>
+          <ul class="nested">
+            <li class="folder">
+              <span class="folder-label">📁 rcx</span>
+              <ul class="nested">
                 <li data-content="01">📄 01</li>
                 <li data-content="02">📄 02</li>
                 <li data-content="03">📄 03</li>

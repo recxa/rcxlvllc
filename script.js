@@ -1,5 +1,13 @@
-document.querySelectorAll('.sidebar ul li').forEach(item => {
-    item.addEventListener('click', () => {
+document.querySelectorAll('.folder-label').forEach(label => {
+    label.addEventListener('click', () => {
+      const parent = label.parentElement;
+      parent.classList.toggle('open'); // Toggle open/close class on folder
+    });
+  });
+  
+  document.querySelectorAll('.file-tree li[data-content]').forEach(item => {
+    item.addEventListener('click', (event) => {
+      event.stopPropagation(); // Prevent event from bubbling up to folder click
       const contentId = item.getAttribute('data-content');
       if (contentId) {
         showContent(contentId);
