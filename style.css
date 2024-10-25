@@ -4,22 +4,22 @@ body, html {
     background-color: black;
     color: white;
     font-family: monospace;
-    overflow: hidden; /* Prevent scrolling of the entire page */
+    overflow: hidden; /* Prevent the entire page from scrolling */
   }
   
   .container {
     display: flex;
+    height: 100vh; /* Ensure the container fills the viewport height */
   }
   
   .sidebar {
     width: 250px;
     background: #000;
+    height: 100vh;
     padding: 10px;
     border-right: 1px solid #444;
-    overflow-y: auto; /* Sidebar can scroll if content overflows */
-    position: fixed; /* Keeps the sidebar locked to the left side */
-    height: 100%;
-    user-select: none; /* Disable text selection in the sidebar */
+    overflow: hidden; /* Prevent scrolling within the sidebar */
+    user-select: none; /* Prevent text selection */
   }
   
   .sidebar ul {
@@ -58,12 +58,18 @@ body, html {
   
   .content {
     flex: 1;
-    margin-left: 250px; /* Offset content to the right of the sidebar */
     padding: 10px;
     background: #000;
     border-left: 1px solid #444;
-    overflow: auto; /* Allows full scrolling in the content area */
-    height: 100vh; /* Ensure it spans the full height of the viewport */
-    box-sizing: border-box; /* Include padding in the height calculation */
+    overflow-y: auto; /* Allows scrolling only in the content section */
+    height: 100vh; /* Ensure the content section fills the viewport height */
+  }
+  
+  #viewer {
+    padding: 10px;
+    background: #111;
+    border: none;
+    white-space: pre;
+    user-select: text; /* Allows text selection inside the content area */
   }
   
