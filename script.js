@@ -1,11 +1,11 @@
-// Function to toggle folder visibility
-document.querySelectorAll('.folder').forEach(folder => {
-    folder.addEventListener('click', (event) => {
-      const nested = folder.querySelector('.nested');
+// Function to toggle folder visibility for expandable items
+document.querySelectorAll('.expandable').forEach(item => {
+    item.addEventListener('click', (event) => {
+      const nested = item.querySelector('.nested');
       if (nested) {
-        nested.classList.toggle('active');
-        nested.style.display = nested.style.display === 'none' ? 'block' : 'none';
-        folder.classList.toggle('open');
+        const isOpen = nested.style.display === 'block';
+        nested.style.display = isOpen ? 'none' : 'block';
+        item.classList.toggle('open', !isOpen);
       }
       event.stopPropagation(); // Prevent triggering parent folder toggling
     });

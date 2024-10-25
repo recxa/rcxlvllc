@@ -39,14 +39,18 @@ body, html {
     display: none; /* Hide nested lists by default */
   }
   
-  .folder::before {
+  .expandable::before {
     content: '▶ ';
     display: inline-block;
     width: 15px;
   }
   
-  .folder.open::before {
+  .expandable.open::before {
     content: '▼ ';
+  }
+  
+  .folder::before {
+    content: ''; /* No triangle for folder-only items */
   }
   
   .content {
