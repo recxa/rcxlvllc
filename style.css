@@ -4,7 +4,9 @@ body, html {
     background-color: black;
     color: white;
     font-family: monospace;
-    overflow: hidden; /* Prevent the entire page from scrolling */
+    overflow-x: hidden; /* Allow the main content to scroll */
+    overflow-y: auto; /* Allow the main content to scroll */
+    height: 100vh; /* Ensure body takes full viewport height */
   }
   
   .container {
@@ -17,7 +19,8 @@ body, html {
     background: #000;
     height: 100vh;
     padding: 10px;
-    border-right: 1px solid #444;
+    border-right: 2px solid #444;
+    position: fixed; /* Fixed position keeps the sidebar in view */
     overflow: hidden; /* Prevent scrolling within the sidebar */
     user-select: none; /* Prevent text selection */
   }
@@ -58,11 +61,11 @@ body, html {
   
   .content {
     flex: 1;
+    margin-left: 270px; /* Ensure the content area doesn't overlap the sidebar */
     padding: 10px;
     background: #000;
-    border-left: 1px solid #444;
-    overflow-y: auto; /* Allows scrolling only in the content section */
-    height: 100vh; /* Ensure the content section fills the viewport height */
+    border-left: 0px solid #444;
+    overflow-y: auto; /* Allows scrolling within the content area */
   }
   
   #viewer {
