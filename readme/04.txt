@@ -1,0 +1,28 @@
+
+lifebrush
+rcx04 oct26
+-
+
+Draw with Conway's Game of Life.
+
+Your cursor leaves a trail of living cells that multiply and die
+according to the rules of the game. Click to freeze the draw layer
+to canvas. Right click to randomize brush settings. Press UP ARROW 
+to evolve all layers simultaneously.
+
+[ctrls]
+ Draw Layer -------- Left click
+ Randomize Brush --- Right click /SPACE
+ Evolve Program ---- UP ARROW
+ Save Canvas ------- ENTER
+ Reset Canvas ------ DELETE
+
+[rules]
+ < 2 neighbors = dies (loneliness) [ ▓░░░ ] -> ░
+ 2-3 neighbors = lives (harmony)   [ ▓▓░░ ] -> ▓
+ = 3 neighbors = born (genesis)    [ ▓▓▓░ ] -> ▓
+ > 3 neighbors = dies (crowding)   [ ▓▓▓▓ ] -> ░
+
+
+
+

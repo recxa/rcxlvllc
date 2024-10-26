@@ -4,89 +4,95 @@ body, html {
     background-color: black;
     color: white;
     font-family: monospace;
-    overflow: hidden; /* Prevent overall page scrolling */
     height: 100vh;
-}
-
-.container {
+    overflow: hidden;
+  }
+  
+  .container {
     display: flex;
     height: 100vh;
-}
-
-.sidebar {
+  }
+  
+  .sidebar {
     width: 225px;
     background: #000;
     height: 100vh;
     padding: 10px;
     border-right: 2px solid #444;
     position: fixed;
-    overflow-y: auto; /* Allow scrolling in sidebar if needed */
+    overflow-y: auto;
     user-select: none;
-    z-index: 2; /* Ensure sidebar stays above content */
-}
-
-.sidebar ul {
+  }
+  
+  .sidebar ul {
     list-style: none;
     padding: 0;
     margin: 0;
-}
-
-.sidebar ul li {
+  }
+  
+  .sidebar ul li {
     padding: 3px 0;
     margin-left: 15px;
     cursor: pointer;
-}
-
-.sidebar ul ul {
+  }
+  
+  .sidebar ul ul {
     margin-left: 15px;
-}
-
-.nested {
+  }
+  
+  .nested {
     display: none;
-}
-
-.expandable::before {
+  }
+  
+  .expandable::before {
     content: '▶ ';
     display: inline-block;
     width: 15px;
-}
-
-.expandable.open::before {
+  }
+  
+  .expandable.open::before {
     content: '▼ ';
-}
-
-.folder::before {
+  }
+  
+  .folder::before {
     content: '';
-}
-
-.content {
+  }
+  
+  .content {
     flex: 1;
     margin-left: 247px;
-    padding: 0; /* Remove padding for canvas */
     background: #000;
-    position: relative; /* For absolute positioning of children */
-    overflow: hidden; /* Prevent scrolling in content area */
-}
-
-#viewer {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  #viewer {
     padding: 10px;
     background: #111;
-    border: none;
     white-space: pre;
     user-select: text;
     height: 100%;
-    overflow-y: auto; /* Allow scrolling for text content */
-}
-
-#lifebrush-container {
+    overflow-y: auto;
+  }
+  
+  #lifebrush-container {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     overflow: hidden;
-}
+  }
+  
+  #lifebrush-container canvas {
+    display: block;
+  }
 
-#lifebrush-container canvas {
-    display: block; /* Remove default canvas inline spacing */
-}
+  #lifebrush-container canvas {
+    outline: none; /* Removes the blue focus ring */
+  }
+  
+  #lifebrush-container canvas:focus {
+    outline: none;
+  }

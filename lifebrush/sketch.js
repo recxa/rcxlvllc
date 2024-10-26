@@ -1,17 +1,20 @@
+// sketch.js
 let cols, rows;
 let resolution;
 let grid;
 let next;
 let activatedCount = 0;
 let activationThreshold = 20;
-let layers = []; // List of LifeLayer objects
+let layers = [];
 let brushColor;
 let isMobile;
 let bottomBarHeight = 80;
+let canvas;
+let isInitialized = false;
 
 class LifeLayer {
   constructor(grid, resolution, color) {
-    this.grid = grid.map(arr => arr.slice()); // Deep copy the grid
+    this.grid = grid.map(arr => arr.slice());
     this.resolution = resolution;
     this.color = color;
   }
@@ -50,51 +53,67 @@ class LifeLayer {
 }
 
 function setup() {
-  const container = document.getElementById('lifebrush-container');
-  const canvas = createCanvas(container.offsetWidth, container.offsetHeight);
-  canvas.parent('lifebrush-container');
-
+  isInitialized = false;
   isMobile = /Mobi|Android/i.test(navigator.userAgent);
-  initializeSimulation(randomResolution());
-  brushColor = color(random(255), random(255), random(255));
-  
-  // Prevent default behaviors
-  canvas.elt.addEventListener('contextmenu', (e) => e.preventDefault());
-  canvas.elt.addEventListener('wheel', (e) => e.preventDefault());
-  
-  // Prevent keyboard events from affecting the page
-  window.addEventListener('keydown', (e) => {
-    if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1 && 
-        document.getElementById('lifebrush-container').style.display === 'block') {
-      e.preventDefault();
-    }
-  });
-
-  // Handle window resizing
-  window.addEventListener('resize', () => {
-    if (document.getElementById('lifebrush-container').style.display === 'block') {
-      resizeCanvas(container.offsetWidth, container.offsetHeight);
-      initializeSimulation(resolution); // Keep same resolution but update grid size
-    }
-  });
-
-  // Prevent default touch behavior for mobile
-  if (isMobile) {
-    canvas.addEventListener('touchstart', preventDefaultTouch, {passive: false});
-    canvas.addEventListener('touchmove', preventDefaultTouch, {passive: false});
-    canvas.addEventListener('touchend', preventDefaultTouch, {passive: false});
+  if (!window.savedBrushColor) {
+    window.savedBrushColor = color(random(255), random(255), random(255));
   }
+  brushColor = window.savedBrushColor;
 }
 
 function draw() {
+  const container = document.getElementById('lifebrush-container');
+  if (container.style.display !== 'none' && !isInitialized) {
+    const rect = container.getBoundingClientRect();
+    if (!window.persistentCanvas) {
+      canvas = createCanvas(rect.width, rect.height);
+      window.persistentCanvas = canvas;
+      canvas.parent('lifebrush-container');
+      
+      canvas.elt.setAttribute('tabindex', '0');
+      
+      canvas.elt.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+      });
+
+      if (isMobile) {
+        canvas.elt.addEventListener('touchstart', preventDefaultTouch, {passive: false});
+        canvas.elt.addEventListener('touchmove', preventDefaultTouch, {passive: false});
+        canvas.elt.addEventListener('touchend', preventDefaultTouch, {passive: false});
+      }
+
+      if (!window.persistentGrid) {
+        initializeSimulation(randomResolution());
+      } else {
+        grid = window.persistentGrid;
+        next = make2DArray(grid.length, grid[0].length);
+        resolution = window.savedResolution;
+        cols = grid.length;
+        rows = grid[0].length;
+        layers = window.savedLayers || [];
+      }
+    } else {
+      canvas = window.persistentCanvas;
+      grid = window.persistentGrid;
+      layers = window.savedLayers || [];
+      resolution = window.savedResolution;
+      brushColor = window.savedBrushColor;
+      resizeCanvas(rect.width, rect.height);
+    }
+    
+    isInitialized = true;
+    window.isLifebrushInitialized = true;
+    canvas.elt.focus();
+  }
+
+  if (!isInitialized) return;
+
   background(0);
 
-  // Draw all background layers
   for (let layer of layers) {
     layer.draw();
   }
 
-  // Draw the grid
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
       let x = i * resolution;
@@ -107,14 +126,12 @@ function draw() {
     }
   }
 
-  // Draw the bottom bar for mobile
   if (isMobile) {
     fill(brushColor);
     noStroke();
     rect(0, height - bottomBarHeight, width, bottomBarHeight);
   }
   
-  // Turn on squares under the mouse or touch
   if (!isMobile || mouseY < height - bottomBarHeight) {
     let touchPos = getTouchPos();
     let touchCol = floor(touchPos.x / resolution);
@@ -127,7 +144,6 @@ function draw() {
     }
   }
   
-  // Progress the simulation based on activation threshold
   if (activatedCount >= activationThreshold) {
     applyGameOfLifeRules();
     activatedCount = 0;
@@ -139,10 +155,12 @@ function mousePressed() {
     if (mouseButton === LEFT) {
       saveStateToLayers();
       initializeSimulation(randomResolution());
+      canvas.elt.focus();
     } else if (mouseButton === RIGHT) {
       randomizeBrushColor();
       initializeSimulation(randomResolution());
-      return false; // Prevent default context menu
+      canvas.elt.focus();
+      return false;
     }
   } else {
     randomizeBrushColor();
@@ -165,7 +183,7 @@ function touchStarted() {
       randomizeBrushColor();
       initializeSimulation(randomResolution());
     }
-    return false; // Prevent default touch behavior
+    return false;
   }
 }
 
@@ -173,12 +191,20 @@ function keyPressed() {
   if (keyCode === ENTER) {
     saveCanvas('canvas', 'png');
   } else if (keyCode === DELETE || keyCode === BACKSPACE) {
-    resetCanvas();
-  } else if (keyCode === 32) { // Spacebar
+    fullReset();
+  } else if (keyCode === 32) {
     randomizeBrushColor();
     initializeSimulation(randomResolution());
   } else if (keyCode === UP_ARROW) {
     progressLayers();
+  }
+}
+
+function windowResized() {
+  const container = document.getElementById('lifebrush-container');
+  if (container.style.display !== 'none' && isInitialized) {
+    const rect = container.getBoundingClientRect();
+    resizeCanvas(rect.width, rect.height);
   }
 }
 
@@ -195,15 +221,36 @@ function getTouchPos() {
 
 function saveStateToLayers() {
   let newLayer = new LifeLayer(grid, resolution, brushColor);
-  layers.push(newLayer); // Add the new layer to the list
+  layers.push(newLayer);
+  window.persistentGrid = grid.map(arr => arr.slice());
+  window.savedResolution = resolution;
+  window.savedLayers = layers;
+  window.savedBrushColor = brushColor;
 }
 
 function randomizeBrushColor() {
   brushColor = color(random(255), random(255), random(255));
+  window.savedBrushColor = brushColor;
+}
+
+function fullReset() {
+  window.persistentCanvas = null;
+  window.persistentGrid = null;
+  window.savedResolution = null;
+  window.savedLayers = null;
+  window.savedBrushColor = null;
+  window.isLifebrushInitialized = false;
+  layers = [];
+  background(0);
+  setup();
+  initializeSimulation(randomResolution());
 }
 
 function resetCanvas() {
-  layers = []; // Clear all background layers
+  layers = window.savedLayers || [];
+  window.persistentGrid = null;
+  window.savedResolution = null;
+  window.savedLayers = [];
   background(0);
 }
 
@@ -211,6 +258,7 @@ function progressLayers() {
   for (let layer of layers) {
     layer.stepForward();
   }
+  window.savedLayers = layers;
 }
 
 function randomResolution() {
@@ -225,35 +273,14 @@ function initializeSimulation(res) {
   grid = make2DArray(cols, rows);
   next = make2DArray(cols, rows);
 
-  // Initialize grid with all cells dead
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
       grid[i][j] = 0;
     }
   }
-}
 
-function applyGameOfLifeRules() {
-  // Apply Game of Life rules
-  for (let i = 0; i < cols; i++) {
-    for (let j = 0; j < rows; j++) {
-      let state = grid[i][j];
-      let neighbors = countNeighbors(grid, i, j);
-      
-      if (state == 0 && neighbors == 3) {
-        next[i][j] = 1;
-      } else if (state == 1 && (neighbors < 2 || neighbors > 3)) {
-        next[i][j] = 0;
-      } else {
-        next[i][j] = state;
-      }
-    }
-  }
-  
-  // Swap grids
-  let temp = grid;
-  grid = next;
-  next = temp;
+  window.savedResolution = resolution;
+  window.persistentGrid = grid;
 }
 
 function make2DArray(cols, rows) {
@@ -278,3 +305,28 @@ function countNeighbors(grid, x, y) {
   sum -= grid[x][y];
   return sum;
 }
+
+function applyGameOfLifeRules() {
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      let state = grid[i][j];
+      let neighbors = countNeighbors(grid, i, j);
+      
+      if (state == 0 && neighbors == 3) {
+        next[i][j] = 1;
+      } else if (state == 1 && (neighbors < 2 || neighbors > 3)) {
+        next[i][j] = 0;
+      } else {
+        next[i][j] = state;
+      }
+    }
+  }
+  
+  let temp = grid;
+  grid = next;
+  next = temp;
+  window.persistentGrid = grid;
+}
+
+window.resetCanvas = resetCanvas;
+window.isLifebrushInitialized = false;

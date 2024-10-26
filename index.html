@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <meta charset="utf-8" />
-    <title>recxa lovelace</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <meta charset="utf-8" />
+  <title>recxa lovelace</title>
 </head>
 <body>
   <div class="container">
@@ -13,35 +12,34 @@
       <ul>
         <li data-content="home">🏠 home</li>
         <li data-content="cv">📑 cv</li>
-        <!-- <li class="folder">📲 call me</li> -->
         <li class="folder">📁 experiments
           <ul class="nested">
             <li class="folder">📁 rcx
               <ul class="nested">
                 <li class="expandable">01
                   <ul class="nested">
-                    <li data-content="01-readme">📃 README</li>
+                    <li data-content="readme-01">📃 README</li>
                   </ul>
                 </li>
                 <li class="expandable">02
                   <ul class="nested">
-                    <li data-content="02-readme">📃 README</li>
+                    <li data-content="readme-02">📃 README</li>
                   </ul>
                 </li>
                 <li class="expandable">03
                   <ul class="nested">
-                    <li data-content="03-readme">📃 README</li>
+                    <li data-content="readme-03">📃 README</li>
                   </ul>
                 </li>
                 <li class="expandable">04
                   <ul class="nested">
                     <li data-content="lifebrush">🎨 lifebrush</li>
-                    <li data-content="04-readme">📃 README</li>
+                    <li data-content="readme-04">📃 README</li>
                   </ul>
                 </li>
                 <li class="expandable">05
                   <ul class="nested">
-                    <li data-content="05-readme">📃 README</li>
+                    <li data-content="readme-05">📃 README</li>
                   </ul>
                 </li>
               </ul>
@@ -53,18 +51,11 @@
       </ul>
     </nav>
     <main class="content">
-      <div id="viewer" style="border: none; width: 100%; height: 100%; display: none;">
-        <!-- The p5.js sketch will be drawn into this iframe -->
-      </div>
-      <!-- <iframe id="viewer" style="border: none; width: 100%; height: 100%; display: none;"> -->
-        <!-- <script src="lifebrush/sketch.js"></script> -->
-      <!-- </iframe> -->
-      <div id="lifebrush-container" style="display: none;">
-        <script src="lifebrush/sketch.js"></script>
-        <!-- The p5.js sketch will be drawn into this container -->
-      </div>
+      <div id="viewer" style="display: none;"></div>
+      <div id="lifebrush-container" style="display: none;"></div>
     </main>
   </div>
   <script src="script.js"></script>
+  <script src="lifebrush/sketch.js"></script>
 </body>
 </html>
