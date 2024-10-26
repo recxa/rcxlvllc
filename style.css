@@ -4,75 +4,89 @@ body, html {
     background-color: black;
     color: white;
     font-family: monospace;
-    overflow-x: hidden; /* Allow the main content to scroll */
-    overflow-y: auto; /* Allow the main content to scroll */
-    height: 100vh; /* Ensure body takes full viewport height */
-  }
-  
-  .container {
+    overflow: hidden; /* Prevent overall page scrolling */
+    height: 100vh;
+}
+
+.container {
     display: flex;
-    height: 100vh; /* Ensure the container fills the viewport height */
-  }
-  
-  .sidebar {
-    width: 250px;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 225px;
     background: #000;
     height: 100vh;
     padding: 10px;
     border-right: 2px solid #444;
-    position: fixed; /* Fixed position keeps the sidebar in view */
-    overflow: hidden; /* Prevent scrolling within the sidebar */
-    user-select: none; /* Prevent text selection */
-  }
-  
-  .sidebar ul {
+    position: fixed;
+    overflow-y: auto; /* Allow scrolling in sidebar if needed */
+    user-select: none;
+    z-index: 2; /* Ensure sidebar stays above content */
+}
+
+.sidebar ul {
     list-style: none;
     padding: 0;
     margin: 0;
-  }
-  
-  .sidebar ul li {
+}
+
+.sidebar ul li {
     padding: 3px 0;
     margin-left: 15px;
     cursor: pointer;
-  }
-  
-  .sidebar ul ul {
-    margin-left: 15px; /* Indentation for sub-items */
-  }
-  
-  .nested {
-    display: none; /* Hide nested lists by default */
-  }
-  
-  .expandable::before {
+}
+
+.sidebar ul ul {
+    margin-left: 15px;
+}
+
+.nested {
+    display: none;
+}
+
+.expandable::before {
     content: '▶ ';
     display: inline-block;
     width: 15px;
-  }
-  
-  .expandable.open::before {
+}
+
+.expandable.open::before {
     content: '▼ ';
-  }
-  
-  .folder::before {
-    content: ''; /* No triangle for folder-only items */
-  }
-  
-  .content {
+}
+
+.folder::before {
+    content: '';
+}
+
+.content {
     flex: 1;
-    margin-left: 270px; /* Ensure the content area doesn't overlap the sidebar */
-    padding: 10px;
+    margin-left: 247px;
+    padding: 0; /* Remove padding for canvas */
     background: #000;
-    border-left: 0px solid #444;
-    overflow-y: auto; /* Allows scrolling within the content area */
-  }
-  
-  #viewer {
+    position: relative; /* For absolute positioning of children */
+    overflow: hidden; /* Prevent scrolling in content area */
+}
+
+#viewer {
     padding: 10px;
     background: #111;
     border: none;
     white-space: pre;
-    user-select: text; /* Allows text selection inside the content area */
-  }
-  
+    user-select: text;
+    height: 100%;
+    overflow-y: auto; /* Allow scrolling for text content */
+}
+
+#lifebrush-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+}
+
+#lifebrush-container canvas {
+    display: block; /* Remove default canvas inline spacing */
+}

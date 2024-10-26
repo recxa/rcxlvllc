@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interactive Portfolio</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+    <title>recxa lovelace</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -34,6 +35,7 @@
                 </li>
                 <li class="expandable">04
                   <ul class="nested">
+                    <li data-content="lifebrush">🎨 lifebrush</li>
                     <li data-content="04-readme">📃 README</li>
                   </ul>
                 </li>
@@ -51,8 +53,15 @@
       </ul>
     </nav>
     <main class="content">
-      <div id="viewer">
-        <p>Select an item from the sidebar to view content.</p>
+      <div id="viewer" style="border: none; width: 100%; height: 100%; display: none;">
+        <!-- The p5.js sketch will be drawn into this iframe -->
+      </div>
+      <!-- <iframe id="viewer" style="border: none; width: 100%; height: 100%; display: none;"> -->
+        <!-- <script src="lifebrush/sketch.js"></script> -->
+      <!-- </iframe> -->
+      <div id="lifebrush-container" style="display: none;">
+        <script src="lifebrush/sketch.js"></script>
+        <!-- The p5.js sketch will be drawn into this container -->
       </div>
     </main>
   </div>

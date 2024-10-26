@@ -50,13 +50,33 @@ class LifeLayer {
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  const container = document.getElementById('lifebrush-container');
+  const canvas = createCanvas(container.offsetWidth, container.offsetHeight);
+  canvas.parent('lifebrush-container');
+
   isMobile = /Mobi|Android/i.test(navigator.userAgent);
   initializeSimulation(randomResolution());
   brushColor = color(random(255), random(255), random(255));
   
-  // Prevent the context menu from appearing
-  canvas.oncontextmenu = () => false;
+  // Prevent default behaviors
+  canvas.elt.addEventListener('contextmenu', (e) => e.preventDefault());
+  canvas.elt.addEventListener('wheel', (e) => e.preventDefault());
+  
+  // Prevent keyboard events from affecting the page
+  window.addEventListener('keydown', (e) => {
+    if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1 && 
+        document.getElementById('lifebrush-container').style.display === 'block') {
+      e.preventDefault();
+    }
+  });
+
+  // Handle window resizing
+  window.addEventListener('resize', () => {
+    if (document.getElementById('lifebrush-container').style.display === 'block') {
+      resizeCanvas(container.offsetWidth, container.offsetHeight);
+      initializeSimulation(resolution); // Keep same resolution but update grid size
+    }
+  });
 
   // Prevent default touch behavior for mobile
   if (isMobile) {
