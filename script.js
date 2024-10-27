@@ -1,4 +1,3 @@
-// script.js
 document.querySelectorAll('.folder, .expandable').forEach(item => {
   item.addEventListener('click', (event) => {
     const nested = item.querySelector('.nested');
@@ -19,36 +18,27 @@ document.querySelectorAll('[data-content]').forEach(item => {
   });
 });
 
-function showContent(contentId) {
+async function loadReadme(number) {
+  try {
+    const response = await fetch(`readme/${number}.txt`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const text = await response.text();
+    return text;
+  } catch (error) {
+    console.error('Error loading README:', error);
+    return 'Error loading README file.';
+  }
+}
+
+async function showContent(contentId) {
   const viewer = document.getElementById('viewer');
   const lifebrushContainer = document.getElementById('lifebrush-container');
 
   viewer.style.display = 'none';
   lifebrushContainer.style.display = 'none';
 
-  // Handle readme files
-  if (contentId.startsWith('readme-')) {
-    const readmeNumber = contentId.split('-')[1];
-    fetch(`readme/${readmeNumber}.txt`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('README not found');
-        }
-        return response.text();
-      })
-      .then(content => {
-        viewer.style.display = 'block';
-        viewer.innerText = content;
-      })
-      .catch(error => {
-        viewer.style.display = 'block';
-        viewer.innerText = 'Error loading README file.';
-        console.error('Error:', error);
-      });
-    return;
-  }
-
-  // Handle other content types
   switch(contentId) {
     case 'lifebrush':
       lifebrushContainer.style.display = 'block';
@@ -70,6 +60,17 @@ function showContent(contentId) {
     case 'cv':
       viewer.style.display = 'block';
       viewer.innerText = 'CV: Here is my CV with all relevant information and history.';
+      break;
+    case '01-readme':
+    case '02-readme':
+    case '03-readme':
+    case '04-readme':
+    case '05-readme':
+      const number = contentId.split('-')[0];
+      viewer.style.display = 'block';
+      viewer.innerText = 'Loading...';
+      const content = await loadReadme(number);
+      viewer.innerText = content;
       break;
     case 'music':
       viewer.style.display = 'block';

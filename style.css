@@ -5,7 +5,8 @@ body, html {
     color: white;
     font-family: monospace;
     height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: inherit;
   }
   
   .container {
@@ -64,7 +65,8 @@ body, html {
     background: #000;
     position: relative;
     height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
   
   #viewer {
