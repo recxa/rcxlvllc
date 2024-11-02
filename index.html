@@ -7,54 +7,78 @@
   <title>recxa lovelace</title>
 </head>
 <body>
-  <div class="container">
-    <nav class="sidebar">
-      <ul>
-        <li data-content="home">🏠 home</li>
-        <li data-content="cv">📑 cv</li>
-        <li class="folder">📁 experiments
-          <ul class="nested">
+    <div class="container">
+        <nav class="sidebar">
+          <ul>
+            <li data-content="home">🏠 home</li>
+            <li data-content="cv">📑 cv</li>
             <li class="folder">📁 rcx
               <ul class="nested">
                 <li class="expandable">01
                   <ul class="nested">
-                    <li data-content="01-readme">📃 README</li>
+                    <li class="folder">🎬 demos
+                      <ul class="nested">
+                        <li data-content="video-01-231204">12/04/23 (proto)</li>
+                        <li data-content="video-01-231213">12/13/23 (proto)</li>
+                        <li data-content="video-01-240816">08/16/24</li>
+                        <li data-content="video-01-study">playtest study</li>
+                      </ul>
+                    </li>
+                    <!-- <li data-content="controls-01">🎮 controls</li> -->
+                    <li data-content="git-01">💻 code</li>
+                    <li data-content="readme-01">📃 README</li>
                   </ul>
                 </li>
                 <li class="expandable">02
                   <ul class="nested">
-                    <li data-content="02-readme">📃 README</li>
+                    <li class="folder">🎬 demos
+                      <ul class="nested">
+                        <li data-content="video-02-may4a">may4a</li>
+                        <li data-content="video-02-may4b">may4b</li>
+                        <li data-content="video-02-may5a">may5a</li>
+                        <li data-content="video-02-may5b">may5b</li>
+                      </ul>
+                    </li>
+                    <li data-content="stream-02">📲 stream</li>
+                    <li data-content="git-02">💻 code</li>
+                    <li data-content="readme-02">📃 README</li>
                   </ul>
                 </li>
                 <li class="expandable">03
                   <ul class="nested">
-                    <li data-content="03-readme">📃 README</li>
+                    <li class="folder">🎬 demos
+                      <ul class="nested">
+                        <li data-content="video-03-a">A</li>
+                        <li data-content="video-03-b">B</li>
+                      </ul>
+                    </li>
+                    <li data-content="git-03">💻 code</li>
+                    <li data-content="readme-03">📃 README</li>
                   </ul>
                 </li>
                 <li class="expandable">04
                   <ul class="nested">
                     <li data-content="lifebrush">🎨 lifebrush</li>
-                    <li data-content="04-readme">📃 README</li>
+                    <!-- <li data-content="gallery-05">🖼️ gallery</li> -->
+                    <li data-content="readme-04">📃 README</li>
                   </ul>
                 </li>
                 <li class="expandable">05
                   <ul class="nested">
-                    <li data-content="05-readme">📃 README</li>
+                    <li data-content="video-05-demo">🎬 demo</li>
+                    <li data-content="code-05">💻 code</li>
+                    <li data-content="readme-05">📃 README</li>
                   </ul>
                 </li>
               </ul>
             </li>
-            <li data-content="music">💿 music</li>
-            <li data-content="crumbs">📄 crumbs</li>
           </ul>
-        </li>
-      </ul>
-    </nav>
-    <main class="content">
-      <div id="viewer" style="display: none;"></div>
-      <div id="lifebrush-container" style="display: none;"></div>
-    </main>
-  </div>
+        </nav>
+        <main class="content">
+          <div id="viewer" style="display: none;"></div>
+          <div id="lifebrush-container" style="display: none;"></div>
+        </main>
+      </div>
   <script src="script.js"></script>
   <script src="lifebrush/sketch.js"></script>
 </body>
