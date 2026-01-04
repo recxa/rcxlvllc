@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>rcx03 — readme</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      background: #0a0a0c; color: #c8ccd4;
+      font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .wrap { max-width: 640px; padding: 32px 24px; }
+    h1 { font-size: 16px; font-weight: normal; color: #e8eaed; margin: 0 0 4px 0; }
+    .subtitle { color: #667; font-size: 12px; margin-bottom: 24px; }
+    h2 { font-size: 13px; font-weight: normal; color: #99a; margin: 24px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+    p { margin: 0 0 16px 0; color: #9a9da4; }
+    ul { margin: 0 0 16px 0; padding-left: 20px; color: #9a9da4; }
+    li { margin-bottom: 6px; }
+    .marker { color: #444; font-size: 10px; margin-top: 48px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>rcx03</h1>
+    <div class="subtitle">cellular audio engine</div>
+
+    <h2>Overview</h2>
+    <p>A Game of Life-based audio plugin built in Max/MSP and Processing. Simple concept, cohesive execution. The cellular automata grid directly controls audio parameters.</p>
+
+    <h2>How It Works</h2>
+    <ul>
+      <li>2D grid of cells following Conway's Game of Life rules</li>
+      <li>Each cell's state maps to audio parameters (pitch, amplitude, filter)</li>
+      <li>Grid evolution creates evolving, organic sound textures</li>
+      <li>User can seed initial patterns or let randomness guide</li>
+    </ul>
+
+    <h2>Audio Mapping</h2>
+    <p>The grid is divided into regions, each controlling different aspects of the sound. Horizontal position affects pitch. Vertical position affects timbre. Cell density in a region affects amplitude.</p>
+
+    <h2>Controls</h2>
+    <ul>
+      <li>Click to toggle cells</li>
+      <li>Space — pause/resume evolution</li>
+      <li>C — clear grid</li>
+      <li>R — randomize</li>
+      <li>Arrow keys — adjust evolution speed</li>
+    </ul>
+
+    <h2>Development Status</h2>
+    <p>Functional prototype. Needs cleanup and extended documentation.</p>
+
+    <div class="marker">~</div>
+  </div>
+</body>
+</html>

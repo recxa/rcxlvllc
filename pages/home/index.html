@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>rcx — system view</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #050508; overflow: hidden; }
+    canvas { width: 100%; height: 100%; display: block; touch-action: none; }
+
+    .hint {
+      position: fixed; left: 12px; bottom: 10px;
+      color: #667; opacity: 0.8;
+      font: 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Info Panel - Fixed Mode */
+    #info-panel {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      min-width: 200px;
+      max-width: 300px;
+      background: rgba(8, 10, 14, 0.92);
+      border: 1px solid #2a2d33;
+      font: 12px ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: #b8bcc4;
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+    }
+    #info-panel.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    #info-panel.floating {
+      bottom: auto;
+      right: auto;
+      position: fixed;
+    }
+    #info-panel-header {
+      padding: 10px 12px 6px;
+      border-bottom: 1px solid #222;
+    }
+    #info-panel-path {
+      font-size: 10px;
+      color: #556;
+      margin: 0 0 4px 0;
+      letter-spacing: 0.3px;
+    }
+    #info-panel-path span {
+      color: #445;
+    }
+    #info-panel-title {
+      font-size: 14px;
+      color: #e8eaed;
+      margin: 0 0 2px 0;
+    }
+    #info-panel-subtitle {
+      font-size: 11px;
+      color: #667;
+      margin: 0;
+    }
+    #info-panel-body {
+      padding: 8px 12px;
+    }
+    #info-panel-desc {
+      font-size: 11px;
+      line-height: 1.5;
+      color: #889;
+      margin: 0 0 10px 0;
+    }
+    #info-panel-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .info-action {
+      padding: 4px 10px;
+      background: #1a1d22;
+      border: 1px solid #333;
+      color: #99a;
+      font: inherit;
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .info-action:hover {
+      background: #252830;
+      border-color: #444;
+      color: #ccd;
+    }
+  </style>
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="./settings-panel.js"></script>
+  <script src="./visual-engine.js"></script>
+</head>
+<body>
+<canvas id="renderCanvas"></canvas>
+<div class="hint">click = focus · scroll = zoom · drag = orbit · R = reset · ` = settings</div>
+
+<div id="info-panel">
+  <div id="info-panel-header">
+    <div id="info-panel-path"></div>
+    <div id="info-panel-title">—</div>
+    <div id="info-panel-subtitle">—</div>
+  </div>
+  <div id="info-panel-body">
+    <p id="info-panel-desc"></p>
+    <div id="info-panel-actions"></div>
+  </div>
+</div>
+
+<script>
+(async () => {
+  const canvas = document.getElementById("renderCanvas");
+  const engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
+
+  // ============ SETTINGS ============
+  let cfg = await SettingsPanel.init(onSettingsChange);
+
+  // Add new settings for integration
+  cfg.integration = cfg.integration || {
+    panelMode: 'fixed',           // 'fixed' or 'floating'
+    sidebarClickFocuses: true,    // clicking sidebar item focuses camera
+    showBaseRcx: false,           // show 'rcx >' prefix in breadcrumb path
+  };
+
+  // ============ VISUAL ENGINE ============
+  let visualEngine = null;
+
+  function onSettingsChange(newSettings) {
+    cfg = newSettings;
+    // Update visual engine when settings change
+    if (visualEngine) {
+      visualEngine.updateSettings(cfg);
+    }
+  }
+
+  // ============ PROJECT METADATA ============
+  const projectMeta = {
+    'central': {
+      title: 'rcx',
+      subtitle: 'creative systems lab',
+      description: 'experimental projects in audio, visual, and interactive systems',
+      actions: []
+    },
+    'rcx01': {
+      title: 'rcx01',
+      subtitle: 'explorative loop sampler',
+      description: 'keyboard-driven audio performance system with real-time loop manipulation and playtest studies',
+      sectionId: 'sec-01',
+      actions: [
+        { label: 'readme', type: 'page', target: 'readme-01' },
+        { label: 'demos', type: 'expand', target: 'sec-01-demos' },
+        { label: 'code', type: 'link', target: 'git-01' }
+      ]
+    },
+    'rcx02': {
+      title: 'rcx02',
+      subtitle: 'algorithmic installation',
+      description: 'generative audiovisual installation exploring emergent patterns and procedural aesthetics',
+      sectionId: 'sec-02',
+      actions: [
+        { label: 'readme', type: 'page', target: 'readme-02' },
+        { label: 'demos', type: 'expand', target: 'sec-02-demos' },
+        { label: 'stream', type: 'link', target: 'stream-02' },
+        { label: 'code', type: 'link', target: 'git-02' }
+      ]
+    },
+    'rcx03': {
+      title: 'rcx03',
+      subtitle: 'cellular audio engine',
+      description: 'Game of Life-based audio plugin built in Max/MSP and Processing — simple concept, cohesive execution',
+      sectionId: 'sec-03',
+      actions: [
+        { label: 'readme', type: 'page', target: 'readme-03' },
+        { label: 'demos', type: 'expand', target: 'sec-03-demos' },
+        { label: 'code', type: 'link', target: 'git-03' }
+      ]
+    },
+    'rcx04': {
+      title: 'rcx04',
+      subtitle: 'lifebrush',
+      description: 'interactive drawing system combining cellular automata with generative layering',
+      sectionId: 'sec-04',
+      actions: [
+        { label: 'try it', type: 'page', target: 'lifebrush' },
+        { label: 'readme', type: 'page', target: 'readme-04' }
+      ]
+    },
+    'rcx05': {
+      title: 'rcx05',
+      subtitle: 'hybrid visualizer',
+      description: 'Processing and TouchDesigner hybrid for real-time audio-reactive visuals',
+      sectionId: 'sec-05',
+      actions: [
+        { label: 'readme', type: 'page', target: 'readme-05' },
+        { label: 'demo', type: 'link', target: 'video-05-demo' },
+        { label: 'code', type: 'link', target: 'git-05' }
+      ]
+    },
+    // Moons
+    'rcx01_demos': {
+      title: 'demos',
+      subtitle: 'video documentation',
+      sectionId: 'sec-01-demos',
+      description: 'playtests and development videos',
+      actions: [
+        { label: '12/04/23', type: 'link', target: 'video-01-231204' },
+        { label: '12/13/23', type: 'link', target: 'video-01-231213' },
+        { label: '08/16/24', type: 'link', target: 'video-01-240816' },
+        { label: 'playtest', type: 'link', target: 'video-01-study' }
+      ]
+    },
+    'rcx01_code': { title: 'code', subtitle: 'source repository', actions: [{ label: 'open', type: 'link', target: 'git-01' }] },
+    'rcx01_readme': { title: 'readme', subtitle: 'documentation', actions: [{ label: 'open', type: 'page', target: 'readme-01' }] },
+    'rcx02_demos': {
+      title: 'demos',
+      subtitle: 'video documentation',
+      sectionId: 'sec-02-demos',
+      description: 'installation recordings',
+      actions: [
+        { label: 'may4a', type: 'link', target: 'video-02-may4a' },
+        { label: 'may4b', type: 'link', target: 'video-02-may4b' },
+        { label: 'may5a', type: 'link', target: 'video-02-may5a' },
+        { label: 'may5b', type: 'link', target: 'video-02-may5b' }
+      ]
+    },
+    'rcx02_stream': { title: 'stream', subtitle: 'live channel', actions: [{ label: 'open', type: 'link', target: 'stream-02' }] },
+    'rcx02_code': { title: 'code', subtitle: 'source repository', actions: [{ label: 'open', type: 'link', target: 'git-02' }] },
+    'rcx02_readme': { title: 'readme', subtitle: 'documentation', actions: [{ label: 'open', type: 'page', target: 'readme-02' }] },
+    'rcx03_demos': {
+      title: 'demos',
+      subtitle: 'video documentation',
+      sectionId: 'sec-03-demos',
+      description: 'cellular audio demonstrations',
+      actions: [
+        { label: 'demo A', type: 'link', target: 'video-03-a' },
+        { label: 'demo B', type: 'link', target: 'video-03-b' }
+      ]
+    },
+    'rcx03_code': { title: 'code', subtitle: 'source repository', actions: [{ label: 'open', type: 'link', target: 'git-03' }] },
+    'rcx03_readme': { title: 'readme', subtitle: 'documentation', actions: [{ label: 'open', type: 'page', target: 'readme-03' }] },
+    'rcx04_lifebrush': { title: 'lifebrush', subtitle: 'interactive demo', actions: [{ label: 'open', type: 'page', target: 'lifebrush' }] },
+    'rcx04_readme': { title: 'readme', subtitle: 'documentation', actions: [{ label: 'open', type: 'page', target: 'readme-04' }] },
+    'rcx05_demo': { title: 'demo', subtitle: 'video', actions: [{ label: 'watch', type: 'link', target: 'video-05-demo' }] },
+    'rcx05_code': { title: 'code', subtitle: 'source repository', actions: [{ label: 'open', type: 'link', target: 'git-05' }] },
+    'rcx05_readme': { title: 'readme', subtitle: 'documentation', actions: [{ label: 'open', type: 'page', target: 'readme-05' }] },
+    // Sub-moons (individual demos)
+    'rcx01_demo1': { title: '12/04/23', subtitle: 'prototype', actions: [{ label: 'watch', type: 'link', target: 'video-01-231204' }] },
+    'rcx01_demo2': { title: '12/13/23', subtitle: 'prototype', actions: [{ label: 'watch', type: 'link', target: 'video-01-231213' }] },
+    'rcx01_demo3': { title: '08/16/24', subtitle: 'demo', actions: [{ label: 'watch', type: 'link', target: 'video-01-240816' }] },
+    'rcx01_demo4': { title: 'playtest', subtitle: 'user study', actions: [{ label: 'watch', type: 'link', target: 'video-01-study' }] },
+    'rcx02_demo1': { title: 'may4a', subtitle: 'demo', actions: [{ label: 'watch', type: 'link', target: 'video-02-may4a' }] },
+    'rcx02_demo2': { title: 'may4b', subtitle: 'demo', actions: [{ label: 'watch', type: 'link', target: 'video-02-may4b' }] },
+    'rcx02_demo3': { title: 'may5a', subtitle: 'demo', actions: [{ label: 'watch', type: 'link', target: 'video-02-may5a' }] },
+    'rcx02_demo4': { title: 'may5b', subtitle: 'demo', actions: [{ label: 'watch', type: 'link', target: 'video-02-may5b' }] },
+    'rcx03_demo1': { title: 'demo A', subtitle: 'demo', actions: [{ label: 'watch', type: 'link', target: 'video-03-a' }] },
+    'rcx03_demo2': { title: 'demo B', subtitle: 'demo', actions: [{ label: 'watch', type: 'link', target: 'video-03-b' }] },
+  };
+
+  // Body ID to manifest node ID mapping
+  const bodyToNodeId = {
+    'central': 'rcx',
+    'rcx01': 'sec-01', 'rcx02': 'sec-02', 'rcx03': 'sec-03', 'rcx04': 'sec-04', 'rcx05': 'sec-05',
+    'rcx01_demos': 'sec-01-demos', 'rcx01_code': 'git-01', 'rcx01_readme': 'readme-01',
+    'rcx02_demos': 'sec-02-demos', 'rcx02_stream': 'stream-02', 'rcx02_code': 'git-02', 'rcx02_readme': 'readme-02',
+    'rcx03_demos': 'sec-03-demos', 'rcx03_code': 'git-03', 'rcx03_readme': 'readme-03',
+    'rcx04_lifebrush': 'lifebrush', 'rcx04_readme': 'readme-04',
+    'rcx05_demo': 'video-05-demo', 'rcx05_code': 'git-05', 'rcx05_readme': 'readme-05',
+    'rcx01_demo1': 'video-01-231204', 'rcx01_demo2': 'video-01-231213', 'rcx01_demo3': 'video-01-240816', 'rcx01_demo4': 'video-01-study',
+    'rcx02_demo1': 'video-02-may4a', 'rcx02_demo2': 'video-02-may4b', 'rcx02_demo3': 'video-02-may5a', 'rcx02_demo4': 'video-02-may5b',
+    'rcx03_demo1': 'video-03-a', 'rcx03_demo2': 'video-03-b',
+  };
+
+  const nodeIdToBody = Object.fromEntries(Object.entries(bodyToNodeId).map(([k,v]) => [v,k]));
+
+  // ============ EASING ============
+  const easings = {
+    linear: t => t,
+    cubicInOut: t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+    expoOut: t => t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
+  };
+
+  // ============ SCENE ============
+  const scene = new BABYLON.Scene(engine);
+  scene.clearColor = new BABYLON.Color4(0.02, 0.02, 0.03, 1.0);
+
+  const camera = new BABYLON.ArcRotateCamera("camera", Math.PI * 0.25, Math.PI * 0.35, 35, BABYLON.Vector3.Zero(), scene);
+  camera.minZ = 0.01;
+  camera.panningSensibility = 0;
+  camera.attachControl(canvas, true);
+  camera.inputs.attached.mousewheel.detachControl();
+
+  const hl = new BABYLON.HighlightLayer("hl", scene);
+  hl.innerGlow = false;
+  hl.outerGlow = true;
+  hl.blurHorizontalSize = 0.5;
+  hl.blurVerticalSize = 0.5;
+
+  // Secondary highlight for sidebar hover
+  const sidebarHl = new BABYLON.HighlightLayer("sidebarHl", scene);
+  sidebarHl.innerGlow = true;
+  sidebarHl.outerGlow = true;
+  sidebarHl.blurHorizontalSize = 1;
+  sidebarHl.blurVerticalSize = 1;
+
+  const hemi = new BABYLON.HemisphericLight("hemi", new BABYLON.Vector3(0, 1, 0), scene);
+  hemi.intensity = 0.6;
+  const point = new BABYLON.PointLight("point", new BABYLON.Vector3(0, 0, 0), scene);
+  point.intensity = 0.8;
+
+  // ============ INIT VISUAL ENGINE ============
+  const DISABLE_VISUAL_ENGINE = false;
+
+  if (!DISABLE_VISUAL_ENGINE) {
+    try {
+      if (typeof VisualEngine !== 'undefined') {
+        visualEngine = VisualEngine.init(scene, engine, camera, cfg);
+      }
+    } catch (err) {
+      console.warn('Visual engine failed to initialize:', err);
+      visualEngine = null;
+    }
+  }
+
+  // ============ CENTRAL ============
+  const central = BABYLON.MeshBuilder.CreateSphere("central", { diameter: 3.0, segments: 32 }, scene);
+  central._bodyId = 'central';
+  central._bodyLevel = 0;
+  central._bodyParent = null;
+
+  // Apply visual engine or fallback to default material
+  if (visualEngine) {
+    visualEngine.applyToBody(central, '#335577', 'central');
+    visualEngine.setupStarEffects(central);
+  } else {
+    const centralMat = new BABYLON.StandardMaterial("centralMat", scene);
+    centralMat.emissiveColor = new BABYLON.Color3(0.15, 0.25, 0.35);
+    centralMat.diffuseColor = new BABYLON.Color3(0.2, 0.4, 0.5);
+    centralMat.specularPower = 128;
+    central.material = centralMat;
+  }
+
+  // ============ CELESTIAL BODY CLASS ============
+  class CelestialBody {
+    constructor(scene, { id, orbitRadius, size, color, speed, inclination = 0, phase = 0, parent = null, showOrbit = true, level = 1 }) {
+      this.id = id;
+      this.orbitRadius = orbitRadius;
+      this.size = size;
+      this.speed = speed;
+      this.level = level;
+      this.children = [];
+      this.parentBody = parent;
+      this.currentAngle = phase;
+
+      this.orbitPivot = new BABYLON.TransformNode(`${id}_pivot`, scene);
+      if (parent) {
+        this.orbitPivot.parent = parent.mesh;
+      }
+      this.orbitPivot.rotation.z = inclination;
+
+      this.angleNode = new BABYLON.TransformNode(`${id}_angle`, scene);
+      this.angleNode.parent = this.orbitPivot;
+      this.angleNode.rotation.y = phase;
+
+      this.mesh = BABYLON.MeshBuilder.CreateSphere(id, { diameter: size, segments: 16 }, scene);
+      this.mesh.parent = this.angleNode;
+      this.mesh.position.x = orbitRadius;
+      this.mesh._bodyId = id;
+      this.mesh._bodyLevel = level;
+      this.mesh._bodyParent = parent ? parent.mesh : central;
+      this.mesh._bodyRef = this;
+
+      // Convert 3-char hex to 6-char if needed
+      const fullColor = color.length === 4 ? '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3] : color;
+
+      // Apply visual engine or fallback to default material
+      if (visualEngine) {
+        visualEngine.applyToBody(this.mesh, fullColor, id);
+      } else {
+        const mat = new BABYLON.StandardMaterial(`${id}_mat`, scene);
+        mat.diffuseColor = BABYLON.Color3.FromHexString(fullColor);
+        // Higher emissive for moons/sub-moons so they're visible
+        const emissiveScale = level === 1 ? 0.35 : (level === 2 ? 0.6 : 0.7);
+        mat.emissiveColor = BABYLON.Color3.FromHexString(fullColor).scale(emissiveScale);
+        mat.specularPower = 64;
+        this.mesh.material = mat;
+      }
+
+      if (showOrbit && orbitRadius > 0) {
+        this.orbitRing = BABYLON.MeshBuilder.CreateTorus(`${id}_orbit`, {
+          diameter: orbitRadius * 2,
+          thickness: level === 1 ? 0.02 : 0.008,
+          tessellation: 96
+        }, scene);
+        this.orbitRing.parent = this.orbitPivot;
+        this.orbitRing.isPickable = false;
+        const ringMat = new BABYLON.StandardMaterial(`${id}_orbitMat`, scene);
+        ringMat.emissiveColor = new BABYLON.Color3(0.12, 0.15, 0.2);
+        ringMat.alpha = level === 1 ? 0.3 : 0.15;
+        this.orbitRing.material = ringMat;
+      }
+    }
+
+    addChild(scene, params) {
+      params.parent = this;
+      params.level = this.level + 1;
+      const child = new CelestialBody(scene, params);
+      this.children.push(child);
+      return child;
+    }
+
+    update(dt) {
+      const angleChange = this.speed * cfg.orbit.timeScale * dt;
+      this.angleNode.rotation.y += angleChange;
+      this.currentAngle += angleChange;
+      this.children.forEach(c => c.update(dt));
+    }
+
+    getAllMeshes() {
+      let meshes = [this.mesh];
+      this.children.forEach(c => { meshes = meshes.concat(c.getAllMeshes()); });
+      return meshes;
+    }
+
+    getCumulativeOrbitAngle() {
+      let angle = this.currentAngle;
+      if (this.parentBody) {
+        angle += this.parentBody.getCumulativeOrbitAngle();
+      }
+      return angle;
+    }
+  }
+
+  // ============ BUILD SOLAR SYSTEM ============
+  const planets = [];
+  const bodyMap = { 'central': central };
+
+  // Planet configs
+  const planetConfigs = [
+    { id: 'rcx01', orbitRadius: 7,  size: 1.0,  color: '#e8c547', speed: 0.5,  inclination: 0.05, phase: 0 },
+    { id: 'rcx02', orbitRadius: 11, size: 0.9,  color: '#47a8e8', speed: 0.35, inclination: 0.15, phase: 2.1 },
+    { id: 'rcx03', orbitRadius: 15, size: 0.75, color: '#e87847', speed: 0.25, inclination: -0.1, phase: 4.2 },
+    { id: 'rcx04', orbitRadius: 19, size: 0.85, color: '#47e878', speed: 0.18, inclination: 0.2,  phase: 1.0 },
+    { id: 'rcx05', orbitRadius: 24, size: 0.65, color: '#a847e8', speed: 0.12, inclination: -0.05, phase: 5.5 }
+  ];
+
+  // Moon configs for each planet
+  const moonConfigs = {
+    'rcx01': [
+      { id: 'rcx01_demos', orbitRadius: 1.8, size: 0.2, color: '#aaa', speed: 1.0 },
+      { id: 'rcx01_code', orbitRadius: 2.4, size: 0.15, color: '#8af', speed: 0.8, inclination: 0.2 },
+      { id: 'rcx01_readme', orbitRadius: 3.0, size: 0.18, color: '#fa8', speed: 0.6, inclination: -0.15 }
+    ],
+    'rcx02': [
+      { id: 'rcx02_demos', orbitRadius: 1.6, size: 0.18, color: '#aaa', speed: 1.1 },
+      { id: 'rcx02_stream', orbitRadius: 2.2, size: 0.14, color: '#a6f', speed: 0.9, inclination: 0.25 },
+      { id: 'rcx02_code', orbitRadius: 2.8, size: 0.15, color: '#8af', speed: 0.7, inclination: -0.1 },
+      { id: 'rcx02_readme', orbitRadius: 3.3, size: 0.16, color: '#fa8', speed: 0.55 }
+    ],
+    'rcx03': [
+      { id: 'rcx03_demos', orbitRadius: 1.5, size: 0.16, color: '#aaa', speed: 1.2 },
+      { id: 'rcx03_code', orbitRadius: 2.1, size: 0.14, color: '#8af', speed: 0.85, inclination: 0.15 },
+      { id: 'rcx03_readme', orbitRadius: 2.6, size: 0.15, color: '#fa8', speed: 0.65, inclination: -0.2 }
+    ],
+    'rcx04': [
+      { id: 'rcx04_lifebrush', orbitRadius: 1.7, size: 0.22, color: '#4e8', speed: 0.9 },
+      { id: 'rcx04_readme', orbitRadius: 2.4, size: 0.16, color: '#fa8', speed: 0.7, inclination: 0.2 }
+    ],
+    'rcx05': [
+      { id: 'rcx05_demo', orbitRadius: 1.4, size: 0.14, color: '#aaa', speed: 1.0 },
+      { id: 'rcx05_code', orbitRadius: 1.9, size: 0.12, color: '#8af', speed: 0.8, inclination: 0.1 },
+      { id: 'rcx05_readme', orbitRadius: 2.4, size: 0.13, color: '#fa8', speed: 0.6, inclination: -0.15 }
+    ]
+  };
+
+  // Sub-moon configs (for demo folders)
+  const subMoonConfigs = {
+    'rcx01_demos': [
+      { id: 'rcx01_demo1', orbitRadius: 0.5, size: 0.06, color: '#888', speed: 1.5 },
+      { id: 'rcx01_demo2', orbitRadius: 0.65, size: 0.06, color: '#888', speed: 1.3, phase: 1.5 },
+      { id: 'rcx01_demo3', orbitRadius: 0.8, size: 0.06, color: '#888', speed: 1.1, phase: 3.0 },
+      { id: 'rcx01_demo4', orbitRadius: 0.95, size: 0.07, color: '#9a9', speed: 0.9, phase: 4.5 }
+    ],
+    'rcx02_demos': [
+      { id: 'rcx02_demo1', orbitRadius: 0.45, size: 0.05, color: '#888', speed: 1.6 },
+      { id: 'rcx02_demo2', orbitRadius: 0.58, size: 0.05, color: '#888', speed: 1.4, phase: 1.57 },
+      { id: 'rcx02_demo3', orbitRadius: 0.71, size: 0.05, color: '#888', speed: 1.2, phase: 3.14 },
+      { id: 'rcx02_demo4', orbitRadius: 0.84, size: 0.05, color: '#888', speed: 1.0, phase: 4.71 }
+    ],
+    'rcx03_demos': [
+      { id: 'rcx03_demo1', orbitRadius: 0.4, size: 0.05, color: '#888', speed: 1.5 },
+      { id: 'rcx03_demo2', orbitRadius: 0.55, size: 0.05, color: '#888', speed: 1.2, phase: 3.14 }
+    ]
+  };
+
+  // Build planets
+  planetConfigs.forEach(cfg => {
+    const planet = new CelestialBody(scene, cfg);
+    planets.push(planet);
+    bodyMap[cfg.id] = planet.mesh;
+
+    // Add moons
+    const moons = moonConfigs[cfg.id] || [];
+    moons.forEach(moonCfg => {
+      const moon = planet.addChild(scene, { ...moonCfg, showOrbit: false });
+      bodyMap[moonCfg.id] = moon.mesh;
+
+      // Add sub-moons
+      const subMoons = subMoonConfigs[moonCfg.id] || [];
+      subMoons.forEach(subCfg => {
+        const subMoon = moon.addChild(scene, { ...subCfg, showOrbit: false });
+        bodyMap[subCfg.id] = subMoon.mesh;
+      });
+    });
+  });
+
+  const allBodies = [central, ...planets.flatMap(p => p.getAllMeshes())];
+
+  // Collect orbit rings and pass to visual engine
+  if (visualEngine) {
+    const orbitRings = planets.map(p => p.orbitRing).filter(r => r);
+    visualEngine.updateOrbitRings(orbitRings);
+  }
+
+  // ============ STATE ============
+  let focusTarget = central;
+  let hoveredBody = null;
+  let transitioning = false;
+  let transitionProgress = 0;
+  let transitionStart = { target: BABYLON.Vector3.Zero(), radius: 35 };
+  let transitionEnd = { target: BABYLON.Vector3.Zero(), radius: 35 };
+  let pendingScrollDelta = 0;
+  let sidebarHighlightedBody = null;
+  let planetOpenedFolders = new Set(); // Track folders opened via planet clicks (not sidebar)
+
+  // ============ INFO PANEL ============
+  const infoPanel = document.getElementById('info-panel');
+  const infoPanelPath = document.getElementById('info-panel-path');
+  const infoPanelTitle = document.getElementById('info-panel-title');
+  const infoPanelSubtitle = document.getElementById('info-panel-subtitle');
+  const infoPanelDesc = document.getElementById('info-panel-desc');
+  const infoPanelActions = document.getElementById('info-panel-actions');
+
+  // Resting = focused body (shown when not hovering)
+  // Central has no resting panel - only shows on hover
+  let restingBodyId = null;  // null means no resting panel (central default)
+  let currentPanelBodyId = null;
+
+  // Body hierarchy for breadcrumb paths
+  const bodyHierarchy = {
+    'central': [],
+    'rcx01': ['rcx01'],
+    'rcx02': ['rcx02'],
+    'rcx03': ['rcx03'],
+    'rcx04': ['rcx04'],
+    'rcx05': ['rcx05'],
+    'rcx01_demos': ['rcx01', 'demos'],
+    'rcx01_code': ['rcx01', 'code'],
+    'rcx01_readme': ['rcx01', 'readme'],
+    'rcx02_demos': ['rcx02', 'demos'],
+    'rcx02_stream': ['rcx02', 'stream'],
+    'rcx02_code': ['rcx02', 'code'],
+    'rcx02_readme': ['rcx02', 'readme'],
+    'rcx03_demos': ['rcx03', 'demos'],
+    'rcx03_code': ['rcx03', 'code'],
+    'rcx03_readme': ['rcx03', 'readme'],
+    'rcx04_lifebrush': ['rcx04', 'lifebrush'],
+    'rcx04_readme': ['rcx04', 'readme'],
+    'rcx05_demo': ['rcx05', 'demo'],
+    'rcx05_code': ['rcx05', 'code'],
+    'rcx05_readme': ['rcx05', 'readme'],
+    'rcx01_demo1': ['rcx01', 'demos', '12/04/23'],
+    'rcx01_demo2': ['rcx01', 'demos', '12/13/23'],
+    'rcx01_demo3': ['rcx01', 'demos', '08/16/24'],
+    'rcx01_demo4': ['rcx01', 'demos', 'playtest'],
+    'rcx02_demo1': ['rcx02', 'demos', 'may4a'],
+    'rcx02_demo2': ['rcx02', 'demos', 'may4b'],
+    'rcx02_demo3': ['rcx02', 'demos', 'may5a'],
+    'rcx02_demo4': ['rcx02', 'demos', 'may5b'],
+    'rcx03_demo1': ['rcx03', 'demos', 'A'],
+    'rcx03_demo2': ['rcx03', 'demos', 'B'],
+  };
+
+  function buildBreadcrumb(bodyId) {
+    const parts = bodyHierarchy[bodyId] || [];
+    if (parts.length === 0) return '';
+
+    const showBase = cfg.integration?.showBaseRcx;
+    const prefix = showBase ? ['rcx'] : [];
+    const fullPath = [...prefix, ...parts];
+
+    return fullPath.map((p, i) => {
+      if (i < fullPath.length - 1) {
+        return `${p} <span>›</span>`;
+      }
+      return p;
+    }).join(' ');
+  }
+
+  function showInfoPanel(bodyId) {
+    const meta = projectMeta[bodyId];
+    if (!meta) {
+      hideInfoPanel();
+      return;
+    }
+
+    currentPanelBodyId = bodyId;
+
+    // Build breadcrumb path
+    infoPanelPath.innerHTML = buildBreadcrumb(bodyId);
+
+    infoPanelTitle.textContent = meta.title || '—';
+    infoPanelSubtitle.textContent = meta.subtitle || '';
+    infoPanelDesc.textContent = meta.description || '';
+
+    // Build action buttons
+    infoPanelActions.innerHTML = '';
+    (meta.actions || []).forEach(action => {
+      const btn = document.createElement('button');
+      btn.className = 'info-action';
+      btn.textContent = action.label;
+      btn.addEventListener('click', () => handleAction(action));
+      infoPanelActions.appendChild(btn);
+    });
+
+    infoPanel.classList.add('visible');
+
+    // Position for floating mode
+    if (cfg.integration?.panelMode === 'floating') {
+      updateFloatingPanelPosition();
+    }
+  }
+
+  function hideInfoPanel() {
+    infoPanel.classList.remove('visible');
+    currentPanelBodyId = null;
+  }
+
+  // Show hovered body temporarily, or restore resting if unhover
+  function showHoverPanel(bodyId) {
+    if (bodyId) {
+      showInfoPanel(bodyId);
+    } else {
+      // Unhover - restore resting panel
+      restoreRestingPanel();
+    }
+  }
+
+  function restoreRestingPanel() {
+    if (restingBodyId && restingBodyId !== 'central') {
+      showInfoPanel(restingBodyId);
+    } else {
+      hideInfoPanel();
+    }
+  }
+
+  function setRestingBody(bodyId) {
+    restingBodyId = bodyId;
+    // Central has no resting panel
+    if (bodyId === 'central') {
+      hideInfoPanel();
+    } else {
+      showInfoPanel(bodyId);
+    }
+  }
+
+  function updateFloatingPanelPosition() {
+    if (cfg.integration?.panelMode !== 'floating') {
+      infoPanel.style.left = '';
+      infoPanel.style.top = '';
+      infoPanel.classList.remove('floating');
+      return;
+    }
+
+    infoPanel.classList.add('floating');
+    const worldPos = focusTarget.getAbsolutePosition();
+    const screenPos = BABYLON.Vector3.Project(
+      worldPos,
+      BABYLON.Matrix.Identity(),
+      scene.getTransformMatrix(),
+      camera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight())
+    );
+
+    // Offset to the right of the body
+    const offsetX = 60;
+    const offsetY = -30;
+    infoPanel.style.left = Math.min(screenPos.x + offsetX, window.innerWidth - 320) + 'px';
+    infoPanel.style.top = Math.max(20, Math.min(screenPos.y + offsetY, window.innerHeight - 200)) + 'px';
+  }
+
+  function handleAction(action) {
+    switch (action.type) {
+      case 'page':
+        sendToParent({ type: 'navigate', target: action.target });
+        break;
+      case 'link':
+        sendToParent({ type: 'openLink', target: action.target });
+        break;
+      case 'expand':
+        sendToParent({ type: 'expand', target: action.target });
+        break;
+    }
+  }
+
+  // ============ MESSAGING ============
+  function sendToParent(message) {
+    try {
+      parent.postMessage(message, '*');
+    } catch (e) {}
+  }
+
+  window.addEventListener('message', (event) => {
+    const msg = event.data;
+    if (!msg || !msg.type) return;
+
+    switch (msg.type) {
+      case 'sidebar:hover':
+        onSidebarHover(msg.bodyId);
+        break;
+      case 'sidebar:unhover':
+        onSidebarUnhover();
+        break;
+      case 'sidebar:click':
+        if (cfg.integration?.sidebarClickFocuses) {
+          onSidebarClick(msg.bodyId);
+        }
+        break;
+      case 'visibility':
+        // Existing visibility handling
+        break;
+    }
+  });
+
+  function onSidebarHover(bodyId) {
+    const mesh = bodyMap[bodyId];
+    if (mesh && mesh !== sidebarHighlightedBody) {
+      if (sidebarHighlightedBody) {
+        sidebarHl.removeMesh(sidebarHighlightedBody);
+      }
+      sidebarHl.addMesh(mesh, new BABYLON.Color3(0.3, 0.6, 1));
+      sidebarHighlightedBody = mesh;
+    }
+  }
+
+  function onSidebarUnhover() {
+    if (sidebarHighlightedBody) {
+      sidebarHl.removeMesh(sidebarHighlightedBody);
+      sidebarHighlightedBody = null;
+    }
+  }
+
+  function onSidebarClick(bodyId) {
+    const mesh = bodyMap[bodyId];
+    if (mesh) {
+      focusOn(mesh);
+    }
+  }
+
+  // ============ HELPERS ============
+  function getRadius(mesh) {
+    return mesh.getBoundingInfo().boundingSphere.radiusWorld;
+  }
+
+  function getMinDistance(mesh) {
+    return getRadius(mesh) * cfg.zoom.minDistanceMultiplier;
+  }
+
+  function applyZoom(delta) {
+    const mode = cfg.zoom.mode;
+    let newRadius;
+
+    if (mode === 'logarithmic') {
+      const factor = Math.exp(-delta * cfg.zoom.scrollSpeed);
+      newRadius = camera.radius * factor;
+    } else if (mode === 'linear') {
+      newRadius = camera.radius - delta * cfg.zoom.scrollSpeed * 10;
+    } else {
+      newRadius = camera.radius * (1 - delta * cfg.zoom.scrollSpeed * 0.5);
+    }
+
+    newRadius = Math.max(getMinDistance(focusTarget), Math.min(cfg.zoom.maxDistance, newRadius));
+    camera.radius = newRadius;
+  }
+
+  // ============ FOCUS ============
+  function focusOn(mesh) {
+    if (transitioning && mesh === focusTarget) return;
+
+    // Close previously planet-opened folders when navigating to a different body
+    const previousBodyId = focusTarget._bodyId;
+    const newBodyId = mesh._bodyId;
+
+    if (previousBodyId !== newBodyId) {
+      // Close folders that were opened via planet (not direct sidebar interaction)
+      planetOpenedFolders.forEach(folderId => {
+        sendToParent({ type: 'collapse', target: folderId, source: 'planet' });
+      });
+      planetOpenedFolders.clear();
+    }
+
+    transitionStart.target = camera.target.clone();
+    transitionStart.radius = camera.radius;
+
+    const currentApparentSize = getRadius(focusTarget) / camera.radius;
+    let newRadius = getRadius(mesh) / currentApparentSize;
+    const minDist = getMinDistance(mesh);
+    newRadius = Math.max(minDist, Math.min(newRadius, cfg.zoom.maxDistance));
+
+    transitionEnd.target = mesh.getAbsolutePosition().clone();
+    transitionEnd.radius = newRadius;
+
+    focusTarget = mesh;
+    transitioning = true;
+    transitionProgress = 0;
+    pendingScrollDelta = 0;
+
+    // Set this as the resting body (central has no resting panel)
+    setRestingBody(mesh._bodyId);
+
+    // Notify parent to expand section
+    const nodeId = bodyToNodeId[mesh._bodyId];
+    if (nodeId) {
+      sendToParent({ type: 'planet:click', bodyId: mesh._bodyId });
+      sendToParent({ type: 'planet:focus', bodyId: mesh._bodyId });
+
+      // Track this folder as opened via planet
+      const meta = projectMeta[mesh._bodyId];
+      if (meta && meta.sectionId) {
+        planetOpenedFolders.add(meta.sectionId);
+      }
+    }
+  }
+
+  function resetView() {
+    // Close planet-opened folders when resetting
+    planetOpenedFolders.forEach(folderId => {
+      sendToParent({ type: 'collapse', target: folderId, source: 'planet' });
+    });
+    planetOpenedFolders.clear();
+
+    transitionStart.target = camera.target.clone();
+    transitionStart.radius = camera.radius;
+    transitionEnd.target = central.getAbsolutePosition().clone();
+    transitionEnd.radius = 35;
+    focusTarget = central;
+    transitioning = true;
+    transitionProgress = 0;
+    pendingScrollDelta = 0;
+    setRestingBody('central'); // Central has no resting panel
+  }
+
+  // ============ INPUT ============
+  scene.onPointerObservable.add((pointerInfo) => {
+    switch (pointerInfo.type) {
+      case BABYLON.PointerEventTypes.POINTERMOVE:
+        const pick = scene.pick(scene.pointerX, scene.pointerY, m => allBodies.includes(m));
+        const newHover = pick.hit ? pick.pickedMesh : null;
+
+        if (newHover !== hoveredBody) {
+          if (hoveredBody) {
+            hl.removeMesh(hoveredBody);
+            sendToParent({ type: 'planet:unhover' });
+          }
+          if (newHover) {
+            hl.addMesh(newHover, BABYLON.Color3.White());
+            sendToParent({ type: 'planet:hover', bodyId: newHover._bodyId });
+            // Show hovered body's info panel
+            showHoverPanel(newHover._bodyId);
+          } else {
+            // Not hovering anything - restore resting panel
+            showHoverPanel(null);
+          }
+          hoveredBody = newHover;
+        }
+        break;
+
+      case BABYLON.PointerEventTypes.POINTERDOWN:
+        if (pointerInfo.event.button === 0) {
+          const clickPick = scene.pick(scene.pointerX, scene.pointerY, m => allBodies.includes(m));
+          if (clickPick.hit) {
+            focusOn(clickPick.pickedMesh);
+          }
+        }
+        break;
+    }
+  });
+
+  canvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -1 : 1;
+
+    if (transitioning) {
+      if (cfg.animation.scrollBehavior === 'interrupt') {
+        transitioning = false;
+        camera.target = focusTarget.getAbsolutePosition().clone();
+        applyZoom(delta);
+      } else if (cfg.animation.scrollBehavior === 'additive') {
+        pendingScrollDelta += delta;
+        const factor = Math.exp(-pendingScrollDelta * cfg.zoom.scrollSpeed * 0.5);
+        transitionEnd.radius = Math.max(
+          getMinDistance(focusTarget),
+          Math.min(transitionEnd.radius * factor, cfg.zoom.maxDistance)
+        );
+      } else {
+        pendingScrollDelta += delta;
+      }
+    } else {
+      applyZoom(delta);
+    }
+  }, { passive: false });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'r' || e.key === 'R') {
+      resetView();
+    }
+  });
+
+  // ============ RENDER LOOP ============
+  let lastSyncAngle = 0;
+
+  scene.onBeforeRenderObservable.add(() => {
+    const dt = engine.getDeltaTime() * 0.001;
+
+    // Update visual engine animations (pulse, wobble, etc.)
+    if (visualEngine) {
+      visualEngine.update(dt);
+    }
+
+    planets.forEach(p => p.update(dt));
+
+    if (transitioning) {
+      transitionProgress += dt / cfg.zoom.transitionDuration;
+
+      if (transitionProgress >= 1) {
+        transitionProgress = 1;
+        transitioning = false;
+
+        if (cfg.animation.scrollBehavior === 'queue' && pendingScrollDelta !== 0) {
+          applyZoom(pendingScrollDelta);
+          pendingScrollDelta = 0;
+        }
+      }
+
+      const easing = easings[cfg.animation.easing] || easings.cubicInOut;
+      const t = easing(transitionProgress);
+
+      const currentTargetPos = focusTarget.getAbsolutePosition();
+      camera.target = BABYLON.Vector3.Lerp(transitionStart.target, currentTargetPos, t);
+      camera.radius = transitionStart.radius + (transitionEnd.radius - transitionStart.radius) * t;
+    } else {
+      const targetPos = focusTarget.getAbsolutePosition();
+      camera.target = BABYLON.Vector3.Lerp(camera.target, targetPos, 0.1);
+    }
+
+    // Rotation sync
+    if (cfg.rotation.syncMode !== 'none' && focusTarget._bodyRef) {
+      const syncTarget = focusTarget._bodyRef.parentBody;
+      if (syncTarget) {
+        const targetAngle = syncTarget.getCumulativeOrbitAngle();
+        const angleDiff = targetAngle - lastSyncAngle;
+        lastSyncAngle = targetAngle;
+        camera.alpha += angleDiff * cfg.rotation.smoothing;
+      }
+    }
+
+    // Distance limits
+    const minDist = getMinDistance(focusTarget);
+    if (camera.radius < minDist && cfg.clipping.mode === 'hardLimit') {
+      camera.radius = minDist;
+    }
+    if (camera.radius > cfg.zoom.maxDistance) {
+      camera.radius = cfg.zoom.maxDistance;
+    }
+
+    // Floating panel position update
+    if (cfg.integration?.panelMode === 'floating' && infoPanel.classList.contains('visible')) {
+      updateFloatingPanelPosition();
+    }
+
+    // Clipping
+    if (cfg.clipping.mode === 'fade') {
+      allBodies.forEach(mesh => {
+        const dist = BABYLON.Vector3.Distance(camera.position, mesh.getAbsolutePosition());
+        const r = getRadius(mesh);
+        const fadeStart = r * cfg.clipping.fadeStartDistance;
+        const fadeEnd = r * cfg.clipping.fadeEndDistance;
+
+        if (dist > fadeStart) {
+          mesh.material.alpha = 1;
+        } else if (dist < fadeEnd) {
+          mesh.material.alpha = 0;
+        } else {
+          mesh.material.alpha = (dist - fadeEnd) / (fadeStart - fadeEnd);
+        }
+      });
+    }
+  });
+
+  engine.runRenderLoop(() => scene.render());
+  window.addEventListener("resize", () => engine.resize());
+
+  // No initial info panel - central star shows on hover only
+})();
+</script>
+</body>
+</html>

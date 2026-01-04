@@ -1,0 +1,30 @@
+{
+  "zoom": {
+    "mode": "logarithmic",
+    "scrollSpeed": 0.12,
+    "minDistanceMultiplier": 2.0,
+    "maxDistance": 80,
+    "transitionDuration": 0.5,
+    "focusDistanceMultiplier": 4.0
+  },
+  "rotation": {
+    "syncMode": "hybrid",
+    "level0Sync": "none",
+    "level1Sync": "none",
+    "level2Sync": "parent",
+    "level3Sync": "parent",
+    "smoothing": 0.1
+  },
+  "animation": {
+    "scrollBehavior": "additive",
+    "easing": "cubicInOut"
+  },
+  "clipping": {
+    "mode": "hardLimit",
+    "fadeStartDistance": 1.5,
+    "fadeEndDistance": 1.1
+  },
+  "orbit": {
+    "timeScale": 0.08
+  }
+}

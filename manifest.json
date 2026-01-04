@@ -1,0 +1,97 @@
+{
+  "tree": [
+    { "type": "page", "id": "home", "title": "🏠 home", "iframeSrc": "/pages/home/index.html", "preload": "eager" },
+    { "type": "page", "id": "tour",    "title": "🗺️ tour",    "iframeSrc": "/pages/tour/index.html", "preload": "eager" },
+    { "type": "page", "id": "contact", "title": "📑 contact", "iframeSrc": "/pages/contact/index.html", "preload": "eager" },
+
+    {
+      "type": "folder",
+      "id": "rcx",
+      "title": "📁 rcx",
+      "children": [
+        {
+          "type": "section",
+          "id": "sec-01",
+          "title": "01",
+          "children": [
+            {
+              "type": "folder",
+              "id": "sec-01-demos",
+              "title": "🎬 demos",
+              "children": [
+                { "type": "link", "id": "video-01-231204", "title": "12/04/23 (proto)" },
+                { "type": "link", "id": "video-01-231213", "title": "12/13/23 (proto)" },
+                { "type": "link", "id": "video-01-240816", "title": "08/16/24" },
+                { "type": "link", "id": "video-01-study",  "title": "playtest study" }
+              ]
+            },
+            { "type": "link", "id": "git-01",    "title": "💻 code" },
+            { "type": "page", "id": "readme-01", "title": "📃 README", "iframeSrc": "/pages/readme-01/index.html" }
+          ]
+        },
+
+        {
+          "type": "section",
+          "id": "sec-02",
+          "title": "02",
+          "children": [
+            {
+              "type": "folder",
+              "id": "sec-02-demos",
+              "title": "🎬 demos",
+              "children": [
+                { "type": "link", "id": "video-02-may4a", "title": "may4a" },
+                { "type": "link", "id": "video-02-may4b", "title": "may4b" },
+                { "type": "link", "id": "video-02-may5a", "title": "may5a" },
+                { "type": "link", "id": "video-02-may5b", "title": "may5b" }
+              ]
+            },
+            { "type": "link", "id": "stream-02", "title": "📲 stream" },
+            { "type": "link", "id": "git-02",    "title": "💻 code" },
+            { "type": "page", "id": "readme-02", "title": "📃 README", "iframeSrc": "/pages/readme-02/index.html" }
+          ]
+        },
+
+        {
+          "type": "section",
+          "id": "sec-03",
+          "title": "03",
+          "children": [
+            {
+              "type": "folder",
+              "id": "sec-03-demos",
+              "title": "🎬 demos",
+              "children": [
+                { "type": "link", "id": "video-03-a", "title": "A" },
+                { "type": "link", "id": "video-03-b", "title": "B" }
+              ]
+            },
+            { "type": "link", "id": "git-03",    "title": "💻 code" },
+            { "type": "page", "id": "readme-03", "title": "📃 README", "iframeSrc": "/pages/readme-03/index.html" }
+          ]
+        },
+
+        {
+          "type": "section",
+          "id": "sec-04",
+          "title": "04",
+          "children": [
+            { "type": "page", "id": "lifebrush", "title": "🎨 lifebrush", "iframeSrc": "pages/lifebrush/index.html", "preload": "eager" },
+            { "type": "page", "id": "readme-04", "title": "📃 README", "iframeSrc": "/pages/readme-04/index.html" }
+          ]
+        },
+
+        {
+          "type": "section",
+          "id": "sec-05",
+          "title": "05",
+          "children": [
+            { "type": "link", "id": "video-05-demo", "title": "🎬 demo" },
+            { "type": "link", "id": "git-05",        "title": "💻 code" },
+            { "type": "page", "id": "readme-05", "title": "📃 README", "iframeSrc": "/pages/readme-05/index.html" }
+          ]
+        }
+      ]
+    }
+  ]
+}

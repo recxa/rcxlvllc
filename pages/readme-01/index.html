@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>rcx01 — readme</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #0a0a0c;
+      color: #c8ccd4;
+      font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .wrap {
+      max-width: 640px;
+      padding: 32px 24px;
+    }
+    h1 {
+      font-size: 16px;
+      font-weight: normal;
+      color: #e8eaed;
+      margin: 0 0 4px 0;
+    }
+    .subtitle {
+      color: #667;
+      font-size: 12px;
+      margin-bottom: 24px;
+    }
+    h2 {
+      font-size: 13px;
+      font-weight: normal;
+      color: #99a;
+      margin: 24px 0 8px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    p {
+      margin: 0 0 16px 0;
+      color: #9a9da4;
+    }
+    ul {
+      margin: 0 0 16px 0;
+      padding-left: 20px;
+      color: #9a9da4;
+    }
+    li { margin-bottom: 6px; }
+    .marker {
+      color: #444;
+      font-size: 10px;
+      margin-top: 48px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>rcx01</h1>
+    <div class="subtitle">explorative loop sampler</div>
+
+    <h2>Overview</h2>
+    <p>A keyboard-driven audio performance system designed for real-time loop manipulation and explorative sampling. Built for live performance contexts where traditional DAW workflows feel too rigid.</p>
+
+    <h2>Core Concepts</h2>
+    <ul>
+      <li>Non-linear loop navigation — jump between segments without timeline constraints</li>
+      <li>Keyboard-first interface — all controls mapped to single keypresses</li>
+      <li>Layered recording — stack loops with independent playback states</li>
+      <li>Destructive-by-design — embrace impermanence in live performance</li>
+    </ul>
+
+    <h2>Technical Details</h2>
+    <p>Built in Max/MSP with custom abstractions for buffer manipulation and MIDI mapping. Uses a state machine architecture for managing loop transitions and recording modes.</p>
+
+    <h2>Development Status</h2>
+    <p>Alpha stage. Core functionality complete. Playtest studies conducted with small groups. Documentation in progress.</p>
+
+    <h2>Controls</h2>
+    <ul>
+      <li>Number keys (1-9) — select loop slots</li>
+      <li>Space — toggle playback</li>
+      <li>R — arm recording</li>
+      <li>Backspace — clear current slot</li>
+      <li>Arrow keys — nudge loop boundaries</li>
+    </ul>
+
+    <div class="marker">~</div>
+  </div>
+</body>
+</html>
