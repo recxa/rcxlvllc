@@ -3,35 +3,474 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>tour</title>
+  <title>tour — rcx</title>
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
     html, body {
       margin: 0;
       padding: 0;
-      height: 100%;
-      background: #0b0b0b;
-      color: #e6e6e6;
-      font: 14px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      min-height: 100%;
+      background: #0a0a0c;
+      color: #c8ccd4;
+      font: 14px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
-    .wrap {
-      padding: 24px;
-      max-width: 600px;
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
     }
-    h1 {
-      font-size: 16px;
+
+    /* Header / About */
+    .header {
+      margin-bottom: 64px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid #1a1c20;
+    }
+
+    .header h1 {
+      font-size: 42px;
       font-weight: normal;
+      color: #e8eaed;
       margin: 0 0 16px 0;
     }
-    p {
+
+    .header h1 .punctuation {
+      color: #667;
+    }
+
+    .header h1 .name {
+      background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rainbow-shift 3s linear infinite;
+    }
+
+    @keyframes rainbow-shift {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .header .tagline {
+      font-size: 15px;
+      color: #9a9da4;
       margin: 0;
-      opacity: 0.6;
+    }
+
+    /* Project Section */
+    .project {
+      margin-bottom: 72px;
+    }
+
+    .project:last-child {
+      margin-bottom: 0;
+    }
+
+    .project-header {
+      margin-bottom: 20px;
+    }
+
+    .project-title {
+      font-size: 20px;
+      font-weight: normal;
+      color: #e8eaed;
+      margin: 0 0 4px 0;
+    }
+
+    .project-subtitle {
+      font-size: 13px;
+      color: #667;
+      margin: 0;
+    }
+
+    /* Video Embed */
+    .video-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      margin-bottom: 20px;
+      background: #111;
+      border: 1px solid #1a1c20;
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Demo Embed (for lifebrush) */
+    .demo-container {
+      position: relative;
+      width: 100%;
+      height: 450px;
+      margin-bottom: 20px;
+      background: #111;
+      border: 1px solid #1a1c20;
+    }
+
+    .demo-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Description */
+    .project-description {
+      font-size: 14px;
+      line-height: 1.8;
+      color: #9a9da4;
+      margin: 0 0 20px 0;
+    }
+
+    /* Action Buttons */
+    .project-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #1a1c20;
+      border: 1px solid #2a2d33;
+      color: #b8bcc4;
+      font: inherit;
+      font-size: 13px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .btn:hover {
+      background: #252830;
+      border-color: #3a3d43;
+      color: #e8eaed;
+    }
+
+    .btn-primary {
+      background: #1a2530;
+      border-color: #2a4050;
+      color: #8ab4d4;
+    }
+
+    .btn-primary:hover {
+      background: #253545;
+      border-color: #3a5565;
+      color: #a8d0f0;
+    }
+
+    .btn-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-toggle .arrow {
+      display: inline-block;
+      transition: transform 0.2s ease;
+    }
+
+    .btn-toggle.expanded .arrow {
+      transform: rotate(90deg);
+    }
+
+    /* Demos Accordion */
+    .demos-section {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      margin-top: 0;
+    }
+
+    .demos-section.expanded {
+      margin-top: 24px;
+    }
+
+    .demos-inner {
+      padding: 24px;
+      background: #0d0d10;
+      border: 1px solid #1a1c20;
+      border-radius: 4px;
+    }
+
+    .demos-header {
+      font-size: 12px;
+      color: #667;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0 0 20px 0;
+    }
+
+    .demo-item {
+      margin-bottom: 24px;
+    }
+
+    .demo-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .demo-label {
+      font-size: 13px;
+      color: #9a9da4;
+      margin: 0 0 12px 0;
+    }
+
+    .demo-item .video-container {
+      margin-bottom: 0;
+    }
+
+    /* Divider between projects */
+    .project + .project {
+      padding-top: 48px;
+      border-top: 1px solid #1a1c20;
+    }
+
+    /* Footer spacer */
+    .footer {
+      margin-top: 64px;
+      padding-top: 32px;
+      border-top: 1px solid #1a1c20;
+      text-align: center;
+      color: #444;
+      font-size: 12px;
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>tour</h1>
-    <p>guided tour coming soon.</p>
+  <div class="container">
+    <!-- Header / About -->
+    <header class="header">
+      <h1>Hello<span class="punctuation">();</span> I'm <span class="name">Recxa</span>.</h1>
+      <p class="tagline"> Creative coding, interactive sound exploration, and experimental tools.</p>
+    </header>
+
+    <!-- rcx01 -->
+    <section class="project">
+      <div class="project-header">
+        <h2 class="project-title">rcx01</h2>
+        <p class="project-subtitle">explorative loop sampler</p>
+      </div>
+      <div class="video-container">
+        <iframe
+          src="https://www.youtube.com/embed/rDcJgQN2-MM"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <p class="project-description">
+        A keyboard-driven audio performance system for real-time loop manipulation. Built in Max/MSP, it features non-linear loop navigation, layered recording, and a keyboard-first interface designed for live performance contexts where traditional DAW workflows feel too rigid.
+      </p>
+      <div class="project-actions">
+        <a href="https://github.com/recxa/rcx01" target="_blank" class="btn btn-primary">code</a>
+        <button class="btn btn-toggle" onclick="toggleDemos(this, 'demos-01')">
+          <span class="arrow">></span> explore demos
+        </button>
+      </div>
+      <div id="demos-01" class="demos-section">
+        <div class="demos-inner">
+          <p class="demos-header">Additional Demos</p>
+          <div class="demo-item">
+            <p class="demo-label">12/04/23 — prototype</p>
+            <div class="video-container">
+              <iframe
+                src="https://www.youtube.com/embed/aRytyQccBMQ"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+          <div class="demo-item">
+            <p class="demo-label">12/13/23 — prototype</p>
+            <div class="video-container">
+              <iframe
+                src="https://www.youtube.com/embed/Umu5TPqvm8M"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+          <div class="demo-item">
+            <p class="demo-label">playtest study</p>
+            <div class="video-container">
+              <iframe
+                src="https://www.youtube.com/embed/qO98I7ExsLE"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- rcx02 -->
+    <section class="project">
+      <div class="project-header">
+        <h2 class="project-title">rcx02</h2>
+        <p class="project-subtitle">algorithmic installation</p>
+      </div>
+      <div class="video-container">
+        <iframe
+          src="https://www.youtube.com/embed/FjHWJNS6lDw"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <p class="project-description">
+        A generative audiovisual installation exploring emergent patterns and procedural aesthetics. The system generates continuous streams of audio and visual content through algorithmic processes, responding to time-of-day and runtime. Designed for immersive gallery contexts with long-form playback.
+      </p>
+      <div class="project-actions">
+        <a href="https://github.com/recxa/rcx02" target="_blank" class="btn btn-primary">code</a>
+        <button class="btn btn-toggle" onclick="toggleDemos(this, 'demos-02')">
+          <span class="arrow">></span> explore demos
+        </button>
+      </div>
+      <div id="demos-02" class="demos-section">
+        <div class="demos-inner">
+          <p class="demos-header">Additional Demos</p>
+          <div class="demo-item">
+            <p class="demo-label">may4a</p>
+            <div class="video-container">
+              <iframe
+                src="https://www.youtube.com/embed/FabqhSZxoMc"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+          <div class="demo-item">
+            <p class="demo-label">may4b</p>
+            <div class="video-container">
+              <iframe
+                src="https://www.youtube.com/embed/gTIvsHuooVs"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+          <div class="demo-item">
+            <p class="demo-label">may5a</p>
+            <div class="video-container">
+              <iframe
+                src="https://www.youtube.com/embed/N6xDdNZ2mj0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- rcx03 -->
+    <section class="project">
+      <div class="project-header">
+        <h2 class="project-title">rcx03</h2>
+        <p class="project-subtitle">cellular audio engine</p>
+      </div>
+      <div class="video-container">
+        <iframe
+          src="https://www.youtube.com/embed/OjwYlEE2Fps"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <p class="project-description">
+        A Game of Life-based audio system built in Max/MSP and Processing. The cellular automata grid directly controls audio parameters — horizontal position affects pitch, vertical affects timbre, and cell density controls amplitude. Simple concept, cohesive execution.
+      </p>
+      <div class="project-actions">
+        <a href="https://github.com/recxa/rcx03" target="_blank" class="btn btn-primary">code</a>
+        <button class="btn btn-toggle" onclick="toggleDemos(this, 'demos-03')">
+          <span class="arrow">></span> explore demos
+        </button>
+      </div>
+      <div id="demos-03" class="demos-section">
+        <div class="demos-inner">
+          <p class="demos-header">Additional Demos</p>
+          <div class="demo-item">
+            <p class="demo-label">demo B</p>
+            <div class="video-container">
+              <iframe
+                src="https://www.youtube.com/embed/E8PGipz2XiM"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- rcx04 -->
+    <section class="project">
+      <div class="project-header">
+        <h2 class="project-title">rcx04</h2>
+        <p class="project-subtitle">lifebrush</p>
+      </div>
+      <div class="demo-container">
+        <iframe src="/pages/lifebrush/index.html"></iframe>
+      </div>
+      <p class="project-description">
+        An interactive drawing system combining cellular automata with generative layering. Paint cells onto the canvas, watch them evolve according to Game of Life rules, then save layers and start fresh. Built with p5.js, it treats cellular automata not as simulation but as a drawing medium. ( WOLFIE NOTE: INCLUDE CONTROLS IN DESCRIPTION!!!)
+      </p>
+      <div class="project-actions">
+        <!-- No additional demos for lifebrush -->
+      </div>
+    </section>
+
+    <!-- rcx05 -->
+    <section class="project">
+      <div class="project-header">
+        <h2 class="project-title">rcx05</h2>
+        <p class="project-subtitle">hybrid visualizer</p>
+      </div>
+      <div class="video-container">
+        <iframe
+          src="https://www.youtube.com/embed/pAJ_MM6agng"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <p class="project-description">
+        A Processing and TouchDesigner hybrid for real-time audio-reactive visuals. The aesthetic embraces digital artifacts — pixelation, feedback loops, color banding. Audio analysis drives visual parameters through OSC communication between environments. Designed for live VJ performance.
+      </p>
+      <div class="project-actions">
+        <a href="https://github.com/recxa/rcx05" target="_blank" class="btn btn-primary">code</a>
+        <!-- Only one demo for rcx05, already shown above -->
+      </div>
+    </section>
+
+    <footer class="footer">~</footer>
   </div>
+
+  <script>
+    function toggleDemos(button, demosId) {
+      const demosSection = document.getElementById(demosId);
+      const isExpanded = button.classList.contains('expanded');
+
+      if (isExpanded) {
+        // Collapse
+        button.classList.remove('expanded');
+        demosSection.classList.remove('expanded');
+        demosSection.style.maxHeight = '0';
+      } else {
+        // Expand
+        button.classList.add('expanded');
+        demosSection.classList.add('expanded');
+        // Set max-height to the scroll height for smooth animation
+        demosSection.style.maxHeight = demosSection.scrollHeight + 'px';
+      }
+    }
+  </script>
 </body>
 </html>
