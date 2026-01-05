@@ -12,7 +12,6 @@ const externalUrls = {
 
   'video-03-a': 'https://www.youtube.com/watch?v=OjwYlEE2Fps',
   'video-03-b': 'https://youtu.be/E8PGipz2XiM',
-  'video-03-c': 'https://youtu.be/your-video-id-10',
 
   'video-05-demo': 'https://youtu.be/pAJ_MM6agng?si=zeqQ_spAJ5S-VjY1',
 

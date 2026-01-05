@@ -6,51 +6,282 @@
   <title>rcx02 — readme</title>
   <style>
     html, body {
-      margin: 0; padding: 0; height: 100%;
+      margin: 0; padding: 0; min-height: 100%;
       background: #0a0a0c; color: #c8ccd4;
-      font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
-    .wrap { max-width: 640px; padding: 32px 24px; }
-    h1 { font-size: 16px; font-weight: normal; color: #e8eaed; margin: 0 0 4px 0; }
-    .subtitle { color: #667; font-size: 12px; margin-bottom: 24px; }
-    h2 { font-size: 13px; font-weight: normal; color: #99a; margin: 24px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
-    p { margin: 0 0 16px 0; color: #9a9da4; }
-    ul { margin: 0 0 16px 0; padding-left: 20px; color: #9a9da4; }
-    li { margin-bottom: 6px; }
-    .marker { color: #444; font-size: 10px; margin-top: 48px; }
+    .wrap { max-width: 720px; padding: 32px 24px; }
+
+    .version-hint {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      font-size: 10px;
+      color: #444;
+    }
+    .version-hint kbd {
+      background: #1a1c20;
+      padding: 2px 5px;
+      border-radius: 2px;
+      color: #667;
+    }
+
+    .version { display: none; }
+    .version.active { display: block; }
+
+    /* ========== VERSION A: PURIST ========== */
+    .v-purist {
+      white-space: pre-wrap;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #9a9da4;
+    }
+    .v-purist .title { color: #e8eaed; }
+
+    /* ========== VERSION B: STYLED ========== */
+    .v-styled h1 { font-size: 14px; font-weight: normal; color: #e8eaed; margin: 0; }
+    .v-styled .subtitle { color: #556; font-size: 12px; margin-bottom: 28px; }
+    .v-styled h2 {
+      font-size: 11px; font-weight: normal; color: #556;
+      margin: 28px 0 10px 0; text-transform: uppercase; letter-spacing: 1px;
+      border-bottom: 1px solid #1a1c20; padding-bottom: 6px;
+    }
+    .v-styled p { margin: 0 0 14px 0; color: #9a9da4; }
+    .v-styled .diagram {
+      background: #0d0d10;
+      border: 1px solid #1a1c20;
+      padding: 14px 16px;
+      margin: 12px 0 16px 0;
+      font-size: 11px;
+      line-height: 1.4;
+      color: #667;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .v-styled .uses {
+      margin-top: 32px; padding-top: 16px; border-top: 1px solid #1a1c20;
+      font-size: 11px; color: #445;
+    }
+    .v-styled .uses span { color: #556; }
+
+    /* ========== VERSION C: BOXED ========== */
+    .v-boxed pre { margin: 0; color: #9a9da4; font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
+    .v-boxed .box {
+      border: 1px solid #222; padding: 12px 14px; margin: 16px 0;
+      background: #0c0c0f;
+    }
+    .v-boxed .section-title { color: #667; font-size: 11px; margin-bottom: 8px; }
+    .v-boxed .title-box {
+      border: 1px solid #333; padding: 10px 14px; margin-bottom: 20px;
+      background: #0d0d10;
+    }
+    .v-boxed .title-box .name { color: #e8eaed; font-size: 13px; }
+    .v-boxed .title-box .sub { color: #556; font-size: 11px; margin-top: 2px; }
+    .v-boxed .uses {
+      margin-top: 24px; font-size: 10px; color: #333; text-align: right;
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>rcx02</h1>
-    <div class="subtitle">algorithmic installation</div>
 
-    <h2>Overview</h2>
-    <p>A generative audiovisual installation exploring emergent patterns and procedural aesthetics. Designed for immersive gallery contexts with an "underground" experimental sensibility.</p>
+    <!-- ========== VERSION A: PURIST ========== -->
+    <div id="v-purist" class="version v-purist active">
+<span class="title">                                   r c x 0 2
+            recursive real-time youtube worm  /  0-view slop installation</span>
+================================================================================
 
-    <h2>Concept</h2>
-    <p>The piece generates continuous streams of audio and visual content through algorithmic processes. No two moments are identical. The system responds to time-of-day, accumulated runtime, and subtle environmental factors.</p>
 
-    <h2>Technical Approach</h2>
-    <ul>
-      <li>Real-time audio synthesis with stochastic parameter modulation</li>
-      <li>Visual output driven by the same data streams as audio</li>
-      <li>Long-form generative composition — designed for hours of continuous playback</li>
-      <li>Minimal human intervention once running</li>
-    </ul>
+    rcx02 is a self-feeding video installation that watches itself watching
+    YouTube. it uses OCR to read text from its own display, searches YouTube
+    for short videos matching those words, downloads them, and plays them
+    back—where they get read again, continuing the loop indefinitely.
 
-    <h2>Installation Requirements</h2>
-    <ul>
-      <li>Projection surface or large display</li>
-      <li>Stereo or multichannel audio system</li>
-      <li>Dedicated computer running the system</li>
-      <li>Dark or controlled lighting environment</li>
-    </ul>
+    the result is a live window into whatever is actually being uploaded to
+    YouTube in real-time: 0-view videos, global content drift, algorithmic
+    noise, and the endless stream of media that exists whether anyone sees
+    it or not.
 
-    <h2>Development Status</h2>
-    <p>Multiple iterations exist. VOD documentation available. Potential for live-streamed versions under consideration.</p>
+    first installed at Columbia College Chicago Manifest 2024.
 
-    <div class="marker">~</div>
+
+================================================================================
+                              PHYSICAL INSTALLATION
+================================================================================
+
+
+    ┌─────────────────────────────────────────────────────────────────┐
+    │                         [ WIDESCREEN TV ]                       │
+    │                                                                 │
+    │      ┌──────────┐                                               │
+    │      │ gramCam  │  ← webcam pointed DOWN at desk surface        │
+    │      └────┬─────┘                                               │
+    │           ▼                                                     │
+    │   ┌───────────────┐                                             │
+    │   │  BANANAGRAMS  │  ← letter tiles, audience can rearrange     │
+    │   │   on desk     │    to steer the loop                        │
+    │   └───────────────┘                                             │
+    │                                                                 │
+    │           ┌─────────────────┐                                   │
+    │           │   WOODEN CHAIR  │                                   │
+    │           │   with stick    │  ← branch duct-taped as spine     │
+    │           │   spine + head  │    styrofoam head on top          │
+    │           │    ◉  ◉  ←──────│── webcam in eye sockets           │
+    │           │                 │   pointed at TV                   │
+    │           └─────────────────┘                                   │
+    │                                                                 │
+    └─────────────────────────────────────────────────────────────────┘
+
+    the styrofoam figure watches the TV. what it sees becomes the background.
+    the bananagrams on the desk are the audience's input mechanism.
+
+
+================================================================================
+                                  THE LOOP
+================================================================================
+
+
+        1. camera captures the current display
+        2. frame sent to Python backend running Keras-OCR
+        3. OCR detects text (from videos, bananagrams, anything)
+        4. detected words become YouTube search queries
+        5. system finds a short video (<60 seconds)
+        6. video downloaded, scaled, added to playback queue
+        7. video plays, overlaid via background subtraction
+        8. the new video contains new text → loop continues
+
+                    ┌────────────────────────────────┐
+                    │                                │
+                    ▼                                │
+                 DISPLAY ──▶ OCR ──▶ SEARCH ──▶ DOWNLOAD
+                    ▲                                │
+                    └───────── PLAYBACK ◀────────────┘
+
+
+================================================================================
+                                    NOTES
+================================================================================
+
+
+    · the worm tends to find slop: AI-generated content, test uploads,
+      screen recordings, surveillance footage, things with text overlays.
+      this is what's actually being uploaded constantly.
+
+    · language drift follows the sun. set it up for a day and watch it
+      cycle through the world's upload patterns.
+
+    · the bananagrams are optional but recommended. without audience input,
+      the loop will wander wherever the text takes it.
+
+
+                                    · · ·
+
+
+    rcx02 is a worm that eats text and excretes video. it lives in the
+    space between upload and view, surfacing content that would otherwise
+    exist unseen.
+
+================================================================================
+
+                                                              manifest 2024
+
+uses: processing, python, keras-ocr, opencv, yt-dlp, osc
+~
+    </div>
+
+    <!-- ========== VERSION B: STYLED ========== -->
+    <div id="v-styled" class="version v-styled">
+      <h1>rcx02</h1>
+      <div class="subtitle">recursive real-time youtube worm / 0-view slop installation</div>
+
+      <h2>what it is</h2>
+      <p>a self-feeding video installation that watches itself watching YouTube. uses OCR to read text from its own display, searches YouTube for short videos matching those words, downloads and plays them back—where they get read again, continuing indefinitely.</p>
+      <p>the result is a live window into whatever is actually being uploaded to YouTube in real-time: 0-view videos, global content drift, algorithmic noise. first installed at Columbia College Chicago Manifest 2024.</p>
+
+      <h2>the loop</h2>
+      <div class="diagram">camera → OCR (Keras) → extract words → YouTube search
+    ↓
+find short video (<60s) → download → background subtraction
+    ↓
+play overlaid → new text appears → loop continues
+
+          ┌──────────────────────────────────┐
+          ▼                                  │
+       DISPLAY → OCR → SEARCH → DOWNLOAD → PLAY</div>
+
+      <h2>physical installation</h2>
+      <p>widescreen TV. styrofoam figure with webcam eyes watches the screen. second webcam points down at bananagram tiles on a desk—audience can rearrange letters to steer the worm. what the figure sees becomes the feedback background.</p>
+
+      <h2>notes</h2>
+      <p>the worm tends to find slop: AI-generated content, test uploads, surveillance footage. language drift follows the sun—the installation cycles through global upload patterns as the day progresses.</p>
+
+      <div class="uses"><span>uses:</span> processing, python, keras-ocr, opencv, yt-dlp, osc</div>
+    </div>
+
+    <!-- ========== VERSION C: BOXED ========== -->
+    <div id="v-boxed" class="version v-boxed">
+      <div class="title-box">
+        <div class="name">rcx02</div>
+        <div class="sub">recursive youtube worm / 0-view slop installation</div>
+      </div>
+
+      <div class="box">
+        <div class="section-title">WHAT IT IS</div>
+        <pre>self-feeding video installation.
+watches itself watching YouTube.
+
+OCR reads text from display
+→ searches YouTube for matching videos
+→ downloads and plays them
+→ new text appears → loop continues
+
+surfaces 0-view content, global drift,
+algorithmic noise.</pre>
+      </div>
+
+      <div class="box">
+        <div class="section-title">PHYSICAL SETUP</div>
+        <pre>widescreen TV
+styrofoam figure with webcam eyes (watches TV)
+bananagram tiles on desk (audience input)
+second webcam pointed at tiles
+
+what the figure sees = feedback background
+rearrange letters = steer the worm</pre>
+      </div>
+
+      <div class="box">
+        <div class="section-title">THE LOOP</div>
+        <pre>DISPLAY → OCR → SEARCH → DOWNLOAD → PLAY
+   ↑                                  │
+   └──────────────────────────────────┘
+
+the worm finds slop: AI content, test uploads,
+surveillance footage, screen recordings.
+language drift follows the sun.</pre>
+      </div>
+
+      <div class="uses">processing · python · keras-ocr · opencv · yt-dlp · osc</div>
+    </div>
+
   </div>
+
+  <div class="version-hint">
+    <kbd>tab</kbd> cycle versions
+  </div>
+
+  <script>
+    const versions = ['v-purist', 'v-styled', 'v-boxed'];
+    let currentVersion = 0;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        document.getElementById(versions[currentVersion]).classList.remove('active');
+        currentVersion = (currentVersion + 1) % versions.length;
+        document.getElementById(versions[currentVersion]).classList.add('active');
+      }
+    });
+  </script>
 </body>
 </html>

@@ -56,10 +56,94 @@
       100% { background-position: 200% center; }
     }
 
+    /* Header versions */
+    .header-version { display: none; }
+    .header-version.active { display: block; }
+
     .header .tagline {
       font-size: 15px;
       color: #9a9da4;
       margin: 0;
+    }
+
+    /* Version A: Current rainbow */
+    .hv-rainbow h1 .name {
+      background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rainbow-shift 3s linear infinite;
+    }
+    .hv-rainbow h1 .punctuation { color: #667; }
+
+    /* Version B: Minimal */
+    .hv-minimal h1 {
+      font-size: 32px;
+      letter-spacing: 8px;
+      text-transform: lowercase;
+    }
+    .hv-minimal h1 .name { color: #e8eaed; }
+
+    /* Version C: Terminal prompt */
+    .hv-terminal h1 {
+      font-size: 18px;
+      color: #667;
+    }
+    .hv-terminal h1 .prompt { color: #4a9; }
+    .hv-terminal h1 .name { color: #e8eaed; }
+    .hv-terminal h1 .cursor {
+      display: inline-block;
+      width: 10px;
+      height: 18px;
+      background: #4a9;
+      margin-left: 2px;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* Version D: Understated */
+    .hv-understated h1 {
+      font-size: 16px;
+      font-weight: normal;
+      color: #778;
+      letter-spacing: 0.5px;
+    }
+    .hv-understated h1 .name {
+      color: #c8ccd4;
+      border-bottom: 1px solid #333;
+      padding-bottom: 2px;
+    }
+
+    /* Version E: Coordinates */
+    .hv-coords h1 {
+      font-size: 14px;
+      color: #556;
+      font-weight: normal;
+    }
+    .hv-coords h1 .name {
+      color: #e8eaed;
+      font-size: 28px;
+      display: block;
+      margin-bottom: 8px;
+      letter-spacing: 4px;
+    }
+    .hv-coords h1 .meta { font-size: 11px; color: #445; }
+
+    .header-hint {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      font-size: 10px;
+      color: #333;
+    }
+    .header-hint kbd {
+      background: #1a1c20;
+      padding: 2px 5px;
+      border-radius: 2px;
+      color: #556;
     }
 
     /* Project Section */
@@ -129,6 +213,14 @@
       line-height: 1.8;
       color: #9a9da4;
       margin: 0 0 20px 0;
+    }
+
+    .project-description code {
+      background: #1a1c20;
+      padding: 2px 7px;
+      border-radius: 3px;
+      font-size: 12px;
+      color: #b8bcc4;
     }
 
     /* Action Buttons */
@@ -250,7 +342,7 @@
   <div class="container">
     <!-- Header / About -->
     <header class="header">
-      <h1>Hello<span class="punctuation">();</span> I'm <span class="name">Recxa</span>.</h1>
+      <h1>Hello<span class="punctuation">();</span> I'm <span class="name">recxa</span>.</h1>
       <p class="tagline"> Creative coding, interactive sound exploration, and experimental tools.</p>
     </header>
 
@@ -258,7 +350,7 @@
     <section class="project">
       <div class="project-header">
         <h2 class="project-title">rcx01</h2>
-        <p class="project-subtitle">explorative loop sampler</p>
+        <p class="project-subtitle">dynamic loop sampler</p>
       </div>
       <div class="video-container">
         <iframe
@@ -268,7 +360,7 @@
         </iframe>
       </div>
       <p class="project-description">
-        A keyboard-driven audio performance system for real-time loop manipulation. Built in Max/MSP, it features non-linear loop navigation, layered recording, and a keyboard-first interface designed for live performance contexts where traditional DAW workflows feel too rigid.
+        a loop sampler built for real-time exploration. processing front-end, supercollider audio engine, connected via OSC. tempo is controlled through ship physics rather than a slider—you fly around a 2D plane, and your position maps to BPM. 8 decks with 4 buffers each, all driven by a global phasor so switching samples mid-loop is seamless. designed so someone unfamiliar with DAWs can still be at the wheel of the beat.
       </p>
       <div class="project-actions">
         <a href="https://github.com/recxa/rcx01" target="_blank" class="btn btn-primary">code</a>
@@ -317,7 +409,7 @@
     <section class="project">
       <div class="project-header">
         <h2 class="project-title">rcx02</h2>
-        <p class="project-subtitle">algorithmic installation</p>
+        <p class="project-subtitle">recursive youtube worm</p>
       </div>
       <div class="video-container">
         <iframe
@@ -327,7 +419,7 @@
         </iframe>
       </div>
       <p class="project-description">
-        A generative audiovisual installation exploring emergent patterns and procedural aesthetics. The system generates continuous streams of audio and visual content through algorithmic processes, responding to time-of-day and runtime. Designed for immersive gallery contexts with long-form playback.
+        a real-time installation that reads text from the world—via webcam OCR—then searches YouTube for 0-view videos matching that text. each video plays once, for the first and possibly only time, then the loop continues: the system reads from its own output, spawning new searches. shown at Manifest 2024, featuring a foam figure, a keyboard, and bananagram tiles visitors could rearrange to guide the system's journey through YouTube's depths.
       </p>
       <div class="project-actions">
         <a href="https://github.com/recxa/rcx02" target="_blank" class="btn btn-primary">code</a>
@@ -376,7 +468,7 @@
     <section class="project">
       <div class="project-header">
         <h2 class="project-title">rcx03</h2>
-        <p class="project-subtitle">cellular audio engine</p>
+        <p class="project-subtitle">game of life spectral filter</p>
       </div>
       <div class="video-container">
         <iframe
@@ -386,7 +478,7 @@
         </iframe>
       </div>
       <p class="project-description">
-        A Game of Life-based audio system built in Max/MSP and Processing. The cellular automata grid directly controls audio parameters — horizontal position affects pitch, vertical affects timbre, and cell density controls amplitude. Simple concept, cohesive execution.
+        a spectral filter controlled by conway's game of life. a 32×32 grid maps directly to 1024 FFT bins—alive cells pass audio through, dead cells gate it out. the cellular automaton evolves, and the frequency spectrum evolves with it. two modes: scanning (playhead sweeps through the grid like a sequencer) and full-spectrum (entire grid as a comb-like mask). processing handles the simulation; max/msp handles the audio.
       </p>
       <div class="project-actions">
         <a href="https://github.com/recxa/rcx03" target="_blank" class="btn btn-primary">code</a>
@@ -415,13 +507,15 @@
     <section class="project">
       <div class="project-header">
         <h2 class="project-title">rcx04</h2>
-        <p class="project-subtitle">lifebrush</p>
+        <p class="project-subtitle">lifebrush — game of life drawing tool</p>
       </div>
       <div class="demo-container">
         <iframe src="/pages/lifebrush/index.html"></iframe>
       </div>
       <p class="project-description">
-        An interactive drawing system combining cellular automata with generative layering. Paint cells onto the canvas, watch them evolve according to Game of Life rules, then save layers and start fresh. Built with p5.js, it treats cellular automata not as simulation but as a drawing medium. ( WOLFIE NOTE: INCLUDE CONTROLS IN DESCRIPTION!!!)
+        a browser-based drawing tool where your strokes come alive. draw on the canvas, and after a few cells are lit, conway's game of life takes over—your drawing evolves, mutates, and settles into new forms. save layers, change colors, let patterns stack and interact. the grid wraps at the edges (toroidal topology), so patterns that drift off one side reappear on the other.
+        <br><br>
+        <strong>Controls:</strong> <code>drag</code> — paint · <code>left click</code> — save layer · <code>right click</code> — change color · <code>space</code> — randomize · <code>↑</code> — evolve all layers · <code>enter</code> — download PNG · <code>delete</code> — reset
       </p>
       <div class="project-actions">
         <!-- No additional demos for lifebrush -->
@@ -432,7 +526,7 @@
     <section class="project">
       <div class="project-header">
         <h2 class="project-title">rcx05</h2>
-        <p class="project-subtitle">hybrid visualizer</p>
+        <p class="project-subtitle">noclip — depth-based video compositing</p>
       </div>
       <div class="video-container">
         <iframe
@@ -442,7 +536,7 @@
         </iframe>
       </div>
       <p class="project-description">
-        A Processing and TouchDesigner hybrid for real-time audio-reactive visuals. The aesthetic embraces digital artifacts — pixelation, feedback loops, color banding. Audio analysis drives visual parameters through OSC communication between environments. Designed for live VJ performance.
+        a video compositing system that overlays multiple videos in 3D space using AI-extracted depth maps. pixel-by-pixel, frame-by-frame, the system shows whichever video is "closest"—as if videos were stacked in depth and you see through to whatever's in front. objects from different videos appear to coexist and pass through each other based on their actual spatial depth. named after the video game cheat that lets you walk through walls.
       </p>
       <div class="project-actions">
         <a href="https://github.com/recxa/rcx05" target="_blank" class="btn btn-primary">code</a>

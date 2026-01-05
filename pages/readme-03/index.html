@@ -6,52 +6,286 @@
   <title>rcx03 — readme</title>
   <style>
     html, body {
-      margin: 0; padding: 0; height: 100%;
+      margin: 0; padding: 0; min-height: 100%;
       background: #0a0a0c; color: #c8ccd4;
-      font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
-    .wrap { max-width: 640px; padding: 32px 24px; }
-    h1 { font-size: 16px; font-weight: normal; color: #e8eaed; margin: 0 0 4px 0; }
-    .subtitle { color: #667; font-size: 12px; margin-bottom: 24px; }
-    h2 { font-size: 13px; font-weight: normal; color: #99a; margin: 24px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
-    p { margin: 0 0 16px 0; color: #9a9da4; }
-    ul { margin: 0 0 16px 0; padding-left: 20px; color: #9a9da4; }
-    li { margin-bottom: 6px; }
-    .marker { color: #444; font-size: 10px; margin-top: 48px; }
+    .wrap { max-width: 720px; padding: 32px 24px; }
+
+    .version-hint {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      font-size: 10px;
+      color: #444;
+    }
+    .version-hint kbd {
+      background: #1a1c20;
+      padding: 2px 5px;
+      border-radius: 2px;
+      color: #667;
+    }
+
+    .version { display: none; }
+    .version.active { display: block; }
+
+    /* ========== VERSION A: PURIST ========== */
+    .v-purist {
+      white-space: pre-wrap;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #9a9da4;
+    }
+    .v-purist .title { color: #e8eaed; }
+
+    /* ========== VERSION B: STYLED ========== */
+    .v-styled h1 { font-size: 14px; font-weight: normal; color: #e8eaed; margin: 0; }
+    .v-styled .subtitle { color: #556; font-size: 12px; margin-bottom: 28px; }
+    .v-styled h2 {
+      font-size: 11px; font-weight: normal; color: #556;
+      margin: 28px 0 10px 0; text-transform: uppercase; letter-spacing: 1px;
+      border-bottom: 1px solid #1a1c20; padding-bottom: 6px;
+    }
+    .v-styled p { margin: 0 0 14px 0; color: #9a9da4; }
+    .v-styled ul.control-list {
+      list-style: none; padding: 0; margin: 12px 0 16px 0;
+    }
+    .v-styled ul.control-list li {
+      margin-bottom: 8px; color: #778; font-size: 13px;
+    }
+    .v-styled ul.control-list code {
+      background: #1a1c20; padding: 2px 7px; border-radius: 3px;
+      font-size: 11px; color: #b8bcc4; margin-right: 8px;
+    }
+    .v-styled .diagram {
+      background: #0d0d10;
+      border: 1px solid #1a1c20;
+      padding: 14px 16px;
+      margin: 12px 0 16px 0;
+      font-size: 11px;
+      line-height: 1.4;
+      color: #667;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .v-styled .uses {
+      margin-top: 32px; padding-top: 16px; border-top: 1px solid #1a1c20;
+      font-size: 11px; color: #445;
+    }
+    .v-styled .uses span { color: #556; }
+
+    /* ========== VERSION C: BOXED ========== */
+    .v-boxed pre { margin: 0; color: #9a9da4; font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
+    .v-boxed .box {
+      border: 1px solid #222; padding: 12px 14px; margin: 16px 0;
+      background: #0c0c0f;
+    }
+    .v-boxed .section-title { color: #667; font-size: 11px; margin-bottom: 8px; }
+    .v-boxed .title-box {
+      border: 1px solid #333; padding: 10px 14px; margin-bottom: 20px;
+      background: #0d0d10;
+    }
+    .v-boxed .title-box .name { color: #e8eaed; font-size: 13px; }
+    .v-boxed .title-box .sub { color: #556; font-size: 11px; margin-top: 2px; }
+    .v-boxed .uses {
+      margin-top: 24px; font-size: 10px; color: #333; text-align: right;
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>rcx03</h1>
-    <div class="subtitle">cellular audio engine</div>
 
-    <h2>Overview</h2>
-    <p>A Game of Life-based audio plugin built in Max/MSP and Processing. Simple concept, cohesive execution. The cellular automata grid directly controls audio parameters.</p>
+    <!-- ========== VERSION A: PURIST ========== -->
+    <div id="v-purist" class="version v-purist active">
+<span class="title">                                   r c x 0 3
+                          game of life spectral filter</span>
+================================================================================
 
-    <h2>How It Works</h2>
-    <ul>
-      <li>2D grid of cells following Conway's Game of Life rules</li>
-      <li>Each cell's state maps to audio parameters (pitch, amplitude, filter)</li>
-      <li>Grid evolution creates evolving, organic sound textures</li>
-      <li>User can seed initial patterns or let randomness guide</li>
-    </ul>
 
-    <h2>Audio Mapping</h2>
-    <p>The grid is divided into regions, each controlling different aspects of the sound. Horizontal position affects pitch. Vertical position affects timbre. Cell density in a region affects amplitude.</p>
+    rcx03 is a prototype for a spectral filter controlled by Conway's Game
+    of Life. a 32x32 grid of cells maps directly to FFT bins—alive cells
+    pass audio through, dead cells gate it out. the cellular automaton
+    evolves, and the frequency spectrum evolves with it.
 
-    <h2>Controls</h2>
-    <ul>
-      <li>Click to toggle cells</li>
-      <li>Space — pause/resume evolution</li>
-      <li>C — clear grid</li>
-      <li>R — randomize</li>
-      <li>Arrow keys — adjust evolution speed</li>
-    </ul>
+    it functions as both a filter and a sequencer depending on mode:
+    scanning mode sweeps a slice through the grid like a playhead, while
+    full-spectrum mode uses the entire grid as a static (or evolving)
+    comb-like spectral mask.
 
-    <h2>Development Status</h2>
-    <p>Functional prototype. Needs cleanup and extended documentation.</p>
+    Processing handles the Game of Life simulation and UI; Max/MSP handles
+    the audio.
 
-    <div class="marker">~</div>
+
+================================================================================
+                                  HOW IT WORKS
+================================================================================
+
+
+    THE GRID
+    ──────────────────────────────────────────────────────────────────────
+
+    32 x 32 cells = 1024 cells total, mapped 1:1 to 1024 FFT bins.
+
+    frequency mapping is logarithmic (20 Hz – 20 kHz), so the grid covers
+    the audible spectrum perceptually—low frequencies at one end, highs
+    at the other, spaced by octaves rather than linearly.
+
+        cell alive  →  that frequency bin passes through
+        cell dead   →  that frequency bin is gated/silent
+
+    the grid wraps toroidally (edges connect), so patterns can flow
+    continuously without hitting walls.
+
+
+    MODES
+    ──────────────────────────────────────────────────────────────────────
+
+    SCANNING MODE (sequencer-like)
+        a playhead sweeps through the grid. each frame, one slice
+        is sent as the spectral mask. the yellow highlight shows
+        which slice is currently active. creates rhythmic, evolving
+        spectral patterns.
+
+    FULL-SPECTRUM MODE (comb-like)
+        the entire 32x32 grid used as spectral mask simultaneously.
+        creates a comb-filter-like effect—many frequency bands
+        gated on/off across the spectrum at once.
+
+
+================================================================================
+                                   CONTROLS
+================================================================================
+
+
+        LMB drag       paint cells alive (white)
+        RMB drag       paint cells dead (black)
+
+        [▶]            play/pause automatic generation advancement
+        [I]            immortal mode (manual stepping only)
+        [NEXT]         manually advance one generation
+        [RAND]         LMB: randomize grid  /  RMB: clear grid
+        [MIX]          wet/dry slider (default: 0.8)
+
+
+================================================================================
+                                    NOTES
+================================================================================
+
+
+    · classic Game of Life patterns translate to spectral behaviors:
+        - gliders = sweeping frequency bands
+        - oscillators = rhythmic spectral pulses
+        - still lifes = static EQ curves
+        - chaos = dense, evolving textures
+
+    · phase is preserved during gating, so the output stays coherent
+
+
+                                    · · ·
+
+
+    rcx03 is a prototype. the concept: what if a cellular automaton
+    was a filter? what if Conway's rules shaped your frequency spectrum?
+
+================================================================================
+
+                                                                    prototype
+
+uses: processing, max/msp, osc
+~
+    </div>
+
+    <!-- ========== VERSION B: STYLED ========== -->
+    <div id="v-styled" class="version v-styled">
+      <h1>rcx03</h1>
+      <div class="subtitle">game of life spectral filter</div>
+
+      <h2>what it is</h2>
+      <p>a spectral filter controlled by Conway's Game of Life. 32x32 grid of cells maps directly to 1024 FFT bins—alive cells pass audio through, dead cells gate it out. the cellular automaton evolves, and the frequency spectrum evolves with it.</p>
+      <p>functions as both filter and sequencer: scanning mode sweeps a slice like a playhead, full-spectrum mode uses the entire grid as a comb-like spectral mask.</p>
+
+      <h2>the grid</h2>
+      <p>32×32 = 1024 cells mapped 1:1 to FFT bins. frequency mapping is logarithmic (20Hz–20kHz), covering the audible spectrum perceptually. grid wraps toroidally—patterns flow continuously without hitting walls.</p>
+
+      <h2>controls</h2>
+      <ul class="control-list">
+        <li><code>LMB drag</code> — paint cells alive</li>
+        <li><code>RMB drag</code> — paint cells dead</li>
+        <li><code>▶</code> — play/pause generation advancement</li>
+        <li><code>I</code> — immortal mode (manual stepping)</li>
+        <li><code>NEXT</code> — advance one generation</li>
+        <li><code>RAND</code> — randomize (LMB) / clear (RMB)</li>
+        <li><code>MIX</code> — wet/dry (default 0.8)</li>
+      </ul>
+
+      <h2>notes</h2>
+      <p>Game of Life patterns become spectral behaviors: gliders = sweeping bands, oscillators = rhythmic pulses, still lifes = static EQ, chaos = dense textures. phase is preserved during gating.</p>
+
+      <div class="uses"><span>uses:</span> processing, max/msp, osc</div>
+    </div>
+
+    <!-- ========== VERSION C: BOXED ========== -->
+    <div id="v-boxed" class="version v-boxed">
+      <div class="title-box">
+        <div class="name">rcx03</div>
+        <div class="sub">game of life spectral filter</div>
+      </div>
+
+      <div class="box">
+        <div class="section-title">WHAT IT IS</div>
+        <pre>spectral filter controlled by Game of Life.
+
+32x32 grid → 1024 FFT bins (1:1 mapping)
+  cell alive = frequency passes through
+  cell dead = frequency gated silent
+
+automaton evolves, spectrum evolves with it.</pre>
+      </div>
+
+      <div class="box">
+        <div class="section-title">MODES</div>
+        <pre>SCANNING (sequencer-like)
+  playhead sweeps through grid
+  one slice = spectral mask per frame
+  rhythmic, evolving patterns
+
+FULL-SPECTRUM (comb-like)
+  entire grid = mask simultaneously
+  many bands gated on/off at once</pre>
+      </div>
+
+      <div class="box">
+        <div class="section-title">CONTROLS</div>
+        <pre>LMB drag ....... paint cells alive
+RMB drag ....... paint cells dead
+▶ .............. play/pause evolution
+I .............. immortal (manual step)
+NEXT ........... advance generation
+RAND ........... randomize / clear
+MIX ............ wet/dry slider</pre>
+      </div>
+
+      <div class="uses">processing · max/msp · osc</div>
+    </div>
+
   </div>
+
+  <div class="version-hint">
+    <kbd>tab</kbd> cycle versions
+  </div>
+
+  <script>
+    const versions = ['v-purist', 'v-styled', 'v-boxed'];
+    let currentVersion = 0;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        document.getElementById(versions[currentVersion]).classList.remove('active');
+        currentVersion = (currentVersion + 1) % versions.length;
+        document.getElementById(versions[currentVersion]).classList.add('active');
+      }
+    });
+  </script>
 </body>
 </html>

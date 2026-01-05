@@ -6,85 +6,325 @@
   <title>rcx01 — readme</title>
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #0a0a0c;
-      color: #c8ccd4;
-      font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      margin: 0; padding: 0; min-height: 100%;
+      background: #0a0a0c; color: #c8ccd4;
+      font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
-    .wrap {
-      max-width: 640px;
-      padding: 32px 24px;
-    }
-    h1 {
-      font-size: 16px;
-      font-weight: normal;
-      color: #e8eaed;
-      margin: 0 0 4px 0;
-    }
-    .subtitle {
-      color: #667;
-      font-size: 12px;
-      margin-bottom: 24px;
-    }
-    h2 {
-      font-size: 13px;
-      font-weight: normal;
-      color: #99a;
-      margin: 24px 0 8px 0;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    p {
-      margin: 0 0 16px 0;
-      color: #9a9da4;
-    }
-    ul {
-      margin: 0 0 16px 0;
-      padding-left: 20px;
-      color: #9a9da4;
-    }
-    li { margin-bottom: 6px; }
-    .marker {
-      color: #444;
+    .wrap { max-width: 720px; padding: 32px 24px; }
+
+    .version-hint {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
       font-size: 10px;
-      margin-top: 48px;
+      color: #444;
+    }
+    .version-hint kbd {
+      background: #1a1c20;
+      padding: 2px 5px;
+      border-radius: 2px;
+      color: #667;
+    }
+
+    .version { display: none; }
+    .version.active { display: block; }
+
+    /* ========== VERSION A: PURIST ========== */
+    .v-purist {
+      white-space: pre-wrap;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #9a9da4;
+    }
+    .v-purist .title { color: #e8eaed; }
+
+    /* ========== VERSION B: STYLED ========== */
+    .v-styled h1 { font-size: 14px; font-weight: normal; color: #e8eaed; margin: 0; }
+    .v-styled .subtitle { color: #556; font-size: 12px; margin-bottom: 28px; }
+    .v-styled h2 {
+      font-size: 11px; font-weight: normal; color: #556;
+      margin: 28px 0 10px 0; text-transform: uppercase; letter-spacing: 1px;
+      border-bottom: 1px solid #1a1c20; padding-bottom: 6px;
+    }
+    .v-styled p { margin: 0 0 14px 0; color: #9a9da4; }
+    .v-styled ul.control-list {
+      list-style: none; padding: 0; margin: 12px 0 16px 0;
+    }
+    .v-styled ul.control-list li {
+      margin-bottom: 8px; color: #778; font-size: 13px;
+    }
+    .v-styled ul.control-list code {
+      background: #1a1c20; padding: 2px 7px; border-radius: 3px;
+      font-size: 11px; color: #b8bcc4; margin-right: 8px;
+    }
+    .v-styled .diagram {
+      background: #0d0d10;
+      border: 1px solid #1a1c20;
+      padding: 14px 16px;
+      margin: 12px 0 16px 0;
+      font-size: 11px;
+      line-height: 1.4;
+      color: #667;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .v-styled .uses {
+      margin-top: 32px; padding-top: 16px; border-top: 1px solid #1a1c20;
+      font-size: 11px; color: #445;
+    }
+    .v-styled .uses span { color: #556; }
+
+    /* ========== VERSION C: BOXED ========== */
+    .v-boxed pre { margin: 0; color: #9a9da4; font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
+    .v-boxed .box {
+      border: 1px solid #222; padding: 12px 14px; margin: 16px 0;
+      background: #0c0c0f;
+    }
+    .v-boxed .section-title { color: #667; font-size: 11px; margin-bottom: 8px; }
+    .v-boxed .title-box {
+      border: 1px solid #333; padding: 10px 14px; margin-bottom: 20px;
+      background: #0d0d10;
+    }
+    .v-boxed .title-box .name { color: #e8eaed; font-size: 13px; }
+    .v-boxed .title-box .sub { color: #556; font-size: 11px; margin-top: 2px; }
+    .v-boxed .uses {
+      margin-top: 24px; font-size: 10px; color: #333; text-align: right;
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>rcx01</h1>
-    <div class="subtitle">explorative loop sampler</div>
 
-    <h2>Overview</h2>
-    <p>A keyboard-driven audio performance system designed for real-time loop manipulation and explorative sampling. Built for live performance contexts where traditional DAW workflows feel too rigid.</p>
+    <!-- ========== VERSION A: PURIST ========== -->
+    <div id="v-purist" class="version v-purist active">
+<span class="title">                                   r c x 0 1
+                              dynamic loop sampler</span>
+================================================================================
 
-    <h2>Core Concepts</h2>
-    <ul>
-      <li>Non-linear loop navigation — jump between segments without timeline constraints</li>
-      <li>Keyboard-first interface — all controls mapped to single keypresses</li>
-      <li>Layered recording — stack loops with independent playback states</li>
-      <li>Destructive-by-design — embrace impermanence in live performance</li>
-    </ul>
 
-    <h2>Technical Details</h2>
-    <p>Built in Max/MSP with custom abstractions for buffer manipulation and MIDI mapping. Uses a state machine architecture for managing loop transitions and recording modes.</p>
+    rcx01 is a loop sampler built for real-time exploration and manipulation.
+    it combines a Processing front-end with a SuperCollider audio engine,
+    connected via OSC. tempo is controlled through ship physics rather than
+    a slider. samples are organized across two axes. everything is keyboard-
+    driven and designed to reward intuition over manual precision.
 
-    <h2>Development Status</h2>
-    <p>Alpha stage. Core functionality complete. Playtest studies conducted with small groups. Documentation in progress.</p>
+    the instrument is built around the idea that parameters like tempo and
+    sample selection can be terrain to move through rather than values to set.
+    it's useful for solo beatmaking, live performance, or jamming with others
+    who may not have experience with traditional production tools—the controls
+    are immediate enough that someone unfamiliar with DAWs can still be at the
+    wheel of the beat.
 
-    <h2>Controls</h2>
-    <ul>
-      <li>Number keys (1-9) — select loop slots</li>
-      <li>Space — toggle playback</li>
-      <li>R — arm recording</li>
-      <li>Backspace — clear current slot</li>
-      <li>Arrow keys — nudge loop boundaries</li>
-    </ul>
 
-    <div class="marker">~</div>
+================================================================================
+                                  ARCHITECTURE
+================================================================================
+
+
+    ┌─────────────────────┐          OSC           ┌─────────────────────────┐
+    │                     │  ──────────────────▶   │                         │
+    │  Processing (pde/)  │                        │  SuperCollider (.scd)   │
+    │                     │                        │                         │
+    │  - UI rendering     │   /bpm, /dex, /rev,    │  - audio playback       │
+    │  - keyboard input   │   /jump, /rec, etc.    │  - recording            │
+    │  - ship physics     │                        │  - effects              │
+    │  - visual feedback  │                        │  - deck management      │
+    │                     │  ◀──────────────────   │                         │
+    └─────────────────────┘    waveform data       └─────────────────────────┘
+
+
+================================================================================
+                                   THE ENGINE
+================================================================================
+
+
+    DECKS & BUFFERS
+    ──────────────────────────────────────────────────────────────────────────
+
+    audio is organized into Decks. each Deck holds 4 interchangeable buffers—
+    think of them as 4 variations of the same musical idea. there are 8 Decks
+    total: the first 4 are assigned to the X-axis sampler, the next 4 to the
+    Y-axis sampler.
+
+        Deck 0 ──▶ [ buf0 | buf1 | buf2 | buf3 ]  ─┐
+        Deck 1 ──▶ [ buf0 | buf1 | buf2 | buf3 ]   │  X-axis
+        Deck 2 ──▶ [ buf0 | buf1 | buf2 | buf3 ]   │  samplers
+        Deck 3 ──▶ [ buf0 | buf1 | buf2 | buf3 ]  ─┘
+
+        Deck 4 ──▶ [ buf0 | buf1 | buf2 | buf3 ]  ─┐
+        Deck 5 ──▶ [ buf0 | buf1 | buf2 | buf3 ]   │  Y-axis
+        Deck 6 ──▶ [ buf0 | buf1 | buf2 | buf3 ]   │  samplers
+        Deck 7 ──▶ [ buf0 | buf1 | buf2 | buf3 ]  ─┘
+
+
+    PHASOR-DRIVEN PLAYBACK
+    ──────────────────────────────────────────────────────────────────────────
+
+    a global phasor runs continuously, synced to the current BPM. this phasor
+    (ranging 0–4, representing 4 beats) drives all sample playback. every
+    sampler reads its buffer position from this phasor, so all loops stay
+    locked together regardless of which buffers are active.
+
+    because playback is phasor-driven rather than trigger-driven, switching
+    buffers mid-loop is seamless—the new buffer picks up at the same phase
+    position.
+
+
+================================================================================
+                                   CONTROLS
+================================================================================
+
+
+    SHIP / TEMPO
+    ──────────────────────────────────────────────────────────────────────────
+
+        ↑           thrust forward (accelerate in facing direction)
+        ←  →        rotate ship left/right
+        SPACE       brake (kill velocity)
+
+    tempo is derived from the ship's position on the 2D plane.
+
+
+    MAIN MATRIX (deck/buffer selection)
+    ──────────────────────────────────────────────────────────────────────────
+
+        1  2  3  4
+        Q  W  E  R    ──▶   columns = deck, rows = buffer
+        A  S  D  F
+        Z  X  C  V
+
+
+    ALT MATRIX (jump points)
+    ──────────────────────────────────────────────────────────────────────────
+
+        5  6  7  8
+        T  Y  U  I    ──▶   16 storable phasor positions
+        G  H  J  K
+        B  N  M  ,
+
+
+    RECORDING
+    ──────────────────────────────────────────────────────────────────────────
+
+        TAB (hold)    enter recording mode
+        ENTER         prime / confirm recording
+
+
+    EFFECTS
+    ──────────────────────────────────────────────────────────────────────────
+
+        [           toggle X-axis reverse
+        ]           toggle Y-axis reverse
+        - / =       mute toggles
+
+
+================================================================================
+
+    rcx01 is an instrument for exploring sample space through movement
+    and gesture. it's meant to be played, not just operated.
+
+                                                                         v.2024
+
+uses: processing, supercollider, osc
+~
+    </div>
+
+    <!-- ========== VERSION B: STYLED ========== -->
+    <div id="v-styled" class="version v-styled">
+      <h1>rcx01</h1>
+      <div class="subtitle">dynamic loop sampler</div>
+
+      <h2>what it is</h2>
+      <p>a loop sampler built for real-time exploration and manipulation. Processing front-end, SuperCollider audio engine, connected via OSC. tempo is controlled through ship physics rather than a slider. samples organized across two axes. everything keyboard-driven.</p>
+      <p>the instrument is built around the idea that parameters like tempo and sample selection can be terrain to move through rather than values to set. useful for solo beatmaking, live performance, or jamming with others who may not have DAW experience.</p>
+
+      <h2>architecture</h2>
+      <div class="diagram">┌─────────────────────┐          OSC           ┌─────────────────────────┐
+│  Processing (pde/)  │  ──────────────────▶   │  SuperCollider (.scd)   │
+│  - UI rendering     │   /bpm, /dex, /rev,    │  - audio playback       │
+│  - keyboard input   │   /jump, /rec, etc.    │  - recording            │
+│  - ship physics     │  ◀──────────────────   │  - effects              │
+└─────────────────────┘    waveform data       └─────────────────────────┘</div>
+
+      <h2>the engine</h2>
+      <p>audio organized into 8 Decks, each with 4 interchangeable buffers. first 4 Decks = X-axis sampler, next 4 = Y-axis sampler. a global phasor (0–4, representing 4 beats) drives all playback, so switching buffers mid-loop is seamless.</p>
+
+      <h2>controls</h2>
+      <ul class="control-list">
+        <li><code>↑ ← →</code> — thrust/rotate ship (tempo via position)</li>
+        <li><code>SPACE</code> — brake</li>
+        <li><code>1-4 / Q-V</code> — main matrix (deck/buffer selection)</li>
+        <li><code>5-8 / T-,</code> — alt matrix (16 jump points)</li>
+        <li><code>TAB</code> — recording mode</li>
+        <li><code>ENTER</code> — prime/confirm recording</li>
+        <li><code>[ ]</code> — toggle X/Y reverse</li>
+        <li><code>- =</code> — mute toggles</li>
+      </ul>
+
+      <div class="uses"><span>uses:</span> processing, supercollider, osc</div>
+    </div>
+
+    <!-- ========== VERSION C: BOXED ========== -->
+    <div id="v-boxed" class="version v-boxed">
+      <div class="title-box">
+        <div class="name">rcx01</div>
+        <div class="sub">dynamic loop sampler</div>
+      </div>
+
+      <div class="box">
+        <div class="section-title">WHAT IT IS</div>
+        <pre>loop sampler for real-time exploration.
+Processing front-end + SuperCollider audio engine.
+tempo = ship physics. samples = two axes.
+everything keyboard-driven.
+
+parameters are terrain to move through,
+not values to set.</pre>
+      </div>
+
+      <div class="box">
+        <div class="section-title">ENGINE</div>
+        <pre>8 Decks × 4 buffers each
+  Decks 0-3 → X-axis sampler
+  Decks 4-7 → Y-axis sampler
+
+global phasor (0–4 beats) drives playback
+switching buffers mid-loop = seamless</pre>
+      </div>
+
+      <div class="box">
+        <div class="section-title">CONTROLS</div>
+        <pre>↑ ← → .......... thrust/rotate (tempo via position)
+SPACE .......... brake
+1-4 / Q-V ...... main matrix (deck/buffer)
+5-8 / T-, ...... jump points (16 slots)
+TAB ............ recording mode
+ENTER .......... prime/confirm recording
+[ ] ............ toggle X/Y reverse
+- = ............ mute toggles</pre>
+      </div>
+
+      <div class="uses">processing · supercollider · osc</div>
+    </div>
+
   </div>
+
+  <div class="version-hint">
+    <kbd>tab</kbd> cycle versions
+  </div>
+
+  <script>
+    const versions = ['v-purist', 'v-styled', 'v-boxed'];
+    let currentVersion = 0;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        document.getElementById(versions[currentVersion]).classList.remove('active');
+        currentVersion = (currentVersion + 1) % versions.length;
+        document.getElementById(versions[currentVersion]).classList.add('active');
+      }
+    });
+  </script>
 </body>
 </html>

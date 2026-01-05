@@ -6,51 +6,288 @@
   <title>rcx05 — readme</title>
   <style>
     html, body {
-      margin: 0; padding: 0; height: 100%;
+      margin: 0; padding: 0; min-height: 100%;
       background: #0a0a0c; color: #c8ccd4;
-      font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
-    .wrap { max-width: 640px; padding: 32px 24px; }
-    h1 { font-size: 16px; font-weight: normal; color: #e8eaed; margin: 0 0 4px 0; }
-    .subtitle { color: #667; font-size: 12px; margin-bottom: 24px; }
-    h2 { font-size: 13px; font-weight: normal; color: #99a; margin: 24px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
-    p { margin: 0 0 16px 0; color: #9a9da4; }
-    ul { margin: 0 0 16px 0; padding-left: 20px; color: #9a9da4; }
-    li { margin-bottom: 6px; }
-    .marker { color: #444; font-size: 10px; margin-top: 48px; }
+    .wrap { max-width: 720px; padding: 32px 24px; }
+
+    .version-hint {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      font-size: 10px;
+      color: #444;
+    }
+    .version-hint kbd {
+      background: #1a1c20;
+      padding: 2px 5px;
+      border-radius: 2px;
+      color: #667;
+    }
+
+    .version { display: none; }
+    .version.active { display: block; }
+
+    /* ========== VERSION A: PURIST ========== */
+    .v-purist {
+      white-space: pre-wrap;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #9a9da4;
+    }
+    .v-purist .title { color: #e8eaed; }
+
+    /* ========== VERSION B: STYLED ========== */
+    .v-styled h1 { font-size: 14px; font-weight: normal; color: #e8eaed; margin: 0; }
+    .v-styled .subtitle { color: #556; font-size: 12px; margin-bottom: 28px; }
+    .v-styled h2 {
+      font-size: 11px; font-weight: normal; color: #556;
+      margin: 28px 0 10px 0; text-transform: uppercase; letter-spacing: 1px;
+      border-bottom: 1px solid #1a1c20; padding-bottom: 6px;
+    }
+    .v-styled p { margin: 0 0 14px 0; color: #9a9da4; }
+    .v-styled .diagram {
+      background: #0d0d10;
+      border: 1px solid #1a1c20;
+      padding: 14px 16px;
+      margin: 12px 0 16px 0;
+      font-size: 11px;
+      line-height: 1.4;
+      color: #667;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .v-styled .uses {
+      margin-top: 32px; padding-top: 16px; border-top: 1px solid #1a1c20;
+      font-size: 11px; color: #445;
+    }
+    .v-styled .uses span { color: #556; }
+
+    /* ========== VERSION C: BOXED ========== */
+    .v-boxed pre { margin: 0; color: #9a9da4; font-size: 12px; line-height: 1.5; white-space: pre-wrap; }
+    .v-boxed .box {
+      border: 1px solid #222; padding: 12px 14px; margin: 16px 0;
+      background: #0c0c0f;
+    }
+    .v-boxed .section-title { color: #667; font-size: 11px; margin-bottom: 8px; }
+    .v-boxed .title-box {
+      border: 1px solid #333; padding: 10px 14px; margin-bottom: 20px;
+      background: #0d0d10;
+    }
+    .v-boxed .title-box .name { color: #e8eaed; font-size: 13px; }
+    .v-boxed .title-box .sub { color: #556; font-size: 11px; margin-top: 2px; }
+    .v-boxed .uses {
+      margin-top: 24px; font-size: 10px; color: #333; text-align: right;
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>rcx05</h1>
-    <div class="subtitle">hybrid visualizer</div>
 
-    <h2>Overview</h2>
-    <p>A Processing and TouchDesigner hybrid system for real-time audio-reactive visuals. Designed for live performance and VJ contexts.</p>
+    <!-- ========== VERSION A: PURIST ========== -->
+    <div id="v-purist" class="version v-purist active">
+<span class="title">                                   r c x 0 5
+                                    noclip
+                        depth-based video compositing</span>
+================================================================================
 
-    <h2>Architecture</h2>
-    <ul>
-      <li>Processing handles generative geometry and particle systems</li>
-      <li>TouchDesigner manages compositing, effects, and output routing</li>
-      <li>OSC communication between the two environments</li>
-      <li>Audio analysis drives parameters in both systems</li>
-    </ul>
 
-    <h2>Visual Language</h2>
-    <p>The aesthetic leans into digital artifacts — pixelation, feedback loops, color banding. Not trying to hide the computational nature of the visuals. Embraces the glitch.</p>
+    rcx05 is a video compositing system that overlays multiple videos in
+    3D space using AI-extracted depth maps. on a pixel-by-pixel, frame-by-
+    frame basis, the system shows whichever video is "closest" at that
+    point—as if the videos were stacked in depth and you're seeing through
+    to whatever's in front.
 
-    <h2>Audio Reactivity</h2>
-    <ul>
-      <li>Frequency bands mapped to different visual parameters</li>
-      <li>Onset detection triggers discrete events</li>
-      <li>RMS amplitude controls overall intensity</li>
-      <li>Spectral centroid affects color temperature</li>
-    </ul>
+    the result: objects from different videos appear to coexist and pass
+    through each other based on their actual spatial depth.
 
-    <h2>Development Status</h2>
-    <p>One demo posted. Additional demo in progress. Code not yet packaged for distribution.</p>
+    example: two clips from a stationary camera at an intersection, shot
+    at different times. cars from both clips appear simultaneously, driving
+    "through" each other—each visible when it's the closest thing at those
+    pixels.
 
-    <div class="marker">~</div>
+    this is a demonstration of a video effect, with the goal of eventually
+    becoming a plugin for video editing software.
+
+
+================================================================================
+                                  HOW IT WORKS
+================================================================================
+
+
+    THE CONCEPT
+    ──────────────────────────────────────────────────────────────────────
+
+        1. start with multiple video clips (ideally same camera angle)
+
+        2. extract depth maps for each video using AI
+           (currently via Runway.ai)
+
+        3. play all videos simultaneously
+
+        4. for each pixel, each frame:
+           compare depth values across all videos
+           show the pixel from whichever video has the closest depth
+
+        5. result: videos composited as if they exist in the same 3D space
+
+
+    COMPOSITION METHODS
+    ──────────────────────────────────────────────────────────────────────
+
+        FRONT-ONLY      show whichever video is closest at each pixel
+                        (the default "noclip" effect)
+
+        BACK-ONLY       show whichever video is furthest at each pixel
+
+        THRESHOLD       user-controlled depth range—only show pixels
+                        within a specific depth band
+
+        SCANNING        animated depth threshold that cycles through
+                        the depth range, revealing layers progressively
+
+
+================================================================================
+                                IMPLEMENTATIONS
+================================================================================
+
+
+    PROCESSING (prototype)
+    ──────────────────────────────────────────────────────────────────────
+
+    fuller prototype demonstrating multiple composition methods.
+    includes interactive threshold control, grid visualization,
+    frame-by-frame recording.
+
+    limitations: inefficient, hard-coded to low resolution,
+    frame alignment issues between source and depth videos.
+
+
+    TOUCHDESIGNER (simplified)
+    ──────────────────────────────────────────────────────────────────────
+
+    simplified version implementing only front-only method.
+    can run at any resolution, incorporate into other patches.
+    this is the cleaner, more practical implementation.
+
+
+================================================================================
+                                    NOTES
+================================================================================
+
+
+    · the effect works best when videos share a camera angle
+    · depth extraction quality matters—AI estimation isn't perfect
+    · "noclip" comes from the video game cheat that lets you pass
+      through walls
+
+
+                                    · · ·
+
+
+    rcx05 asks: what if you could stack videos in depth and see through
+    to whatever's in front? this is the experiment.
+
+================================================================================
+
+                                                                       ongoing
+
+uses: processing, touchdesigner, runway.ai
+~
+    </div>
+
+    <!-- ========== VERSION B: STYLED ========== -->
+    <div id="v-styled" class="version v-styled">
+      <h1>rcx05</h1>
+      <div class="subtitle">noclip — depth-based video compositing</div>
+
+      <h2>what it is</h2>
+      <p>a video compositing system that overlays multiple videos in 3D space using AI-extracted depth maps. pixel-by-pixel, frame-by-frame, the system shows whichever video is "closest"—as if videos were stacked in depth and you see through to whatever's in front.</p>
+      <p>example: two clips from a stationary camera at an intersection, shot at different times. cars from both appear simultaneously, driving "through" each other based on which is closest at each pixel.</p>
+
+      <h2>how it works</h2>
+      <div class="diagram">1. multiple video clips (same camera angle ideal)
+2. extract depth maps via AI (Runway.ai)
+3. play all videos simultaneously
+4. per pixel, per frame: show closest depth
+5. result: videos in same 3D space</div>
+
+      <h2>composition methods</h2>
+      <p><strong>FRONT-ONLY:</strong> closest video wins (default noclip effect). <strong>BACK-ONLY:</strong> furthest video wins. <strong>THRESHOLD:</strong> only show specific depth band. <strong>SCANNING:</strong> animated threshold reveals layers progressively.</p>
+
+      <h2>implementations</h2>
+      <p>Processing prototype: multiple methods, interactive threshold, grid visualization. TouchDesigner version: simplified front-only, any resolution, practical for integration.</p>
+
+      <div class="uses"><span>uses:</span> processing, touchdesigner, runway.ai</div>
+    </div>
+
+    <!-- ========== VERSION C: BOXED ========== -->
+    <div id="v-boxed" class="version v-boxed">
+      <div class="title-box">
+        <div class="name">rcx05</div>
+        <div class="sub">noclip — depth-based video compositing</div>
+      </div>
+
+      <div class="box">
+        <div class="section-title">WHAT IT IS</div>
+        <pre>overlay multiple videos in 3D space
+using AI-extracted depth maps.
+
+per pixel, per frame:
+show whichever video is "closest"
+
+objects from different videos coexist
+and pass through each other based on depth.</pre>
+      </div>
+
+      <div class="box">
+        <div class="section-title">HOW IT WORKS</div>
+        <pre>1. multiple clips (same angle ideal)
+2. extract depth maps (Runway.ai)
+3. play all videos simultaneously
+4. compare depth per pixel
+5. show closest → 3D composite</pre>
+      </div>
+
+      <div class="box">
+        <div class="section-title">METHODS</div>
+        <pre>FRONT-ONLY .... closest wins (default)
+BACK-ONLY ..... furthest wins
+THRESHOLD ..... specific depth band
+SCANNING ...... animated layer reveal</pre>
+      </div>
+
+      <div class="box">
+        <div class="section-title">IMPLEMENTATIONS</div>
+        <pre>Processing: research prototype
+  multiple methods, interactive control
+
+TouchDesigner: practical version
+  front-only, any resolution, clean</pre>
+      </div>
+
+      <div class="uses">processing · touchdesigner · runway.ai</div>
+    </div>
+
   </div>
+
+  <div class="version-hint">
+    <kbd>tab</kbd> cycle versions
+  </div>
+
+  <script>
+    const versions = ['v-purist', 'v-styled', 'v-boxed'];
+    let currentVersion = 0;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        document.getElementById(versions[currentVersion]).classList.remove('active');
+        currentVersion = (currentVersion + 1) % versions.length;
+        document.getElementById(versions[currentVersion]).classList.add('active');
+      }
+    });
+  </script>
 </body>
 </html>

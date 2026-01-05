@@ -1,0 +1,55 @@
+rcx01
+sample keyboard
+================================================================================
+
+WHAT IT IS
+----------
+a keyboard-only interface for making beats with friends. i built it because
+whenever we'd hang out and want to record something, i was the only one who
+knew FL studio - so i'd be glued to the laptop while everyone else just waited.
+i wanted something where we could all be at the wheel of the beat together.
+
+
+HOW IT WORKS
+------------
+the whole thing runs on a single keyboard. no mouse, no menus.
+
+tempo is controlled by flying a little ship around a 2d plane - think asteroids.
+the ship's position maps to BPM. the keyboard splits into two 4x4 grids:
+one for picking which loops are active (drums, samples), the other for setting
+and triggering jump points - spots you can snap the playhead to on the fly.
+
+recording works the same way. hold tab to flip the right grid into rec mode.
+press a slot to arm it, then record vocals. whatever you record stays locked to
+the beat even if you change tempo mid-take - like recording onto spinning vinyl.
+
+
+CONTROLS
+--------
+arrows          fly the tempo ship (up=thrust, left/right=turn)
+space           brake
+
+1-4 / q-r       sample grid (left 4x4)
+a-f / z-v       drum grid (left 4x4)
+
+5-8 / t-u       jump grid (right 4x4)
+g-k / b-,       jump grid (right 4x4)
+
+[ / ]           reverse playback (x / y axis)
+- / =           mute deck 1 / deck 2
+
+tab + grid      recording mode
+enter           arm/disarm recording
+backspace       delete jump or recording
+
+
+WHY
+---
+when only one person knows the tools, they become a middleman between
+everyone else and the music. these gaps aren't about talent or creativity -
+they're about interface. by mapping beat manipulation to a vocabulary that
+everyone in the room can learn in five minutes, this thing dissolves the
+barrier between people and the beat.
+
+
+USES: processing, supercollider, osc
