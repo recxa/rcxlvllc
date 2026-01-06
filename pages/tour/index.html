@@ -679,15 +679,33 @@
     }
 
     // ========== LIFEBRUSH IFRAME MOUSE BRIDGE ==========
-    // Solves the iframe focus issue by tracking mouse in parent and forwarding to iframe
+    // Uses a transparent overlay to capture mouse events before the iframe gets focus
     (function() {
-      // Find the lifebrush iframe
       const lifebrushIframe = document.querySelector('iframe[src*="lifebrush"]');
       if (!lifebrushIframe) return;
 
-      // Track mouse movement over the iframe's container
       const demoContainer = lifebrushIframe.closest('.demo-container');
       if (!demoContainer) return;
+
+      // Create transparent overlay
+      const overlay = document.createElement('div');
+      overlay.style.cssText = `
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 10;
+        cursor: crosshair;
+      `;
+      demoContainer.style.position = 'relative';
+      demoContainer.appendChild(overlay);
+
+      let iframeReady = false;
+
+      // Wait for iframe to signal ready
+      window.addEventListener('message', (e) => {
+        if (e.data && e.data.type === 'lifebrushReady') {
+          iframeReady = true;
+        }
+      });
 
       // Send mouse position to iframe
       function sendMousePosition(x, y, over) {
@@ -701,20 +719,43 @@
         } catch (e) {}
       }
 
-      // Track mouse over the demo container
-      demoContainer.addEventListener('mousemove', (e) => {
+      // Forward mouse events through the overlay
+      overlay.addEventListener('mousemove', (e) => {
         const rect = lifebrushIframe.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         sendMousePosition(x, y, true);
       });
 
-      demoContainer.addEventListener('mouseenter', () => {
-        // Just mark as over, position will come from mousemove
+      overlay.addEventListener('mouseleave', () => {
+        sendMousePosition(-1, -1, false);
       });
 
-      demoContainer.addEventListener('mouseleave', () => {
-        sendMousePosition(-1, -1, false);
+      // Forward all mouse button clicks
+      overlay.addEventListener('mousedown', (e) => {
+        const rect = lifebrushIframe.getBoundingClientRect();
+        lifebrushIframe.contentWindow.postMessage({
+          type: 'mouseClick',
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+          button: e.button
+        }, '*');
+
+        // On left click, remove overlay so iframe gets direct events from now on
+        if (e.button === 0) {
+          overlay.remove();
+          lifebrushIframe.focus();
+        }
+      });
+
+      // Prevent context menu on right-click
+      overlay.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+      });
+
+      // Prevent middle-click scroll behavior
+      overlay.addEventListener('auxclick', (e) => {
+        if (e.button === 1) e.preventDefault();
       });
     })();
   </script>

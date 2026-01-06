@@ -29,7 +29,29 @@ window.addEventListener('message', (e) => {
     trackedMouseX = e.data.x;
     trackedMouseY = e.data.y;
     isMouseOver = e.data.over;
+  } else if (e.data && e.data.type === 'mouseClick') {
+    // Handle click forwarded from parent overlay
+    if (e.data.button === 0) {
+      // Left click - save layer
+      saveStateToLayers();
+      randomizeBrushColor();
+      initializeSimulation(randomResolution());
+    } else if (e.data.button === 1) {
+      // Middle click - progress layers
+      progressLayers();
+    } else if (e.data.button === 2) {
+      // Right click - reset
+      randomizeBrushColor();
+      initializeSimulation(randomResolution());
+    }
   }
+});
+
+// Signal to parent that we're ready
+window.addEventListener('load', () => {
+  try {
+    parent.postMessage({ type: 'lifebrushReady' }, '*');
+  } catch (e) {}
 });
 
 class LifeLayer {
