@@ -223,6 +223,30 @@
       color: #b8bcc4;
     }
 
+    /* Development sections (for rcx01 journey) */
+    .dev-section {
+      margin: 32px 0;
+      padding-left: 16px;
+      border-left: 2px solid #1a1c20;
+    }
+
+    .dev-label {
+      font-size: 12px;
+      color: #556;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0 0 16px 0;
+    }
+
+    .dev-section .project-description {
+      margin-top: 16px;
+      font-size: 13px;
+    }
+
+    .dev-section .video-container {
+      margin-bottom: 0;
+    }
+
     /* Action Buttons */
     .project-actions {
       display: flex;
@@ -342,8 +366,35 @@
   <div class="container">
     <!-- Header / About -->
     <header class="header">
-      <h1>Hello<span class="punctuation">();</span> I'm <span class="name">recxa</span>.</h1>
-      <p class="tagline"> Creative coding, interactive sound exploration, and experimental tools.</p>
+      <!-- Version A: Rainbow (current) -->
+      <div id="hv-rainbow" class="header-version hv-rainbow active">
+        <h1>Hello<span class="punctuation">();</span> I'm <span class="name">recxa</span>.</h1>
+        <p class="tagline">creative coding, interactive sound, experimental tools</p>
+      </div>
+
+      <!-- Version B: Minimal -->
+      <div id="hv-minimal" class="header-version hv-minimal">
+        <h1><span class="name">recxa</span></h1>
+        <p class="tagline">creative coding, interactive sound, experimental tools</p>
+      </div>
+
+      <!-- Version C: Terminal -->
+      <div id="hv-terminal" class="header-version hv-terminal">
+        <h1><span class="prompt">~/rcx $</span> whoami<br><span class="name">recxa</span><span class="cursor"></span></h1>
+        <p class="tagline">creative coding, interactive sound, experimental tools</p>
+      </div>
+
+      <!-- Version D: Understated -->
+      <div id="hv-understated" class="header-version hv-understated">
+        <h1>work by <span class="name">recxa</span></h1>
+        <p class="tagline">creative coding, interactive sound, experimental tools</p>
+      </div>
+
+      <!-- Version E: Coordinates -->
+      <div id="hv-coords" class="header-version hv-coords">
+        <h1><span class="name">recxa</span><span class="meta">creative tools / sound / systems</span></h1>
+        <p class="tagline"></p>
+      </div>
     </header>
 
     <!-- rcx01 -->
@@ -352,50 +403,68 @@
         <h2 class="project-title">rcx01</h2>
         <p class="project-subtitle">dynamic loop sampler</p>
       </div>
-      <div class="video-container">
-        <iframe
-          src="https://www.youtube.com/embed/rDcJgQN2-MM"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
+
       <p class="project-description">
-        a loop sampler built for real-time exploration. processing front-end, supercollider audio engine, connected via OSC. tempo is controlled through ship physics rather than a slider—you fly around a 2D plane, and your position maps to BPM. 8 decks with 4 buffers each, all driven by a global phasor so switching samples mid-loop is seamless. designed so someone unfamiliar with DAWs can still be at the wheel of the beat.
+        a loop sampler built for real-time exploration and collaborative performance. processing front-end, supercollider audio engine, connected via OSC. tempo is controlled through ship physics rather than a slider—you fly around a 2D plane, and your position maps to BPM. the instrument is built around the idea that parameters like tempo and sample selection can be terrain to move through rather than values to set. designed so someone unfamiliar with DAWs can still be at the wheel of the beat.
       </p>
+
+      <!-- Development journey -->
+      <div class="dev-section">
+        <p class="dev-label">initial prototype — 12/04/23</p>
+        <div class="video-container">
+          <iframe
+            src="https://www.youtube.com/embed/aRytyQccBMQ"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
+        <p class="project-description">
+          the first working version. 4 drum loops on X-axis, 4 instrument loops on Y-axis, each with deck selection (4 groups of related samples per axis). includes live vocal recording with loop playback, tempo-synced rolling reverse, and mute controls. the asteroids-style ship already controls tempo. all music in this demo is original. missing the waveform visualizations and chop matrix that came later—but already demonstrates how multiple people could explore and perform together without any prior experience.
+        </p>
+      </div>
+
+      <div class="dev-section">
+        <p class="dev-label">current version</p>
+        <div class="video-container">
+          <iframe
+            src="https://www.youtube.com/embed/rDcJgQN2-MM"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
+        <p class="project-description">
+          expanded to 8 decks with 4 buffers each, all driven by a global phasor (0–4 beats) so switching samples mid-loop is seamless. added waveform visualization, jump point matrix (16 storable phasor positions), and refined the control scheme based on user testing. the keyboard splits into two 4×4 grids: one for deck/buffer selection, the other for jump points you can snap the playhead to on the fly.
+        </p>
+      </div>
+
+      <div class="dev-section">
+        <p class="dev-label">playtest study</p>
+        <div class="video-container">
+          <iframe
+            src="https://www.youtube.com/embed/qO98I7ExsLE"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
+        <p class="project-description">
+          a detailed study of 9 participants using the instrument with no prior instructions. includes keylog analysis tracking which features they discovered and <em>learned</em> on their own. this feedback led to significant control scheme modifications for improved intuitiveness—subsequent testing showed measurably better feature discovery with the revised layout.
+        </p>
+      </div>
+
       <div class="project-actions">
         <a href="https://github.com/recxa/rcx01" target="_blank" class="btn btn-primary">code</a>
         <button class="btn btn-toggle" onclick="toggleDemos(this, 'demos-01')">
-          <span class="arrow">></span> explore demos
+          <span class="arrow">></span> additional demos
         </button>
       </div>
       <div id="demos-01" class="demos-section">
         <div class="demos-inner">
-          <p class="demos-header">Additional Demos</p>
+          <p class="demos-header">More Demos</p>
           <div class="demo-item">
-            <p class="demo-label">12/04/23 — prototype</p>
-            <div class="video-container">
-              <iframe
-                src="https://www.youtube.com/embed/aRytyQccBMQ"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-              </iframe>
-            </div>
-          </div>
-          <div class="demo-item">
-            <p class="demo-label">12/13/23 — prototype</p>
+            <p class="demo-label">12/13/23 — prototype iteration</p>
             <div class="video-container">
               <iframe
                 src="https://www.youtube.com/embed/Umu5TPqvm8M"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-              </iframe>
-            </div>
-          </div>
-          <div class="demo-item">
-            <p class="demo-label">playtest study</p>
-            <div class="video-container">
-              <iframe
-                src="https://www.youtube.com/embed/qO98I7ExsLE"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen>
               </iframe>
@@ -547,21 +616,36 @@
     <footer class="footer">~</footer>
   </div>
 
+  <div class="header-hint">
+    <kbd>tab</kbd> cycle headers
+  </div>
+
   <script>
+    // Header version switching
+    const headerVersions = ['hv-rainbow', 'hv-minimal', 'hv-terminal', 'hv-understated', 'hv-coords'];
+    let currentHeader = 0;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        document.getElementById(headerVersions[currentHeader]).classList.remove('active');
+        currentHeader = (currentHeader + 1) % headerVersions.length;
+        document.getElementById(headerVersions[currentHeader]).classList.add('active');
+      }
+    });
+
+    // Demo accordion toggle
     function toggleDemos(button, demosId) {
       const demosSection = document.getElementById(demosId);
       const isExpanded = button.classList.contains('expanded');
 
       if (isExpanded) {
-        // Collapse
         button.classList.remove('expanded');
         demosSection.classList.remove('expanded');
         demosSection.style.maxHeight = '0';
       } else {
-        // Expand
         button.classList.add('expanded');
         demosSection.classList.add('expanded');
-        // Set max-height to the scroll height for smooth animation
         demosSection.style.maxHeight = demosSection.scrollHeight + 'px';
       }
     }
