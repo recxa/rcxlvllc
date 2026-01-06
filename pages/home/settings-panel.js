@@ -111,7 +111,7 @@ const SettingsPanel = (() => {
       post: {
         // FX order - effects applied in this order (drag to reorder in UI)
         fxOrder: ['pixelate', 'dither', 'colorAdjust', 'scanlines', 'crt', 'bloom', 'chromaticAberration', 'grain', 'vignette', 'glitch'],
-        pixelate: 0,              // pixelation level (0=off, 2-16)
+        pixelate: 3,              // pixelation level (0=off, 2-16) - default 3px
         scanlines: 0,             // scanline intensity (0-1)
         scanlineScale: 2,         // scanline size
         crt: false,               // CRT curvature
@@ -152,6 +152,8 @@ const SettingsPanel = (() => {
         glowColor: "#4488ff",
         thickness: 0.02,
         alpha: 0.3,
+        hierarchical: false,      // only show rings for focused body's children
+        showEmptyMoons: false,    // show parent ring for moons with no submoons
       },
       // STAR/CENTRAL
       star: {
@@ -894,6 +896,16 @@ const SettingsPanel = (() => {
             <div class="row">
               <label>Glow Color</label>
               <input type="color" data-path="visual.orbitRings.glowColor">
+            </div>
+            <div class="row">
+              <label>Hierarchical</label>
+              <input type="checkbox" data-path="visual.orbitRings.hierarchical">
+              <span style="font-size:10px;color:#556;margin-left:8px;">Only show focused body's children</span>
+            </div>
+            <div class="row">
+              <label>Empty Moons</label>
+              <input type="checkbox" data-path="visual.orbitRings.showEmptyMoons">
+              <span style="font-size:10px;color:#556;margin-left:8px;">Show ring for childless moons</span>
             </div>
           </div>
         </div>

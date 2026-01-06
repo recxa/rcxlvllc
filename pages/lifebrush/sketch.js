@@ -1,4 +1,4 @@
-// sketch.js
+// sketch.js - Original lifebrush with hover-draw
 let cols, rows;
 let resolution;
 let grid;
@@ -11,6 +11,20 @@ let isMobile;
 let bottomBarHeight = 80;
 let canvas;
 let isInitialized = false;
+
+// Track mouse position via native events AND postMessage from parent
+let trackedMouseX = -1;
+let trackedMouseY = -1;
+let isMouseOver = false;
+
+// Listen for mouse coordinates from parent page (solves iframe focus issue)
+window.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'mousePosition') {
+    trackedMouseX = e.data.x;
+    trackedMouseY = e.data.y;
+    isMouseOver = e.data.over;
+  }
+});
 
 class LifeLayer {
   constructor(grid, resolution, color) {
@@ -69,9 +83,27 @@ function draw() {
       canvas = createCanvas(rect.width, rect.height);
       window.persistentCanvas = canvas;
       canvas.parent('lifebrush-container');
-      
+
       canvas.elt.setAttribute('tabindex', '0');
-      
+
+      // Native mouse tracking (works without focus)
+      canvas.elt.addEventListener('mousemove', (e) => {
+        const rect = canvas.elt.getBoundingClientRect();
+        trackedMouseX = e.clientX - rect.left;
+        trackedMouseY = e.clientY - rect.top;
+        isMouseOver = true;
+      });
+
+      canvas.elt.addEventListener('mouseenter', () => {
+        isMouseOver = true;
+      });
+
+      canvas.elt.addEventListener('mouseleave', () => {
+        isMouseOver = false;
+        trackedMouseX = -1;
+        trackedMouseY = -1;
+      });
+
       canvas.elt.addEventListener('contextmenu', (e) => {
         e.preventDefault();
       });
@@ -100,7 +132,7 @@ function draw() {
       brushColor = window.savedBrushColor;
       resizeCanvas(rect.width, rect.height);
     }
-    
+
     isInitialized = true;
     window.isLifebrushInitialized = true;
     canvas.elt.focus();
@@ -131,19 +163,34 @@ function draw() {
     noStroke();
     rect(0, height - bottomBarHeight, width, bottomBarHeight);
   }
-  
-  if (!isMobile || mouseY < height - bottomBarHeight) {
+
+  // Hover-draw: paint using tracked mouse position (works without focus)
+  if (isMouseOver && trackedMouseX >= 0 && trackedMouseY >= 0) {
+    if (!isMobile || trackedMouseY < height - bottomBarHeight) {
+      let touchCol = floor(trackedMouseX / resolution);
+      let touchRow = floor(trackedMouseY / resolution);
+      if (touchCol >= 0 && touchCol < cols && touchRow >= 0 && touchRow < rows) {
+        if (grid[touchCol][touchRow] == 0) {
+          grid[touchCol][touchRow] = 1;
+          activatedCount++;
+        }
+      }
+    }
+  } else if (isMobile && touches.length > 0) {
+    // Touch fallback for mobile
     let touchPos = getTouchPos();
-    let touchCol = floor(touchPos.x / resolution);
-    let touchRow = floor(touchPos.y / resolution);
-    if (touchCol >= 0 && touchCol < cols && touchRow >= 0 && touchRow < rows) {
-      if (grid[touchCol][touchRow] == 0) {
-        grid[touchCol][touchRow] = 1;
-        activatedCount++;
+    if (touchPos.y < height - bottomBarHeight) {
+      let touchCol = floor(touchPos.x / resolution);
+      let touchRow = floor(touchPos.y / resolution);
+      if (touchCol >= 0 && touchCol < cols && touchRow >= 0 && touchRow < rows) {
+        if (grid[touchCol][touchRow] == 0) {
+          grid[touchCol][touchRow] = 1;
+          activatedCount++;
+        }
       }
     }
   }
-  
+
   if (activatedCount >= activationThreshold) {
     applyGameOfLifeRules();
     activatedCount = 0;
@@ -311,7 +358,7 @@ function applyGameOfLifeRules() {
     for (let j = 0; j < rows; j++) {
       let state = grid[i][j];
       let neighbors = countNeighbors(grid, i, j);
-      
+
       if (state == 0 && neighbors == 3) {
         next[i][j] = 1;
       } else if (state == 1 && (neighbors < 2 || neighbors > 3)) {
@@ -321,7 +368,7 @@ function applyGameOfLifeRules() {
       }
     }
   }
-  
+
   let temp = grid;
   grid = next;
   next = temp;

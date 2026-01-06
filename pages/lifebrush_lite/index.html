@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>lifebrush lite</title>
+    <style>
+      html, body {
+        margin: 0; padding: 0;
+        height: 100%; background: #000; color: #fff;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        display: flex;
+        flex-direction: column;
+      }
+      #lifebrush-container {
+        flex: 1;
+        overflow: hidden;
+      }
+      #lifebrush-container, #lifebrush-container canvas {
+        pointer-events: auto;
+      }
+      #lifebrush-container canvas { display: block; outline: none; }
+      #lifebrush-container canvas:focus { outline: none; }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        padding: 8px;
+        background: #0a0a0c;
+        border-top: 1px solid #1a1c20;
+      }
+      .controls button {
+        background: #1a1c20;
+        border: 1px solid #2a2d33;
+        color: #9a9da4;
+        padding: 6px 14px;
+        font: inherit;
+        font-size: 11px;
+        cursor: pointer;
+        border-radius: 3px;
+        transition: background 0.15s, color 0.15s;
+      }
+      .controls button:hover {
+        background: #252830;
+        color: #c8ccd4;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.js"></script>
+  </head>
+  <body>
+    <div id="lifebrush-container"></div>
+    <div class="controls">
+      <button onclick="doForward()">forward</button>
+      <button id="btn-play" onclick="doPlay()">play</button>
+      <button onclick="doReset()">reset</button>
+      <button onclick="doSave()">save</button>
+    </div>
+    <script src="./sketch.js"></script>
+  </body>
+</html>

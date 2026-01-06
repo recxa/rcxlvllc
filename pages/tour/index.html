@@ -132,6 +132,11 @@
     }
     .hv-coords h1 .meta { font-size: 11px; color: #445; }
 
+    /* Version F: No header */
+    .header-hidden .header {
+      display: none;
+    }
+
     .header-hint {
       position: fixed;
       bottom: 12px;
@@ -366,8 +371,8 @@
   <div class="container">
     <!-- Header / About -->
     <header class="header">
-      <!-- Version A: Rainbow (current) -->
-      <div id="hv-rainbow" class="header-version hv-rainbow active">
+      <!-- Version A: Rainbow -->
+      <div id="hv-rainbow" class="header-version hv-rainbow">
         <h1>Hello<span class="punctuation">();</span> I'm <span class="name">recxa</span>.</h1>
         <p class="tagline">creative coding, interactive sound, experimental tools</p>
       </div>
@@ -394,6 +399,10 @@
       <div id="hv-coords" class="header-version hv-coords">
         <h1><span class="name">recxa</span><span class="meta">creative tools / sound / systems</span></h1>
         <p class="tagline"></p>
+      </div>
+
+      <!-- Version F: No header (empty, header hidden via CSS) -->
+      <div id="hv-none" class="header-version hv-none">
       </div>
     </header>
 
@@ -579,12 +588,12 @@
         <p class="project-subtitle">lifebrush — game of life drawing tool</p>
       </div>
       <div class="demo-container">
-        <iframe src="/pages/lifebrush/index.html"></iframe>
+        <iframe src="/pages/lifebrush_lite/index.html"></iframe>
       </div>
       <p class="project-description">
         a browser-based drawing tool where your strokes come alive. draw on the canvas, and after a few cells are lit, conway's game of life takes over—your drawing evolves, mutates, and settles into new forms. save layers, change colors, let patterns stack and interact. the grid wraps at the edges (toroidal topology), so patterns that drift off one side reappear on the other.
         <br><br>
-        <strong>Controls:</strong> <code>drag</code> — paint · <code>left click</code> — save layer · <code>right click</code> — change color · <code>space</code> — randomize · <code>↑</code> — evolve all layers · <code>enter</code> — download PNG · <code>delete</code> — reset
+        <strong>Controls:</strong> <code>hover</code> — paint · <code>click</code> — save layer + new color · <code>middle click</code> — evolve layers · <code>right click</code> — change color
       </p>
       <div class="project-actions">
         <!-- No additional demos for lifebrush -->
@@ -622,8 +631,19 @@
 
   <script>
     // Header version switching
-    const headerVersions = ['hv-rainbow', 'hv-minimal', 'hv-terminal', 'hv-understated', 'hv-coords'];
+    // 'hv-none' is first/default - no header, straight to content
+    const headerVersions = ['hv-none', 'hv-rainbow', 'hv-minimal', 'hv-terminal', 'hv-understated', 'hv-coords'];
     let currentHeader = 0;
+
+    // Initialize: set hv-none as active and hide header
+    document.addEventListener('DOMContentLoaded', () => {
+      // Remove 'active' from any currently active header version
+      document.querySelectorAll('.header-version').forEach(el => el.classList.remove('active'));
+      // Set hv-none as active
+      document.getElementById('hv-none').classList.add('active');
+      // Hide the header
+      document.querySelector('.container').classList.add('header-hidden');
+    });
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Tab') {
@@ -631,6 +651,14 @@
         document.getElementById(headerVersions[currentHeader]).classList.remove('active');
         currentHeader = (currentHeader + 1) % headerVersions.length;
         document.getElementById(headerVersions[currentHeader]).classList.add('active');
+
+        // Toggle header visibility based on whether hv-none is selected
+        const container = document.querySelector('.container');
+        if (headerVersions[currentHeader] === 'hv-none') {
+          container.classList.add('header-hidden');
+        } else {
+          container.classList.remove('header-hidden');
+        }
       }
     });
 
@@ -649,6 +677,46 @@
         demosSection.style.maxHeight = demosSection.scrollHeight + 'px';
       }
     }
+
+    // ========== LIFEBRUSH IFRAME MOUSE BRIDGE ==========
+    // Solves the iframe focus issue by tracking mouse in parent and forwarding to iframe
+    (function() {
+      // Find the lifebrush iframe
+      const lifebrushIframe = document.querySelector('iframe[src*="lifebrush"]');
+      if (!lifebrushIframe) return;
+
+      // Track mouse movement over the iframe's container
+      const demoContainer = lifebrushIframe.closest('.demo-container');
+      if (!demoContainer) return;
+
+      // Send mouse position to iframe
+      function sendMousePosition(x, y, over) {
+        try {
+          lifebrushIframe.contentWindow.postMessage({
+            type: 'mousePosition',
+            x: x,
+            y: y,
+            over: over
+          }, '*');
+        } catch (e) {}
+      }
+
+      // Track mouse over the demo container
+      demoContainer.addEventListener('mousemove', (e) => {
+        const rect = lifebrushIframe.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        sendMousePosition(x, y, true);
+      });
+
+      demoContainer.addEventListener('mouseenter', () => {
+        // Just mark as over, position will come from mousemove
+      });
+
+      demoContainer.addEventListener('mouseleave', () => {
+        sendMousePosition(-1, -1, false);
+      });
+    })();
   </script>
 </body>
 </html>

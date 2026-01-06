@@ -100,7 +100,7 @@
   </head>
   <body>
     <!-- Welcome Overlay -->
-    <div id="welcome-overlay" class="welcome-overlay hidden">
+    <div id="welcome-overlay" class="welcome-overlay">
       <div class="welcome-modal">
         <h1 class="welcome-title">Welcome</h1>
         <p class="welcome-subtitle">How would you like to look around?</p>
@@ -109,8 +109,8 @@
             I want to wander and explore
           </button>
           <button class="welcome-btn" onclick="goToTour()">
-            I need a quick overview
-            <span class="welcome-btn-subtext">(Perfect for application reviewers)</span>
+            I'm an application reviewer
+            <span class="welcome-btn-subtext">(I don't have all day)</span>
           </button>
         </div>
       </div>
@@ -136,13 +136,6 @@
     <script type="module" src="./core/router.js"></script>
     <script>
       // Welcome Overlay Logic
-      function showWelcome() {
-        const overlay = document.getElementById('welcome-overlay');
-        if (overlay) {
-          overlay.classList.remove('hidden');
-        }
-      }
-
       function dismissWelcome() {
         const overlay = document.getElementById('welcome-overlay');
         if (overlay) {
@@ -175,9 +168,9 @@
           }
         });
 
-        // Show welcome overlay if not seen this session
-        if (!sessionStorage.getItem('welcomeSeen')) {
-          showWelcome();
+        // Hide welcome overlay if already seen this session
+        if (sessionStorage.getItem('welcomeSeen')) {
+          dismissWelcome();
         }
 
         // Click outside modal to dismiss
