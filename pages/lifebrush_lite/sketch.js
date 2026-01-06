@@ -32,17 +32,27 @@ window.addEventListener('message', (e) => {
   } else if (e.data && e.data.type === 'mouseClick') {
     // Handle click forwarded from parent overlay
     if (e.data.button === 0) {
-      // Left click - save layer
+      // Left click - save layer, NEW SIZE, SAME COLOR
       saveStateToLayers();
-      randomizeBrushColor();
       initializeSimulation(randomResolution());
     } else if (e.data.button === 1) {
       // Middle click - progress layers
       progressLayers();
     } else if (e.data.button === 2) {
-      // Right click - reset
+      // Right click - full reset (new color + new size)
       randomizeBrushColor();
       initializeSimulation(randomResolution());
+    }
+  } else if (e.data && e.data.type === 'clearCursor') {
+    // Clear current unplaced layer (grid) but keep saved layers
+    initializeSimulation(resolution); // Keep same resolution, just clear grid
+  } else if (e.data && e.data.type === 'buttonClick') {
+    // Handle button clicks forwarded from parent
+    switch (e.data.command) {
+      case 'forward': doForward(); break;
+      case 'play': doPlay(); break;
+      case 'reset': doReset(); break;
+      case 'save': doSave(); break;
     }
   }
 });
@@ -183,12 +193,11 @@ function mousePressed() {
     progressLayers();
     return false;
   } else if (mouseButton === LEFT) {
-    // Left click: save layer + new layer
+    // Left click: save layer + NEW SIZE, SAME COLOR
     saveStateToLayers();
-    randomizeBrushColor();
     initializeSimulation(randomResolution());
   } else if (mouseButton === RIGHT) {
-    // Right click: reset + new color + new size (like full version)
+    // Right click: full reset (new color + new size)
     randomizeBrushColor();
     initializeSimulation(randomResolution());
     return false;

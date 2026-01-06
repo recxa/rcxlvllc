@@ -679,7 +679,8 @@
     }
 
     // ========== LIFEBRUSH IFRAME MOUSE BRIDGE ==========
-    // Uses a transparent overlay to capture mouse events before the iframe gets focus
+    // Bypasses iframe focus requirement by disabling pointer-events on iframe
+    // and forwarding all mouse events from the parent document
     (function() {
       const lifebrushIframe = document.querySelector('iframe[src*="lifebrush"]');
       if (!lifebrushIframe) return;
@@ -687,25 +688,8 @@
       const demoContainer = lifebrushIframe.closest('.demo-container');
       if (!demoContainer) return;
 
-      // Create transparent overlay
-      const overlay = document.createElement('div');
-      overlay.style.cssText = `
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        z-index: 10;
-        cursor: crosshair;
-      `;
-      demoContainer.style.position = 'relative';
-      demoContainer.appendChild(overlay);
-
-      let iframeReady = false;
-
-      // Wait for iframe to signal ready
-      window.addEventListener('message', (e) => {
-        if (e.data && e.data.type === 'lifebrushReady') {
-          iframeReady = true;
-        }
-      });
+      // DISABLE pointer events on iframe - all events go to parent document
+      lifebrushIframe.style.pointerEvents = 'none';
 
       // Send mouse position to iframe
       function sendMousePosition(x, y, over) {
@@ -719,43 +703,89 @@
         } catch (e) {}
       }
 
-      // Forward mouse events through the overlay
-      overlay.addEventListener('mousemove', (e) => {
+      // Track mouse globally, check if over iframe area, update cursor
+      document.addEventListener('mousemove', (e) => {
         const rect = lifebrushIframe.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        sendMousePosition(x, y, true);
+        const buttonAreaTop = rect.height - 40;
+
+        // Check if mouse is within iframe bounds
+        const isOver = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height;
+        const isInCanvas = isOver && y < buttonAreaTop;
+
+        // Update cursor
+        if (isOver) {
+          document.body.style.cursor = isInCanvas ? 'crosshair' : 'pointer';
+        } else {
+          document.body.style.cursor = '';
+        }
+
+        // Send position to iframe (only for canvas area)
+        sendMousePosition(x, y, isInCanvas);
       });
 
-      overlay.addEventListener('mouseleave', () => {
-        sendMousePosition(-1, -1, false);
-      });
-
-      // Forward all mouse button clicks
-      overlay.addEventListener('mousedown', (e) => {
+      // Handle clicks - check if within iframe area
+      document.addEventListener('mousedown', (e) => {
         const rect = lifebrushIframe.getBoundingClientRect();
-        lifebrushIframe.contentWindow.postMessage({
-          type: 'mouseClick',
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
-          button: e.button
-        }, '*');
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
-        // On left click, remove overlay so iframe gets direct events from now on
-        if (e.button === 0) {
-          overlay.remove();
-          lifebrushIframe.focus();
+        // Check if click is within iframe bounds (but above the buttons)
+        const buttonAreaHeight = 40; // approximate height of control buttons
+        const isInCanvas = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height - buttonAreaHeight;
+
+        if (isInCanvas) {
+          lifebrushIframe.contentWindow.postMessage({
+            type: 'mouseClick',
+            x: x,
+            y: y,
+            button: e.button
+          }, '*');
+
+          // Prevent default for middle click (scroll) and right click (context menu)
+          if (e.button === 1 || e.button === 2) {
+            e.preventDefault();
+          }
+        } else if (!demoContainer.contains(e.target)) {
+          // Click outside lifebrush area - clear cursor layer
+          lifebrushIframe.contentWindow.postMessage({ type: 'clearCursor' }, '*');
         }
       });
 
-      // Prevent context menu on right-click
-      overlay.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
+      // Prevent context menu over iframe area
+      document.addEventListener('contextmenu', (e) => {
+        const rect = lifebrushIframe.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const buttonAreaHeight = 40;
+        const isInCanvas = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height - buttonAreaHeight;
+        if (isInCanvas) {
+          e.preventDefault();
+        }
       });
 
-      // Prevent middle-click scroll behavior
-      overlay.addEventListener('auxclick', (e) => {
-        if (e.button === 1) e.preventDefault();
+      // Handle clicks in button area by forwarding button commands
+      document.addEventListener('click', (e) => {
+        const rect = lifebrushIframe.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const buttonAreaTop = rect.height - 40;
+
+        // Check if click is in the button area of the iframe
+        if (x >= 0 && x <= rect.width && y >= buttonAreaTop && y <= rect.height) {
+          // Determine which button was clicked based on x position
+          const buttonWidth = rect.width / 4;
+          const buttonIndex = Math.floor(x / buttonWidth);
+
+          const commands = ['forward', 'play', 'reset', 'save'];
+          if (buttonIndex >= 0 && buttonIndex < commands.length) {
+            lifebrushIframe.contentWindow.postMessage({
+              type: 'buttonClick',
+              command: commands[buttonIndex]
+            }, '*');
+          }
+        }
       });
     })();
   </script>
