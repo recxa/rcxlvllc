@@ -247,5 +247,5 @@
     return out;
   }
 
-  window.viewer = { show, getHomeFrame, getPathForId };
+  window.viewer = { show, getHomeFrame, getPathForId, getPageFromPath };
 })();

@@ -9,13 +9,27 @@
     }
   }
 
+  function resizeToContainer() {
+    const c = document.getElementById('lifebrush-container');
+    if (window.resizeCanvas && c) {
+      const r = c.getBoundingClientRect();
+      if (r.width > 10 && r.height > 10) {
+        try { window.resizeCanvas(r.width, r.height); } catch {}
+      }
+    }
+  }
+
   window.addEventListener('message', (ev) => {
     const msg = ev.data || {};
     if (msg && msg.type === 'visibility') {
       if (typeof window.noLoop === 'function' && typeof window.loop === 'function') {
         if (msg.visible) window.loop(); else window.noLoop();
       }
-      if (msg.visible && msg.focus) focusCanvas();
+      if (msg.visible) {
+        // Resize canvas when becoming visible (iframe may have been display:none)
+        setTimeout(resizeToContainer, 50);
+        if (msg.focus) focusCanvas();
+      }
     }
   });
 
@@ -25,11 +39,5 @@
     setTimeout(focusCanvas, 0);
   });
 
-  window.addEventListener('resize', () => {
-    const c = document.getElementById('lifebrush-container');
-    if (window.resizeCanvas && c) {
-      const r = c.getBoundingClientRect();
-      try { window.resizeCanvas(r.width, r.height); } catch {}
-    }
-  });
+  window.addEventListener('resize', resizeToContainer);
 })();

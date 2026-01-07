@@ -55,41 +55,35 @@ class LifeLayer {
 }
 
 function setup() {
-  isInitialized = false;
+  // Create canvas immediately in setup() - critical for p5.js global mode
   isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
+  canvas = createCanvas(windowWidth, windowHeight);
+  canvas.parent('lifebrush-container');
+
+  // Prevent touch scrolling on mobile
+  canvas.elt.style.touchAction = 'none';
+
+  // Prevent context menu on right-click
+  canvas.elt.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  // Prevent middle-click default behavior
+  canvas.elt.addEventListener('mousedown', (e) => {
+    if (e.button === 1) e.preventDefault();
+  });
+
+  if (isMobile) {
+    canvas.elt.addEventListener('touchstart', preventDefaultTouch, {passive: false});
+    canvas.elt.addEventListener('touchmove', preventDefaultTouch, {passive: false});
+    canvas.elt.addEventListener('touchend', preventDefaultTouch, {passive: false});
+  }
+
   brushColor = color(random(255), random(255), random(255));
+  initializeSimulation(randomResolution());
+  isInitialized = true;
 }
 
 function draw() {
-  const container = document.getElementById('lifebrush-container');
-  if (!container) return;
-
-  if (!isInitialized) {
-    const rect = container.getBoundingClientRect();
-    canvas = createCanvas(rect.width, rect.height);
-    canvas.parent('lifebrush-container');
-
-    // Prevent touch scrolling on mobile
-    canvas.elt.style.touchAction = 'none';
-
-    // Prevent context menu on right-click
-    canvas.elt.addEventListener('contextmenu', (e) => e.preventDefault());
-
-    // Prevent middle-click default behavior
-    canvas.elt.addEventListener('mousedown', (e) => {
-      if (e.button === 1) e.preventDefault();
-    });
-
-    if (isMobile) {
-      canvas.elt.addEventListener('touchstart', preventDefaultTouch, {passive: false});
-      canvas.elt.addEventListener('touchmove', preventDefaultTouch, {passive: false});
-      canvas.elt.addEventListener('touchend', preventDefaultTouch, {passive: false});
-    }
-
-    initializeSimulation(randomResolution());
-    isInitialized = true;
-  }
-
   background(0);
 
   // Draw saved layers
@@ -210,10 +204,10 @@ function keyPressed() {
 }
 
 function windowResized() {
-  const container = document.getElementById('lifebrush-container');
-  if (isInitialized && container) {
-    const rect = container.getBoundingClientRect();
-    resizeCanvas(rect.width, rect.height);
+  if (isInitialized) {
+    resizeCanvas(windowWidth, windowHeight);
+    // Reinitialize grid with new dimensions (preserve layers but reset current grid)
+    initializeSimulation(resolution);
   }
 }
 

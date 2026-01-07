@@ -73,7 +73,10 @@ import { externalUrls } from './externals.js';
 
     // back/forward
     window.addEventListener('popstate', () => {
-      const id = pathToId(location.pathname) || 'home';
+      // Use viewer's path mapping to get correct ID
+      const id = window.viewer.getPageFromPath
+        ? window.viewer.getPageFromPath(location.pathname)
+        : cleanPath(location.pathname) || 'home';
       if (window.viewer) window.viewer.show(id);
     });
   }
@@ -85,8 +88,8 @@ import { externalUrls } from './externals.js';
     window.viewer.show(id);
   }
 
-  function pathToId(path) {
-    const clean = path.replace(/^\/+/, '');
+  function cleanPath(path) {
+    const clean = path.replace(/^\/+/, '').replace(/\/+$/, '');
     return clean.length ? clean : null;
   }
 

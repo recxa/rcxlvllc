@@ -76,7 +76,7 @@
           "id": "sec-04",
           "title": "04",
           "children": [
-            { "type": "page", "id": "lifebrush", "title": "🎨 lifebrush", "iframeSrc": "pages/lifebrush/index.html", "preload": "eager" },
+            { "type": "page", "id": "lifebrush", "title": "🎨 lifebrush", "iframeSrc": "/pages/lifebrush/index.html", "preload": "eager" },
             { "type": "page", "id": "readme-04", "title": "📃 README", "iframeSrc": "/pages/readme-04/index.html" }
           ]
         },

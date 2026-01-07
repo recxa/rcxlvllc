@@ -888,37 +888,27 @@
     }
 
     function setup() {
-      lb_isInitialized = false;
+      // Create canvas immediately in setup() - this is critical for p5.js global mode
+      lb_canvas = createCanvas(760, 400);
+      lb_canvas.parent('lifebrush-holder');
+
+      // Prevent touch scrolling
+      lb_canvas.elt.style.touchAction = 'none';
+
+      // Prevent context menu on right-click
+      lb_canvas.elt.addEventListener('contextmenu', (e) => e.preventDefault());
+
+      // Prevent middle-click default behavior
+      lb_canvas.elt.addEventListener('mousedown', (e) => {
+        if (e.button === 1) e.preventDefault();
+      });
+
       lb_brushColor = color(random(255), random(255), random(255));
+      lb_initializeSimulation(lb_randomResolution());
+      lb_isInitialized = true;
     }
 
     function draw() {
-      const container = document.getElementById('lifebrush-holder');
-      if (!container) return;
-
-      // Wait until container is visible and has dimensions
-      const rect = container.getBoundingClientRect();
-      if (rect.width < 10 || rect.height < 10) return;
-
-      if (!lb_isInitialized) {
-        lb_canvas = createCanvas(rect.width, 400);
-        lb_canvas.parent('lifebrush-holder');
-
-        // Prevent touch scrolling
-        lb_canvas.elt.style.touchAction = 'none';
-
-        // Prevent context menu on right-click
-        lb_canvas.elt.addEventListener('contextmenu', (e) => e.preventDefault());
-
-        // Prevent middle-click default behavior
-        lb_canvas.elt.addEventListener('mousedown', (e) => {
-          if (e.button === 1) e.preventDefault();
-        });
-
-        lb_initializeSimulation(lb_randomResolution());
-        lb_isInitialized = true;
-      }
-
       background(0);
 
       // Draw saved layers
@@ -1109,6 +1099,8 @@
       if (lb_isInitialized && container) {
         const rect = container.getBoundingClientRect();
         resizeCanvas(rect.width, 400);
+        // Reinitialize grid with new dimensions
+        lb_initializeSimulation(lb_resolution);
       }
     }
   </script>
