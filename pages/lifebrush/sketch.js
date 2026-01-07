@@ -74,30 +74,46 @@ function draw() {
     canvas.elt.setAttribute('tabindex', '0');
 
     // Native mouse tracking (works immediately without focus)
-    canvas.elt.addEventListener('mousemove', (e) => {
-      const r = canvas.elt.getBoundingClientRect();
+    const canvasEl = canvas.elt;
+    canvasEl.style.display = 'block';
+
+    canvasEl.addEventListener('mousemove', (e) => {
+      const r = canvasEl.getBoundingClientRect();
       trackedMouseX = e.clientX - r.left;
       trackedMouseY = e.clientY - r.top;
       isMouseOver = true;
-    });
+    }, { passive: true });
 
-    canvas.elt.addEventListener('mouseenter', () => {
+    canvasEl.addEventListener('mouseenter', () => {
       isMouseOver = true;
-    });
+    }, { passive: true });
 
-    canvas.elt.addEventListener('mouseleave', () => {
+    canvasEl.addEventListener('mouseleave', () => {
       isMouseOver = false;
       trackedMouseX = -1;
       trackedMouseY = -1;
-    });
+    }, { passive: true });
 
-    canvas.elt.addEventListener('contextmenu', (e) => {
+    canvasEl.addEventListener('contextmenu', (e) => {
       e.preventDefault();
     });
 
-    canvas.elt.addEventListener('mousedown', (e) => {
+    canvasEl.addEventListener('mousedown', (e) => {
       if (e.button === 1) e.preventDefault();
     });
+
+    // Document-level tracking for browsers with focus issues (Arc, etc)
+    document.addEventListener('mousemove', (e) => {
+      if (!canvas) return;
+      const r = canvas.elt.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      if (x >= 0 && x <= r.width && y >= 0 && y <= r.height) {
+        trackedMouseX = x;
+        trackedMouseY = y;
+        isMouseOver = true;
+      }
+    }, { passive: true });
 
     if (isMobile) {
       canvas.elt.addEventListener('touchstart', preventDefaultTouch, {passive: false});

@@ -2,10 +2,31 @@
 import { externalUrls } from './externals.js';
 
 (() => {
-    
   const treeRoot = document.getElementById('tree');
 
-  boot().catch(err => console.error(err));
+  // Wait for sidebar to be ready before attaching click handlers
+  // This prevents race condition where router runs before sidebar builds the tree
+  if (document.readyState === 'loading') {
+    window.addEventListener('sidebarReady', init);
+  } else {
+    // If DOM already loaded, sidebar might already be ready or will be soon
+    window.addEventListener('sidebarReady', init);
+    // Also try immediately in case event already fired
+    setTimeout(init, 0);
+  }
+
+  let initialized = false;
+
+  async function init() {
+    if (initialized) return;
+
+    // Check if sidebar elements exist
+    const items = treeRoot.querySelectorAll('li[data-type]');
+    if (items.length === 0) return; // Sidebar not ready yet
+
+    initialized = true;
+    boot().catch(err => console.error(err));
+  }
 
   async function boot() {
     const res = await fetch('./manifest.json', { cache: 'no-store' });

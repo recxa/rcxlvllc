@@ -884,37 +884,56 @@
       const container = document.getElementById('lifebrush-holder');
       if (!container) return;
 
+      // Wait until container is visible and has dimensions
+      const rect = container.getBoundingClientRect();
+      if (rect.width < 10 || rect.height < 10) return;
+
       if (!lb_isInitialized) {
-        const rect = container.getBoundingClientRect();
         lb_canvas = createCanvas(rect.width, 400);
         lb_canvas.parent('lifebrush-holder');
         lb_canvas.elt.setAttribute('tabindex', '0');
+        lb_canvas.elt.style.display = 'block';
 
-        // Native mouse tracking
-        lb_canvas.elt.addEventListener('mousemove', (e) => {
-          const r = lb_canvas.elt.getBoundingClientRect();
+        // Native mouse tracking - attach to canvas element directly
+        const canvasEl = lb_canvas.elt;
+
+        canvasEl.addEventListener('mousemove', (e) => {
+          const r = canvasEl.getBoundingClientRect();
           lb_trackedMouseX = e.clientX - r.left;
           lb_trackedMouseY = e.clientY - r.top;
           lb_isMouseOver = true;
-        });
+        }, { passive: true });
 
-        lb_canvas.elt.addEventListener('mouseenter', () => {
+        canvasEl.addEventListener('mouseenter', () => {
           lb_isMouseOver = true;
-        });
+        }, { passive: true });
 
-        lb_canvas.elt.addEventListener('mouseleave', () => {
+        canvasEl.addEventListener('mouseleave', () => {
           lb_isMouseOver = false;
           lb_trackedMouseX = -1;
           lb_trackedMouseY = -1;
-        });
+        }, { passive: true });
 
-        lb_canvas.elt.addEventListener('contextmenu', (e) => {
+        canvasEl.addEventListener('contextmenu', (e) => {
           e.preventDefault();
         });
 
-        lb_canvas.elt.addEventListener('mousedown', (e) => {
+        canvasEl.addEventListener('mousedown', (e) => {
           if (e.button === 1) e.preventDefault();
         });
+
+        // Also track via document for when scrolling over canvas
+        document.addEventListener('mousemove', (e) => {
+          if (!lb_canvas) return;
+          const r = lb_canvas.elt.getBoundingClientRect();
+          const x = e.clientX - r.left;
+          const y = e.clientY - r.top;
+          if (x >= 0 && x <= r.width && y >= 0 && y <= r.height) {
+            lb_trackedMouseX = x;
+            lb_trackedMouseY = y;
+            lb_isMouseOver = true;
+          }
+        }, { passive: true });
 
         lb_initializeSimulation(lb_randomResolution());
         lb_isInitialized = true;

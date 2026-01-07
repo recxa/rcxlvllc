@@ -5,10 +5,11 @@
   let highlightedEl = null;
 
   // Track folders opened by planet vs user interaction
-  // Key insight: once user interacts with sidebar while on a planet, protect that planet's folders
-  // When folder is manually collapsed, it resets to default (can be auto-closed again)
   const planetOpenedNodes = new Set();  // Nodes opened via planet focus
   const protectedNodes = new Set();     // Nodes protected by user interaction (won't auto-close)
+
+  // Persistence key for localStorage
+  const STORAGE_KEY = 'rcx_sidebar_state';
 
   boot().catch(err => {
     console.error(err);
@@ -20,12 +21,16 @@
     if (!res.ok) throw new Error(`manifest fetch ${res.status}`);
     const manifest = await res.json();
 
+    // Load saved sidebar state
+    const savedState = loadState();
+
     // build UL structure
-    // Only the top-level 'rcx' folder is open by default, everything else closed
     treeRoot.innerHTML = '';
     (manifest.tree || []).forEach(node => {
+      // Default: only rcx folder open, unless we have saved state
       const isRcxFolder = node.type === 'folder' && node.id === 'rcx';
-      treeRoot.appendChild(renderNode(node, /*openByDefault*/ isRcxFolder, /*depth*/ 0));
+      const shouldOpen = savedState ? savedState.expanded.includes(node.id) : isRcxFolder;
+      treeRoot.appendChild(renderNode(node, shouldOpen, savedState));
     });
 
     // Expose sidebar API for bridge
@@ -49,6 +54,30 @@
     if (window.ManifestBridge) {
       window.ManifestBridge.setSidebarAPI(window.sidebarAPI);
     }
+
+    // Dispatch event so router.js knows sidebar is ready
+    window.dispatchEvent(new CustomEvent('sidebarReady'));
+  }
+
+  // ============ PERSISTENCE ============
+
+  function loadState() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function saveState() {
+    try {
+      const expanded = [];
+      nodeElements.forEach((el, id) => {
+        if (isExpanded(id)) expanded.push(id);
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ expanded }));
+    } catch {}
   }
 
   // ============ API FUNCTIONS ============
@@ -78,6 +107,7 @@
     if (ul && ul.tagName === 'UL') {
       ul.style.display = 'block';
       el.classList.add('open');
+      saveState();
     }
   }
 
@@ -97,9 +127,9 @@
     if (ul && ul.tagName === 'UL') {
       ul.style.display = 'none';
       el.classList.remove('open');
+      saveState();
     }
     // When manually collapsed, reset ALL tracking for this node
-    // This means it can be auto-closed again next time
     planetOpenedNodes.delete(nodeId);
     protectedNodes.delete(nodeId);
   }
@@ -171,12 +201,12 @@
 
   // ============ RENDERERS ============
 
-  function renderNode(node, openByDefault) {
+  function renderNode(node, openByDefault, savedState) {
     switch (node.type) {
       case 'folder':
-        return renderFolder(node, openByDefault);
+        return renderFolder(node, openByDefault, savedState);
       case 'section':
-        return renderSection(node, openByDefault);
+        return renderSection(node, openByDefault, savedState);
       case 'page':
       case 'link':
         return renderLeaf(node);
@@ -186,20 +216,25 @@
   }
 
   // emoji folder: no caret, label click toggles .nested
-  function renderFolder(node, open) {
+  function renderFolder(node, open, savedState) {
     const li = el('li', 'folder', node.title);
     li.dataset.type = 'folder';
     li.dataset.nodeId = node.id || '';
     if (node.id) nodeElements.set(node.id, li);
 
     const ul = el('ul', 'nested');
-    if (open) ul.style.display = 'block';
+    if (open) {
+      ul.style.display = 'block';
+      li.classList.add('open');
+    }
 
     li.addEventListener('click', (e) => {
       e.stopPropagation();
-      ul.style.display = ul.style.display === 'block' ? 'none' : 'block';
-      // Mark as user-interacted so it won't be auto-closed by planet navigation
+      const isOpen = ul.style.display === 'block';
+      ul.style.display = isOpen ? 'none' : 'block';
+      li.classList.toggle('open', !isOpen);
       if (node.id) markUserInteracted(node.id);
+      saveState();
     });
 
     // Hover events for bridge
@@ -214,15 +249,18 @@
       }
     });
 
-    // Children of folders are closed by default (sections, nested folders)
-    (node.children || []).forEach(child => ul.appendChild(renderNode(child, /*openByDefault*/ false)));
+    // Children use savedState to determine open/closed
+    (node.children || []).forEach(child => {
+      const childOpen = savedState ? savedState.expanded.includes(child.id) : false;
+      ul.appendChild(renderNode(child, childOpen, savedState));
+    });
     const wrap = document.createDocumentFragment();
     wrap.append(li, ul);
     return wrap;
   }
 
   // numbered section: caret via .expandable::before, toggles .open class
-  function renderSection(node, open) {
+  function renderSection(node, open, savedState) {
     const li = el('li', 'expandable', node.title);
     li.dataset.type = 'section';
     li.dataset.nodeId = node.id || '';
@@ -238,8 +276,8 @@
       const isOpen = ul.style.display === 'block';
       ul.style.display = isOpen ? 'none' : 'block';
       li.classList.toggle('open', !isOpen);
-      // Mark as user-interacted so it won't be auto-closed by planet navigation
       if (node.id) markUserInteracted(node.id);
+      saveState();
     };
 
     li.addEventListener('click', toggleFn);
@@ -256,8 +294,11 @@
       }
     });
 
-    // Children of sections are closed by default
-    (node.children || []).forEach(child => ul.appendChild(renderNode(child, /*openByDefault*/ false)));
+    // Children use savedState to determine open/closed
+    (node.children || []).forEach(child => {
+      const childOpen = savedState ? savedState.expanded.includes(child.id) : false;
+      ul.appendChild(renderNode(child, childOpen, savedState));
+    });
 
     const wrap = document.createDocumentFragment();
     wrap.append(li, ul);
