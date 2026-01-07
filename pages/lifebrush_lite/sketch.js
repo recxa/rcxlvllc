@@ -29,6 +29,8 @@ window.addEventListener('message', (e) => {
     trackedMouseX = e.data.x;
     trackedMouseY = e.data.y;
     isMouseOver = e.data.over;
+    // Debug: verify messages are received (check browser console)
+    if (Math.random() < 0.01) console.log('mousePos:', Math.round(trackedMouseX), Math.round(trackedMouseY), isMouseOver);
   } else if (e.data && e.data.type === 'mouseClick') {
     // Handle click forwarded from parent overlay
     if (e.data.button === 0) {
@@ -57,12 +59,7 @@ window.addEventListener('message', (e) => {
   }
 });
 
-// Signal to parent that we're ready
-window.addEventListener('load', () => {
-  try {
-    parent.postMessage({ type: 'lifebrushReady' }, '*');
-  } catch (e) {}
-});
+// Note: ready signal is sent after initialization in draw()
 
 class LifeLayer {
   constructor(grid, resolution, color) {
@@ -146,6 +143,9 @@ function draw() {
 
     initializeSimulation(randomResolution());
     isInitialized = true;
+    console.log('Lifebrush lite initialized, resolution:', resolution, 'cols:', cols, 'rows:', rows);
+    // Signal ready to parent
+    try { parent.postMessage({ type: 'lifebrushReady' }, '*'); } catch(e) {}
   }
 
   background(0);

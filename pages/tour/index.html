@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>tour — rcx</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
   <style>
     *, *::before, *::after {
       box-sizing: border-box;
@@ -137,6 +138,11 @@
       display: none;
     }
 
+    /* Lifebrush iframe - ensure pointer events work */
+    .lifebrush-frame {
+      pointer-events: auto !important;
+    }
+
     .header-hint {
       position: fixed;
       bottom: 12px;
@@ -200,9 +206,8 @@
     .demo-container {
       position: relative;
       width: 100%;
-      height: 450px;
       margin-bottom: 20px;
-      background: #111;
+      background: #000;
       border: 1px solid #1a1c20;
     }
 
@@ -210,6 +215,73 @@
       width: 100%;
       height: 100%;
       border: none;
+    }
+
+    /* Lifebrush canvas container */
+    #lifebrush-holder {
+      width: 100%;
+      height: 400px;
+      line-height: 0;
+    }
+
+    #lifebrush-holder canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Lifebrush controls - Style A: Styled buttons (default) */
+    .lifebrush-controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      padding: 10px;
+      background: #0a0a0c;
+      border-top: 1px solid #1a1c20;
+    }
+
+    .lifebrush-controls.style-a button {
+      background: #1a1c20;
+      border: 1px solid #2a2d33;
+      color: #9a9da4;
+      padding: 6px 14px;
+      font: inherit;
+      font-size: 11px;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .lifebrush-controls.style-a button:hover {
+      background: #252830;
+      color: #c8ccd4;
+    }
+
+    /* Lifebrush controls - Style B: Plain links */
+    .lifebrush-controls.style-b {
+      background: transparent;
+      border-top: none;
+      padding: 8px 0;
+    }
+
+    .lifebrush-controls.style-b button {
+      background: none;
+      border: none;
+      color: #556;
+      padding: 0;
+      font: inherit;
+      font-size: 11px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .lifebrush-controls.style-b button:hover {
+      color: #9a9da4;
+      text-decoration: underline;
+    }
+
+    .lifebrush-controls.style-b .separator {
+      color: #333;
     }
 
     /* Description */
@@ -588,12 +660,18 @@
         <p class="project-subtitle">lifebrush — game of life drawing tool</p>
       </div>
       <div class="demo-container">
-        <iframe src="/pages/lifebrush_lite/index.html"></iframe>
+        <div id="lifebrush-holder"></div>
+        <div id="lifebrush-controls" class="lifebrush-controls style-a">
+          <button onclick="lifebrushForward()">forward</button>
+          <button id="lifebrush-play-btn" onclick="lifebrushPlay()">play</button>
+          <button onclick="lifebrushReset()">reset</button>
+          <button onclick="lifebrushSave()">save</button>
+        </div>
       </div>
       <p class="project-description">
         a browser-based drawing tool where your strokes come alive. draw on the canvas, and after a few cells are lit, conway's game of life takes over—your drawing evolves, mutates, and settles into new forms. save layers, change colors, let patterns stack and interact. the grid wraps at the edges (toroidal topology), so patterns that drift off one side reappear on the other.
         <br><br>
-        <strong>Controls:</strong> <code>hover</code> — paint · <code>click</code> — save layer + new color · <code>middle click</code> — evolve layers · <code>right click</code> — change color
+        <strong>Controls:</strong> <code>hover</code> — paint · <code>click</code> — save layer + new size · <code>middle click</code> — evolve layers · <code>right click</code> — new color + new size
       </p>
       <div class="project-actions">
         <!-- No additional demos for lifebrush -->
@@ -626,7 +704,7 @@
   </div>
 
   <div class="header-hint">
-    <kbd>tab</kbd> cycle headers
+    <kbd>tab</kbd> headers · <kbd>`</kbd> button style
   </div>
 
   <script>
@@ -634,6 +712,10 @@
     // 'hv-none' is first/default - no header, straight to content
     const headerVersions = ['hv-none', 'hv-rainbow', 'hv-minimal', 'hv-terminal', 'hv-understated', 'hv-coords'];
     let currentHeader = 0;
+
+    // Lifebrush button styles (toggle with backtick)
+    const buttonStyles = ['style-a', 'style-b'];
+    let currentButtonStyle = 0;
 
     // Initialize: set hv-none as active and hide header
     document.addEventListener('DOMContentLoaded', () => {
@@ -660,6 +742,16 @@
           container.classList.remove('header-hidden');
         }
       }
+
+      // Backtick toggles lifebrush button styles
+      if (e.key === '`') {
+        const controls = document.getElementById('lifebrush-controls');
+        if (controls) {
+          controls.classList.remove(buttonStyles[currentButtonStyle]);
+          currentButtonStyle = (currentButtonStyle + 1) % buttonStyles.length;
+          controls.classList.add(buttonStyles[currentButtonStyle]);
+        }
+      }
     });
 
     // Demo accordion toggle
@@ -678,116 +770,300 @@
       }
     }
 
-    // ========== LIFEBRUSH IFRAME MOUSE BRIDGE ==========
-    // Bypasses iframe focus requirement by disabling pointer-events on iframe
-    // and forwarding all mouse events from the parent document
-    (function() {
-      const lifebrushIframe = document.querySelector('iframe[src*="lifebrush"]');
-      if (!lifebrushIframe) return;
+    // ========== LIFEBRUSH (embedded directly, no iframe) ==========
+    let lb_cols, lb_rows;
+    let lb_resolution;
+    let lb_grid;
+    let lb_next;
+    let lb_activatedCount = 0;
+    let lb_activationThreshold = 20;
+    let lb_layers = [];
+    let lb_brushColor;
+    let lb_canvas;
+    let lb_isInitialized = false;
+    let lb_isPlaying = false;
+    let lb_playInterval = null;
 
-      const demoContainer = lifebrushIframe.closest('.demo-container');
-      if (!demoContainer) return;
+    // Track mouse position
+    let lb_trackedMouseX = -1;
+    let lb_trackedMouseY = -1;
+    let lb_isMouseOver = false;
 
-      // DISABLE pointer events on iframe - all events go to parent document
-      lifebrushIframe.style.pointerEvents = 'none';
-
-      // Send mouse position to iframe
-      function sendMousePosition(x, y, over) {
-        try {
-          lifebrushIframe.contentWindow.postMessage({
-            type: 'mousePosition',
-            x: x,
-            y: y,
-            over: over
-          }, '*');
-        } catch (e) {}
+    class LifeLayer {
+      constructor(grid, resolution, col) {
+        this.grid = grid.map(arr => arr.slice());
+        this.resolution = resolution;
+        this.color = col;
       }
 
-      // Track mouse globally, check if over iframe area, update cursor
-      document.addEventListener('mousemove', (e) => {
-        const rect = lifebrushIframe.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const buttonAreaTop = rect.height - 40;
-
-        // Check if mouse is within iframe bounds
-        const isOver = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height;
-        const isInCanvas = isOver && y < buttonAreaTop;
-
-        // Update cursor
-        if (isOver) {
-          document.body.style.cursor = isInCanvas ? 'crosshair' : 'pointer';
-        } else {
-          document.body.style.cursor = '';
-        }
-
-        // Send position to iframe (only for canvas area)
-        sendMousePosition(x, y, isInCanvas);
-      });
-
-      // Handle clicks - check if within iframe area
-      document.addEventListener('mousedown', (e) => {
-        const rect = lifebrushIframe.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        // Check if click is within iframe bounds (but above the buttons)
-        const buttonAreaHeight = 40; // approximate height of control buttons
-        const isInCanvas = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height - buttonAreaHeight;
-
-        if (isInCanvas) {
-          lifebrushIframe.contentWindow.postMessage({
-            type: 'mouseClick',
-            x: x,
-            y: y,
-            button: e.button
-          }, '*');
-
-          // Prevent default for middle click (scroll) and right click (context menu)
-          if (e.button === 1 || e.button === 2) {
-            e.preventDefault();
+      draw() {
+        for (let i = 0; i < this.grid.length; i++) {
+          for (let j = 0; j < this.grid[i].length; j++) {
+            if (this.grid[i][j] == 1) {
+              let x = i * this.resolution;
+              let y = j * this.resolution;
+              fill(this.color);
+              noStroke();
+              rect(x, y, this.resolution, this.resolution);
+            }
           }
-        } else if (!demoContainer.contains(e.target)) {
-          // Click outside lifebrush area - clear cursor layer
-          lifebrushIframe.contentWindow.postMessage({ type: 'clearCursor' }, '*');
         }
-      });
+      }
 
-      // Prevent context menu over iframe area
-      document.addEventListener('contextmenu', (e) => {
-        const rect = lifebrushIframe.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const buttonAreaHeight = 40;
-        const isInCanvas = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height - buttonAreaHeight;
-        if (isInCanvas) {
+      stepForward() {
+        let nextGrid = lb_make2DArray(this.grid.length, this.grid[0].length);
+        for (let i = 0; i < this.grid.length; i++) {
+          for (let j = 0; j < this.grid[i].length; j++) {
+            let state = this.grid[i][j];
+            let neighbors = lb_countNeighbors(this.grid, i, j);
+            if (state == 0 && neighbors == 3) {
+              nextGrid[i][j] = 1;
+            } else if (state == 1 && (neighbors < 2 || neighbors > 3)) {
+              nextGrid[i][j] = 0;
+            } else {
+              nextGrid[i][j] = state;
+            }
+          }
+        }
+        this.grid = nextGrid;
+      }
+    }
+
+    function setup() {
+      lb_isInitialized = false;
+      lb_brushColor = color(random(255), random(255), random(255));
+    }
+
+    function draw() {
+      const container = document.getElementById('lifebrush-holder');
+      if (!container) return;
+
+      if (!lb_isInitialized) {
+        const rect = container.getBoundingClientRect();
+        lb_canvas = createCanvas(rect.width, 400);
+        lb_canvas.parent('lifebrush-holder');
+        lb_canvas.elt.setAttribute('tabindex', '0');
+
+        // Native mouse tracking
+        lb_canvas.elt.addEventListener('mousemove', (e) => {
+          const r = lb_canvas.elt.getBoundingClientRect();
+          lb_trackedMouseX = e.clientX - r.left;
+          lb_trackedMouseY = e.clientY - r.top;
+          lb_isMouseOver = true;
+        });
+
+        lb_canvas.elt.addEventListener('mouseenter', () => {
+          lb_isMouseOver = true;
+        });
+
+        lb_canvas.elt.addEventListener('mouseleave', () => {
+          lb_isMouseOver = false;
+          lb_trackedMouseX = -1;
+          lb_trackedMouseY = -1;
+        });
+
+        lb_canvas.elt.addEventListener('contextmenu', (e) => {
           e.preventDefault();
-        }
-      });
+        });
 
-      // Handle clicks in button area by forwarding button commands
-      document.addEventListener('click', (e) => {
-        const rect = lifebrushIframe.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const buttonAreaTop = rect.height - 40;
+        lb_canvas.elt.addEventListener('mousedown', (e) => {
+          if (e.button === 1) e.preventDefault();
+        });
 
-        // Check if click is in the button area of the iframe
-        if (x >= 0 && x <= rect.width && y >= buttonAreaTop && y <= rect.height) {
-          // Determine which button was clicked based on x position
-          const buttonWidth = rect.width / 4;
-          const buttonIndex = Math.floor(x / buttonWidth);
+        lb_initializeSimulation(lb_randomResolution());
+        lb_isInitialized = true;
+      }
 
-          const commands = ['forward', 'play', 'reset', 'save'];
-          if (buttonIndex >= 0 && buttonIndex < commands.length) {
-            lifebrushIframe.contentWindow.postMessage({
-              type: 'buttonClick',
-              command: commands[buttonIndex]
-            }, '*');
+      background(0);
+
+      // Draw saved layers
+      for (let layer of lb_layers) {
+        layer.draw();
+      }
+
+      // Draw current grid
+      for (let i = 0; i < lb_cols; i++) {
+        for (let j = 0; j < lb_rows; j++) {
+          let x = i * lb_resolution;
+          let y = j * lb_resolution;
+          if (lb_grid[i][j] == 1) {
+            fill(lb_brushColor);
+            stroke(0);
+            rect(x, y, lb_resolution, lb_resolution);
           }
         }
-      });
-    })();
+      }
+
+      // Hover-draw: paint using tracked mouse position
+      if (lb_isMouseOver && lb_trackedMouseX >= 0 && lb_trackedMouseY >= 0) {
+        let touchCol = floor(lb_trackedMouseX / lb_resolution);
+        let touchRow = floor(lb_trackedMouseY / lb_resolution);
+        if (touchCol >= 0 && touchCol < lb_cols && touchRow >= 0 && touchRow < lb_rows) {
+          if (lb_grid[touchCol][touchRow] == 0) {
+            lb_grid[touchCol][touchRow] = 1;
+            lb_activatedCount++;
+          }
+        }
+      }
+
+      // Auto-evolve after threshold
+      if (lb_activatedCount >= lb_activationThreshold) {
+        lb_applyGameOfLifeRules();
+        lb_activatedCount = 0;
+      }
+    }
+
+    function mousePressed() {
+      // Only handle if click is on lifebrush canvas
+      if (!lb_canvas) return;
+      const rect = lb_canvas.elt.getBoundingClientRect();
+      const mx = mouseX;
+      const my = mouseY;
+      if (mx < 0 || mx > rect.width || my < 0 || my > rect.height) return;
+
+      if (mouseButton === CENTER) {
+        lb_progressLayers();
+        return false;
+      } else if (mouseButton === LEFT) {
+        lb_saveStateToLayers();
+        lb_initializeSimulation(lb_randomResolution());
+      } else if (mouseButton === RIGHT) {
+        lb_randomizeBrushColor();
+        lb_initializeSimulation(lb_randomResolution());
+        return false;
+      }
+    }
+
+    // ========== BUTTON CONTROL FUNCTIONS ==========
+    function lifebrushForward() {
+      lb_progressLayers();
+    }
+
+    function lifebrushPlay() {
+      if (lb_isPlaying) {
+        if (lb_playInterval) {
+          clearInterval(lb_playInterval);
+          lb_playInterval = null;
+        }
+        lb_isPlaying = false;
+        document.getElementById('lifebrush-play-btn').textContent = 'play';
+      } else {
+        lb_isPlaying = true;
+        document.getElementById('lifebrush-play-btn').textContent = 'stop';
+        lb_playInterval = setInterval(() => {
+          lb_progressLayers();
+        }, 300);
+      }
+    }
+
+    function lifebrushReset() {
+      if (lb_isPlaying) lifebrushPlay();
+      lb_layers = [];
+      lb_randomizeBrushColor();
+      lb_initializeSimulation(lb_randomResolution());
+    }
+
+    function lifebrushSave() {
+      saveCanvas('lifebrush', 'png');
+    }
+
+    // ========== LIFEBRUSH HELPER FUNCTIONS ==========
+    function lb_saveStateToLayers() {
+      if (lb_hasContent()) {
+        let newLayer = new LifeLayer(lb_grid, lb_resolution, lb_brushColor);
+        lb_layers.push(newLayer);
+      }
+    }
+
+    function lb_hasContent() {
+      for (let i = 0; i < lb_cols; i++) {
+        for (let j = 0; j < lb_rows; j++) {
+          if (lb_grid[i][j] === 1) return true;
+        }
+      }
+      return false;
+    }
+
+    function lb_randomizeBrushColor() {
+      lb_brushColor = color(random(255), random(255), random(255));
+    }
+
+    function lb_progressLayers() {
+      for (let layer of lb_layers) {
+        layer.stepForward();
+      }
+    }
+
+    function lb_randomResolution() {
+      return floor(random(8, 33));
+    }
+
+    function lb_initializeSimulation(res) {
+      lb_resolution = res;
+      lb_cols = floor(width / lb_resolution);
+      lb_rows = floor(height / lb_resolution);
+
+      lb_grid = lb_make2DArray(lb_cols, lb_rows);
+      lb_next = lb_make2DArray(lb_cols, lb_rows);
+
+      for (let i = 0; i < lb_cols; i++) {
+        for (let j = 0; j < lb_rows; j++) {
+          lb_grid[i][j] = 0;
+        }
+      }
+    }
+
+    function lb_make2DArray(cols, rows) {
+      let arr = new Array(cols);
+      for (let i = 0; i < arr.length; i++) {
+        arr[i] = new Array(rows);
+      }
+      return arr;
+    }
+
+    function lb_countNeighbors(grid, x, y) {
+      let sum = 0;
+      let cols = grid.length;
+      let rows = grid[0].length;
+      for (let i = -1; i < 2; i++) {
+        for (let j = -1; j < 2; j++) {
+          let col = (x + i + cols) % cols;
+          let row = (y + j + rows) % rows;
+          sum += grid[col][row];
+        }
+      }
+      sum -= grid[x][y];
+      return sum;
+    }
+
+    function lb_applyGameOfLifeRules() {
+      for (let i = 0; i < lb_cols; i++) {
+        for (let j = 0; j < lb_rows; j++) {
+          let state = lb_grid[i][j];
+          let neighbors = lb_countNeighbors(lb_grid, i, j);
+
+          if (state == 0 && neighbors == 3) {
+            lb_next[i][j] = 1;
+          } else if (state == 1 && (neighbors < 2 || neighbors > 3)) {
+            lb_next[i][j] = 0;
+          } else {
+            lb_next[i][j] = state;
+          }
+        }
+      }
+
+      let temp = lb_grid;
+      lb_grid = lb_next;
+      lb_next = temp;
+    }
+
+    function windowResized() {
+      const container = document.getElementById('lifebrush-holder');
+      if (lb_isInitialized && container) {
+        const rect = container.getBoundingClientRect();
+        resizeCanvas(rect.width, 400);
+      }
+    }
   </script>
 </body>
 </html>
