@@ -5,6 +5,10 @@
   let currentId = null;
   let homeFrame = null;
 
+  // Path <-> ID mapping
+  const pathToId = new Map();
+  const idToPath = new Map();
+
   boot().catch(err => {
     console.error(err);
     viewerEl.textContent = 'Failed to init viewer.';
@@ -14,6 +18,9 @@
     const res = await fetch('./manifest.json', { cache: 'no-store' });
     if (!res.ok) throw new Error(`manifest fetch ${res.status}`);
     const manifest = await res.json();
+
+    // Build path mappings from tree structure
+    buildPathMappings(manifest.tree || []);
 
     const nodes = flatten(manifest.tree || []);
     nodes.forEach(node => {
@@ -67,7 +74,66 @@
 
   function getPageFromPath(path) {
     const clean = path.replace(/^\/+/, '').replace(/\/+$/, '');
-    return clean.length ? clean : 'home';
+    if (!clean.length) return 'home';
+
+    // Check path mapping first
+    if (pathToId.has(clean)) {
+      return pathToId.get(clean);
+    }
+
+    // Fall back to direct ID (for backwards compatibility)
+    return clean;
+  }
+
+  // Convert title to URL-safe path segment
+  function titleToSlug(title) {
+    return title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')  // Remove special chars except spaces and hyphens
+      .replace(/\s+/g, '_')       // Spaces to underscores
+      .replace(/-+/g, '_')        // Hyphens to underscores
+      .replace(/_+/g, '_')        // Collapse multiple underscores
+      .replace(/^_|_$/g, '');     // Trim underscores
+  }
+
+  // Build path mappings from manifest tree
+  function buildPathMappings(tree, parentPath = '') {
+    tree.forEach(node => {
+      const slug = titleToSlug(node.title || node.id);
+      let nodePath;
+
+      // Special handling for top-level items
+      if (!parentPath) {
+        if (node.id === 'home') {
+          nodePath = '';  // home maps to root
+        } else {
+          nodePath = slug;
+        }
+      } else {
+        nodePath = parentPath + '/' + slug;
+      }
+
+      // Store mapping for pages and links
+      if (node.id) {
+        pathToId.set(nodePath, node.id);
+        idToPath.set(node.id, nodePath);
+
+        // Also map by ID directly for backwards compatibility
+        if (nodePath !== node.id) {
+          pathToId.set(node.id, node.id);
+        }
+      }
+
+      // Recurse into children
+      if (node.children) {
+        buildPathMappings(node.children, nodePath);
+      }
+    });
+  }
+
+  // Get URL path for a page ID
+  function getPathForId(id) {
+    return idToPath.get(id) || id;
   }
 
   function handleIframeMessage(event) {
@@ -89,7 +155,8 @@
         // Navigate to a page
         if (msg.target) {
           show(msg.target);
-          history.pushState({}, '', '/' + msg.target);
+          const urlPath = getPathForId(msg.target);
+          history.pushState({}, '', '/' + urlPath);
         }
         break;
 
@@ -180,5 +247,5 @@
     return out;
   }
 
-  window.viewer = { show, getHomeFrame };
+  window.viewer = { show, getHomeFrame, getPathForId };
 })();

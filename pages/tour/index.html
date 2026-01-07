@@ -177,7 +177,7 @@
     .demo-container {
       position: relative;
       width: 100%;
-      margin-bottom: 20px;
+      margin-bottom: 0;  /* Controls below handle their own spacing */
       background: #000;
       border: 1px solid #1a1c20;
     }
@@ -206,8 +206,8 @@
       display: flex;
       justify-content: center;
       gap: 12px;
-      padding: 12px 0;
-      margin-bottom: 20px;
+      padding: 16px 0;
+      margin: 0;  /* Let padding handle spacing for even centering */
     }
 
     .lifebrush-controls a {
@@ -249,7 +249,7 @@
     .lifebrush-controls.style-c {
       justify-content: space-around;
       width: 80%;
-      margin: 0 auto 20px;
+      margin: 0 auto;
     }
 
     .lifebrush-controls.style-c a {
@@ -274,7 +274,7 @@
     .lifebrush-controls.style-d {
       justify-content: space-around;
       width: 80%;
-      margin: 0 auto 20px;
+      margin: 0 auto;
     }
 
     .lifebrush-controls.style-d a {
@@ -291,7 +291,7 @@
     .lifebrush-controls.style-e {
       justify-content: space-around;
       width: 80%;
-      margin: 0 auto 20px;
+      margin: 0 auto;
     }
 
     .lifebrush-controls.style-e a {
@@ -835,6 +835,27 @@
     let lb_trackedMouseY = -1;
     let lb_isMouseOver = false;
 
+    // Start document-level mouse tracking immediately (before canvas exists)
+    // This ensures hover works without requiring focus/click
+    document.addEventListener('mousemove', (e) => {
+      const container = document.getElementById('lifebrush-holder');
+      if (!container) return;
+
+      const r = container.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+
+      if (x >= 0 && x <= r.width && y >= 0 && y <= r.height) {
+        lb_trackedMouseX = x;
+        lb_trackedMouseY = y;
+        lb_isMouseOver = true;
+      } else {
+        lb_isMouseOver = false;
+        lb_trackedMouseX = -1;
+        lb_trackedMouseY = -1;
+      }
+    }, { passive: true });
+
     class LifeLayer {
       constructor(grid, resolution, col) {
         this.grid = grid.map(arr => arr.slice());
@@ -921,19 +942,6 @@
         canvasEl.addEventListener('mousedown', (e) => {
           if (e.button === 1) e.preventDefault();
         });
-
-        // Also track via document for when scrolling over canvas
-        document.addEventListener('mousemove', (e) => {
-          if (!lb_canvas) return;
-          const r = lb_canvas.elt.getBoundingClientRect();
-          const x = e.clientX - r.left;
-          const y = e.clientY - r.top;
-          if (x >= 0 && x <= r.width && y >= 0 && y <= r.height) {
-            lb_trackedMouseX = x;
-            lb_trackedMouseY = y;
-            lb_isMouseOver = true;
-          }
-        }, { passive: true });
 
         lb_initializeSimulation(lb_randomResolution());
         lb_isInitialized = true;

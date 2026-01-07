@@ -79,7 +79,9 @@ import { externalUrls } from './externals.js';
   }
 
   function navigateTo(id) {
-    history.pushState({}, '', '/' + id);
+    // Use path-based URL if available
+    const urlPath = window.viewer.getPathForId ? window.viewer.getPathForId(id) : id;
+    history.pushState({}, '', '/' + urlPath);
     window.viewer.show(id);
   }
 

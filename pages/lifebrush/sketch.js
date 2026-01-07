@@ -17,6 +17,27 @@ let trackedMouseX = -1;
 let trackedMouseY = -1;
 let isMouseOver = false;
 
+// Start document-level mouse tracking immediately (before canvas exists)
+// This ensures hover works without requiring focus/click
+document.addEventListener('mousemove', (e) => {
+  const container = document.getElementById('lifebrush-container');
+  if (!container) return;
+
+  const r = container.getBoundingClientRect();
+  const x = e.clientX - r.left;
+  const y = e.clientY - r.top;
+
+  if (x >= 0 && x <= r.width && y >= 0 && y <= r.height) {
+    trackedMouseX = x;
+    trackedMouseY = y;
+    isMouseOver = true;
+  } else {
+    isMouseOver = false;
+    trackedMouseX = -1;
+    trackedMouseY = -1;
+  }
+}, { passive: true });
+
 class LifeLayer {
   constructor(grid, resolution, color) {
     this.grid = grid.map(arr => arr.slice());
@@ -101,19 +122,6 @@ function draw() {
     canvasEl.addEventListener('mousedown', (e) => {
       if (e.button === 1) e.preventDefault();
     });
-
-    // Document-level tracking for browsers with focus issues (Arc, etc)
-    document.addEventListener('mousemove', (e) => {
-      if (!canvas) return;
-      const r = canvas.elt.getBoundingClientRect();
-      const x = e.clientX - r.left;
-      const y = e.clientY - r.top;
-      if (x >= 0 && x <= r.width && y >= 0 && y <= r.height) {
-        trackedMouseX = x;
-        trackedMouseY = y;
-        isMouseOver = true;
-      }
-    }, { passive: true });
 
     if (isMobile) {
       canvas.elt.addEventListener('touchstart', preventDefaultTouch, {passive: false});

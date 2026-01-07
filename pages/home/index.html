@@ -508,16 +508,16 @@
     planets.push(planet);
     bodyMap[cfg.id] = planet.mesh;
 
-    // Add moons
+    // Add moons (with orbit rings, initially hidden)
     const moons = moonConfigs[cfg.id] || [];
     moons.forEach(moonCfg => {
-      const moon = planet.addChild(scene, { ...moonCfg, showOrbit: false });
+      const moon = planet.addChild(scene, { ...moonCfg, showOrbit: true });
       bodyMap[moonCfg.id] = moon.mesh;
 
-      // Add sub-moons
+      // Add sub-moons (with orbit rings, initially hidden)
       const subMoons = subMoonConfigs[moonCfg.id] || [];
       subMoons.forEach(subCfg => {
-        const subMoon = moon.addChild(scene, { ...subCfg, showOrbit: false });
+        const subMoon = moon.addChild(scene, { ...subCfg, showOrbit: true });
         bodyMap[subCfg.id] = subMoon.mesh;
       });
     });
@@ -525,9 +525,56 @@
 
   const allBodies = [central, ...planets.flatMap(p => p.getAllMeshes())];
 
+  // Collect ALL orbit rings (planets, moons, sub-moons)
+  function getAllOrbitRings() {
+    const rings = [];
+    planets.forEach(p => {
+      if (p.orbitRing) rings.push(p.orbitRing);
+      p.children.forEach(moon => {
+        if (moon.orbitRing) rings.push(moon.orbitRing);
+        moon.children.forEach(sub => {
+          if (sub.orbitRing) rings.push(sub.orbitRing);
+        });
+      });
+    });
+    return rings;
+  }
+
+  // Update orbit ring visibility based on focused body
+  // Shows rings for immediate children of focused body
+  function updateOrbitRingVisibility(focusedMesh) {
+    // Hide all orbit rings first
+    planets.forEach(p => {
+      if (p.orbitRing) p.orbitRing.setEnabled(false);
+      p.children.forEach(moon => {
+        if (moon.orbitRing) moon.orbitRing.setEnabled(false);
+        moon.children.forEach(sub => {
+          if (sub.orbitRing) sub.orbitRing.setEnabled(false);
+        });
+      });
+    });
+
+    // Show rings for children of focused body
+    if (focusedMesh === central) {
+      // Focused on central star: show planet rings
+      planets.forEach(p => {
+        if (p.orbitRing) p.orbitRing.setEnabled(true);
+      });
+    } else if (focusedMesh._bodyRef) {
+      // Focused on a celestial body: show its children's rings
+      const body = focusedMesh._bodyRef;
+      body.children.forEach(child => {
+        if (child.orbitRing) child.orbitRing.setEnabled(true);
+      });
+    }
+  }
+
+  // Initial setup: show planet rings (focused on central)
+  updateOrbitRingVisibility(central);
+
   // Collect orbit rings and pass to visual engine
   if (visualEngine) {
-    const orbitRings = planets.map(p => p.orbitRing).filter(r => r);
+    const orbitRings = getAllOrbitRings();
     visualEngine.updateOrbitRings(orbitRings);
   }
 
@@ -697,6 +744,13 @@
     infoPanel.style.top = Math.max(20, Math.min(screenPos.y + offsetY, window.innerHeight - 200)) + 'px';
   }
 
+  // Map sidebar folder IDs to body IDs for focusing
+  const folderToBodyId = {
+    'sec-01-demos': 'rcx01_demos',
+    'sec-02-demos': 'rcx02_demos',
+    'sec-03-demos': 'rcx03_demos',
+  };
+
   function handleAction(action) {
     switch (action.type) {
       case 'page':
@@ -707,6 +761,11 @@
         break;
       case 'expand':
         sendToParent({ type: 'expand', target: action.target });
+        // Also focus on the corresponding body (e.g., demos moon)
+        const bodyId = folderToBodyId[action.target];
+        if (bodyId && bodyMap[bodyId]) {
+          focusOn(bodyMap[bodyId]);
+        }
         break;
     }
   }
@@ -823,6 +882,9 @@
     transitionProgress = 0;
     pendingScrollDelta = 0;
 
+    // Update orbit ring visibility to show children of new focus
+    updateOrbitRingVisibility(mesh);
+
     // Set this as the resting body (central has no resting panel)
     setRestingBody(mesh._bodyId);
 
@@ -855,6 +917,10 @@
     transitioning = true;
     transitionProgress = 0;
     pendingScrollDelta = 0;
+
+    // Update orbit ring visibility to show planet rings
+    updateOrbitRingVisibility(central);
+
     setRestingBody('central'); // Central has no resting panel
   }
 

@@ -119,7 +119,7 @@
     <div class="container">
       <aside class="sidebar">
         <ul id="tree"><li>Loading…</li></ul>
-        <div class="version-tag">v0.1.0</div>
+        <div class="version-tag">v0.1.1</div>
       </aside>
 
       <div class="content">
@@ -147,7 +147,8 @@
 
       function goToTour() {
         dismissWelcome();
-        // Navigate to tour page
+        // Navigate to tour page and update URL
+        history.pushState({}, '', '/tour');
         if (window.viewer && window.viewer.show) {
           window.viewer.show('tour');
         } else {
