@@ -497,24 +497,24 @@
       <!-- Version A: Minimal -->
       <div id="hv-minimal" class="header-version hv-minimal">
         <h1><span class="name">recxa</span></h1>
-        <p class="tagline">creative coding, interactive sound, experimental tools</p>
+        <p class="tagline">creative code experiments</p>
       </div>
 
       <!-- Version C: Terminal -->
       <div id="hv-terminal" class="header-version hv-terminal">
         <h1><span class="prompt">~/rcx $</span> whoami<br><span class="name">recxa</span><span class="cursor"></span></h1>
-        <p class="tagline">creative coding, interactive sound, experimental tools</p>
+        <p class="tagline">creative code experiments</p>
       </div>
 
       <!-- Version D: Understated -->
       <div id="hv-understated" class="header-version hv-understated">
         <h1>work by <span class="name">recxa</span></h1>
-        <p class="tagline">creative coding, interactive sound, experimental tools</p>
+        <p class="tagline">creative code experiments</p>
       </div>
 
       <!-- Version E: Coordinates -->
       <div id="hv-coords" class="header-version hv-coords">
-        <h1><span class="name">recxa</span><span class="meta">creative tools / sound / systems</span></h1>
+        <h1><span class="name">recxa</span><span class="meta">creative code experiments</span></h1>
         <p class="tagline"></p>
       </div>
 
@@ -531,7 +531,11 @@
       </div>
 
       <p class="project-description">
-        a loop sampler built for real-time exploration and collaborative performance. processing front-end, supercollider audio engine, connected via OSC. tempo is controlled through ship physics rather than a slider—you fly around a 2D plane, and your position maps to BPM. the instrument is built around the idea that parameters like tempo and sample selection can be terrain to move through rather than values to set. designed so someone unfamiliar with DAWs can still be at the wheel of the beat.
+        a keyboard-only sampler inspired by video game control philosophy. the meat of the keyboard is segmented into two 4x4 grids. the left grid controls sample sources, each row corresponding to a drum loop and each column an instrumental loop. the x,y position of your keyboard input within the grid determines the active sample-source combination. when multiple samples overlap, they are meshed together using non-negative matrix factorization. the right grid is a bank of 16 jump points, which the user can set, trigger, or clear at any time. jump points can be set for drum and instrument tracks jointly or independently, allowing for improvised yet complex sample flips. tempo is controlled by flying an asteroids-style ship on a 2d plane with arrow keys. the user can record vocal loops at any time, even while changing tempo, and it will remain rhythmically and harmonically synced to the sample as if recorded directly onto a spinning vinyl record (with the side effect of a natural formant shift).
+      </p>
+
+      <p class="project-description">
+        the interface was designed to encourage users of any skill level to share control and influence over the beat. currently, i am working on a back-end system that utilizes stem separation and a LoopMaker-inspired segmentation to give users a one-click pipeline for loading new samples without any DAW experience. for more information, see my draft paper for the downbeat detection component of that system.
       </p>
 
       <!-- Development journey -->
@@ -545,12 +549,12 @@
           </iframe>
         </div>
         <p class="project-description">
-          the first working version. 4 drum loops on X-axis, 4 instrument loops on Y-axis, each with deck selection (4 groups of related samples per axis). includes live vocal recording with loop playback, tempo-synced rolling reverse, and mute controls. the asteroids-style ship already controls tempo. all music in this demo is original. missing the waveform visualizations and chop matrix that came later—but already demonstrates how multiple people could explore and perform together without any prior experience.
+          the first working prototype. performed on laptop by me and my friends at a gyro shop after concert. all music in this demo is original.
         </p>
       </div>
 
       <div class="dev-section">
-        <p class="dev-label">current version</p>
+        <p class="dev-label">recent version</p>
         <div class="video-container">
           <iframe
             src="https://www.youtube.com/embed/rDcJgQN2-MM"
@@ -559,7 +563,7 @@
           </iframe>
         </div>
         <p class="project-description">
-          expanded to 8 decks with 4 buffers each, all driven by a global phasor (0–4 beats) so switching samples mid-loop is seamless. added waveform visualization, jump point matrix (16 storable phasor positions), and refined the control scheme based on user testing. the keyboard splits into two 4×4 grids: one for deck/buffer selection, the other for jump points you can snap the playhead to on the fly.
+          a more recent iteration, recorded at my partner's pizzeria. here we see jump, waveform, and blend functionality. i am experimenting with jump point quantization intervals.
         </p>
       </div>
 
@@ -573,7 +577,7 @@
           </iframe>
         </div>
         <p class="project-description">
-          a detailed study of 9 participants using the instrument with no prior instructions. includes keylog analysis tracking which features they discovered and <em>learned</em> on their own. this feedback led to significant control scheme modifications for improved intuitiveness—subsequent testing showed measurably better feature discovery with the revised layout.
+          a formal study of 9 participants using the instrument with no prior instructions. using keylog and screen capture analysis, i evaluate the 'discoverability' of each control scheme. some features are discovered and understood immediately, others are stumbled upon by accident, others are never found at all. in response to this, i adjusted the problematic keybinds and introduced more visual feedback, yielding improved results in subsequent informal tests.
         </p>
       </div>
 
@@ -614,7 +618,7 @@
         </iframe>
       </div>
       <p class="project-description">
-        a real-time installation that reads text from the world—via webcam OCR—then searches YouTube for 0-view videos matching that text. each video plays once, for the first and possibly only time, then the loop continues: the system reads from its own output, spawning new searches. shown at Manifest 2024, featuring a foam figure, a keyboard, and bananagram tiles visitors could rearrange to guide the system's journey through YouTube's depths.
+        a real-time AV installation that recursively scrapes youtube for recently uploaded 0-view videos. the setup consists of a TV on a wooden desk, and a styrofoam head affixed to a wooden stick, duct taped to a wooden chair in front of the desk. a webcam is dug into the eye region of the head facing the TV, creating a feedback loop backdrop. videos are foreground-extracted and displayed on top of the head-cam backdrop, allowing multiple videos to overlap. using OCR, the webcam scans the screen for text, which it uses as the search prompt for the next youtube scrape. another webcam sits on top of the TV, pointed down at the desk where an open bag of bananagrams lies. passerbys are encouraged to steer the feedback loop by spelling out words or phrases on the desk with the bananagram tiles, which are foreground-extracted and thrown into the visual mix with the rest of the video feeds, incorporating itself into the OCR strings. i am currently saving up for a used computer that can host a persistent livestream of the program.
       </p>
       <div class="project-actions">
         <a href="https://github.com/recxa/rcx02" target="_blank" class="btn btn-primary">code</a>
@@ -714,9 +718,9 @@
         <a href="javascript:void(0)" onclick="lifebrushSave()">save</a>
       </div>
       <p class="project-description">
-        a browser-based drawing tool where your strokes come alive. draw on the canvas, and after a few cells are lit, conway's game of life takes over—your drawing evolves, mutates, and settles into new forms. save layers, change colors, let patterns stack and interact. the grid wraps at the edges (toroidal topology), so patterns that drift off one side reappear on the other.
+        a game of life drawing tool.
         <br><br>
-        <strong>Controls:</strong> <code>hover</code> — paint · <code>click</code> — save layer + new size · <code>middle click</code> — evolve layers · <code>right click</code> — new color + new size
+        <code>hover</code> - paint · <code>click</code> - place layer · <code>middle click</code> - evolve 1 generation · <code>right click</code> - randomize brush
       </p>
       <div class="project-actions">
         <!-- No additional demos for lifebrush -->
@@ -737,7 +741,7 @@
         </iframe>
       </div>
       <p class="project-description">
-        a video compositing system that overlays multiple videos in 3D space using AI-extracted depth maps. pixel-by-pixel, frame-by-frame, the system shows whichever video is "closest"—as if videos were stacked in depth and you see through to whatever's in front. objects from different videos appear to coexist and pass through each other based on their actual spatial depth. named after the video game cheat that lets you walk through walls.
+        a video composition effect that superimposes multiple video in 3D space using AI-extracted depth maps. for every pixel, the algorithm sources from whichever video is "closest to the camera" at that pixel and frame, as if they occupied the same space and obstructed one another. objects from different videos appear to pass through one another like noclipping through a video game map. the experimental prototype is built in processing, but i later made a touchdesigner patch that massively simplifies the process and improves the masking fidelity.
       </p>
       <div class="project-actions">
         <a href="https://github.com/recxa/rcx05" target="_blank" class="btn btn-primary">code</a>
