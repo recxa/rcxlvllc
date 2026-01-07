@@ -488,6 +488,53 @@
       scrollbar-width: thin;
       scrollbar-color: #2a2d33 #0d0d10;
     }
+
+    /* Paginated mode */
+    .paginated .project {
+      display: none;
+    }
+    .paginated .project.active {
+      display: block;
+    }
+    .paginated .project + .project {
+      padding-top: 0;
+      border-top: none;
+    }
+
+    /* Page navigation */
+    .page-nav {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      margin-left: auto;
+    }
+    .paginated .page-nav {
+      display: flex;
+    }
+    .page-nav-btn {
+      background: #1a1c20;
+      border: 1px solid #2a2d33;
+      color: #9a9da4;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .page-nav-btn:hover {
+      background: #252830;
+      color: #e8eaed;
+    }
+    .page-nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .page-indicator {
+      font-size: 12px;
+      color: #667;
+      min-width: 32px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -586,6 +633,11 @@
         <button class="btn btn-toggle" onclick="toggleDemos(this, 'demos-01')">
           <span class="arrow">></span> additional demos
         </button>
+        <div class="page-nav">
+          <button class="page-nav-btn" onclick="prevProject()">←</button>
+          <span class="page-indicator">1/5</span>
+          <button class="page-nav-btn" onclick="nextProject()">→</button>
+        </div>
       </div>
       <div id="demos-01" class="demos-section">
         <div class="demos-inner">
@@ -625,6 +677,11 @@
         <button class="btn btn-toggle" onclick="toggleDemos(this, 'demos-02')">
           <span class="arrow">></span> explore demos
         </button>
+        <div class="page-nav">
+          <button class="page-nav-btn" onclick="prevProject()">←</button>
+          <span class="page-indicator">2/5</span>
+          <button class="page-nav-btn" onclick="nextProject()">→</button>
+        </div>
       </div>
       <div id="demos-02" class="demos-section">
         <div class="demos-inner">
@@ -684,6 +741,11 @@
         <button class="btn btn-toggle" onclick="toggleDemos(this, 'demos-03')">
           <span class="arrow">></span> explore demos
         </button>
+        <div class="page-nav">
+          <button class="page-nav-btn" onclick="prevProject()">←</button>
+          <span class="page-indicator">3/5</span>
+          <button class="page-nav-btn" onclick="nextProject()">→</button>
+        </div>
       </div>
       <div id="demos-03" class="demos-section">
         <div class="demos-inner">
@@ -724,6 +786,11 @@
       </p>
       <div class="project-actions">
         <!-- No additional demos for lifebrush -->
+        <div class="page-nav">
+          <button class="page-nav-btn" onclick="prevProject()">←</button>
+          <span class="page-indicator">4/5</span>
+          <button class="page-nav-btn" onclick="nextProject()">→</button>
+        </div>
       </div>
     </section>
 
@@ -746,6 +813,11 @@
       <div class="project-actions">
         <a href="https://github.com/recxa/rcx05" target="_blank" class="btn btn-primary">code</a>
         <!-- Only one demo for rcx05, already shown above -->
+        <div class="page-nav">
+          <button class="page-nav-btn" onclick="prevProject()">←</button>
+          <span class="page-indicator">5/5</span>
+          <button class="page-nav-btn" onclick="nextProject()">→</button>
+        </div>
       </div>
     </section>
 
@@ -835,6 +907,70 @@
         demosSection.style.maxHeight = demosSection.scrollHeight + 'px';
       }
     }
+
+    // ========== PAGINATION ==========
+    let currentProject = 0;
+    const projects = document.querySelectorAll('.project');
+    const totalProjects = projects.length;
+    let isPaginated = false;
+
+    function showProject(index) {
+      projects.forEach((p, i) => {
+        p.classList.toggle('active', i === index);
+      });
+      currentProject = index;
+      updatePageIndicators();
+      // Scroll to top of container when changing pages
+      document.querySelector('.container').scrollTop = 0;
+      window.scrollTo(0, 0);
+    }
+
+    function prevProject() {
+      if (currentProject > 0) {
+        showProject(currentProject - 1);
+      }
+    }
+
+    function nextProject() {
+      if (currentProject < totalProjects - 1) {
+        showProject(currentProject + 1);
+      }
+    }
+
+    function updatePageIndicators() {
+      const indicators = document.querySelectorAll('.page-indicator');
+      indicators.forEach(ind => {
+        ind.textContent = `${currentProject + 1}/${totalProjects}`;
+      });
+      // Update button states
+      const prevBtns = document.querySelectorAll('.page-nav-btn:first-child');
+      const nextBtns = document.querySelectorAll('.page-nav-btn:last-child');
+      prevBtns.forEach(btn => btn.disabled = currentProject === 0);
+      nextBtns.forEach(btn => btn.disabled = currentProject === totalProjects - 1);
+    }
+
+    function togglePagination() {
+      isPaginated = !isPaginated;
+      document.querySelector('.container').classList.toggle('paginated', isPaginated);
+      if (isPaginated) {
+        showProject(currentProject);
+      }
+    }
+
+    // 'p' key toggles pagination mode
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'p' || e.key === 'P') {
+        togglePagination();
+      }
+      // Arrow keys for pagination navigation
+      if (isPaginated) {
+        if (e.key === 'ArrowLeft') {
+          prevProject();
+        } else if (e.key === 'ArrowRight') {
+          nextProject();
+        }
+      }
+    });
 
     // ========== LIFEBRUSH (embedded directly, no iframe) ==========
     // Using p5.js built-in mouseX/mouseY (no custom tracking needed)
