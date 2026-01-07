@@ -80,7 +80,7 @@ const ManifestBridge = (() => {
   };
 
   async function init() {
-    const res = await fetch('/manifest.json', { cache: 'no-store' });
+    const res = await fetch('./manifest.json', { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to load manifest');
     manifest = await res.json();
 

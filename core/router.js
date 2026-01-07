@@ -29,7 +29,7 @@ import { externalUrls } from './externals.js';
   }
 
   async function boot() {
-    const res = await fetch('/manifest.json', { cache: 'no-store' });
+    const res = await fetch('./manifest.json', { cache: 'no-store' });
     if (!res.ok) throw new Error(`manifest fetch ${res.status}`);
     const manifest = await res.json();
     const nodeMap = indexNodes(manifest.tree || []);
@@ -71,25 +71,25 @@ import { externalUrls } from './externals.js';
     // NOTE: Initial page load is handled by viewer.js (single source of truth)
     // Router only handles navigation clicks and back/forward
 
-    // back/forward
-    window.addEventListener('popstate', () => {
-      // Use viewer's path mapping to get correct ID
-      const id = window.viewer.getPageFromPath
-        ? window.viewer.getPageFromPath(location.pathname)
-        : cleanPath(location.pathname) || 'home';
+    // back/forward via hash change
+    window.addEventListener('hashchange', () => {
+      const id = window.viewer.getPageFromHash
+        ? window.viewer.getPageFromHash(location.hash)
+        : cleanHash(location.hash) || 'home';
       if (window.viewer) window.viewer.show(id);
     });
   }
 
   function navigateTo(id) {
-    // Use path-based URL if available
+    // Use path-based URL in hash format: #/path
     const urlPath = window.viewer.getPathForId ? window.viewer.getPathForId(id) : id;
-    history.pushState({}, '', '/' + urlPath);
+    location.hash = '/' + urlPath;
+    // hashchange event will trigger show(), but call it directly for immediate response
     window.viewer.show(id);
   }
 
-  function cleanPath(path) {
-    const clean = path.replace(/^\/+/, '').replace(/\/+$/, '');
+  function cleanHash(hash) {
+    const clean = hash.replace(/^#\/?/, '').replace(/\/+$/, '');
     return clean.length ? clean : null;
   }
 

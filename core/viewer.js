@@ -15,7 +15,7 @@
   });
 
   async function boot() {
-    const res = await fetch('/manifest.json', { cache: 'no-store' });
+    const res = await fetch('./manifest.json', { cache: 'no-store' });
     if (!res.ok) throw new Error(`manifest fetch ${res.status}`);
     const manifest = await res.json();
 
@@ -61,8 +61,8 @@
       window.ManifestBridge.setPlanetFrame(homeFrame);
     }
 
-    // Determine initial page from URL path (let viewer be the single source of truth)
-    const initialPage = getPageFromPath(location.pathname);
+    // Determine initial page from URL hash (let viewer be the single source of truth)
+    const initialPage = getPageFromHash(location.hash);
     if (iframes.has(initialPage)) {
       show(initialPage);
     } else if (iframes.has('home')) {
@@ -72,8 +72,9 @@
     }
   }
 
-  function getPageFromPath(path) {
-    const clean = path.replace(/^\/+/, '').replace(/\/+$/, '');
+  function getPageFromHash(hash) {
+    // Hash format: #/path or #path (strip leading # and optional /)
+    const clean = hash.replace(/^#\/?/, '').replace(/\/+$/, '');
     if (!clean.length) return 'home';
 
     // Check path mapping first
@@ -152,11 +153,11 @@
         break;
 
       case 'navigate':
-        // Navigate to a page
+        // Navigate to a page using hash routing
         if (msg.target) {
           show(msg.target);
           const urlPath = getPathForId(msg.target);
-          history.pushState({}, '', '/' + urlPath);
+          location.hash = '/' + urlPath;
         }
         break;
 
@@ -247,5 +248,5 @@
     return out;
   }
 
-  window.viewer = { show, getHomeFrame, getPathForId, getPageFromPath };
+  window.viewer = { show, getHomeFrame, getPathForId, getPageFromHash };
 })();

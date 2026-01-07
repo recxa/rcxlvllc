@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>rcx shell</title>
-    <link rel="stylesheet" href="/core/style.css" />
+    <link rel="stylesheet" href="./core/style.css" />
     <style>
       /* Welcome Overlay */
       .welcome-overlay {
@@ -127,14 +127,14 @@
       </div>
     </div>
 
-    <script type="module" src="/core/externals.js"></script>
-    <script src="/core/windows.js"></script>
-    <script src="/core/sidebar-effects.js"></script>
-    <script src="/core/manifest-bridge.js"></script>
-    <script src="/core/sidebar.js"></script>
-    <script src="/core/viewer.js"></script>
-    <script src="/core/bus.js"></script>
-    <script type="module" src="/core/router.js"></script>
+    <script type="module" src="./core/externals.js"></script>
+    <script src="./core/windows.js"></script>
+    <script src="./core/sidebar-effects.js"></script>
+    <script src="./core/manifest-bridge.js"></script>
+    <script src="./core/sidebar.js"></script>
+    <script src="./core/viewer.js"></script>
+    <script src="./core/bus.js"></script>
+    <script type="module" src="./core/router.js"></script>
     <script>
       // Welcome Overlay Logic
       function dismissWelcome() {
@@ -147,8 +147,8 @@
 
       function goToTour() {
         dismissWelcome();
-        // Navigate to tour page and update URL
-        history.pushState({}, '', '/tour');
+        // Navigate to tour page using hash routing
+        location.hash = '/tour';
         if (window.viewer && window.viewer.show) {
           window.viewer.show('tour');
         } else {
