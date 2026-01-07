@@ -745,10 +745,10 @@
       </div>
     </section>
 
-    <footer class="footer">~</footer>
+    <footer class="footer dev-overlay" style="display: none;">~</footer>
   </div>
 
-  <div class="header-hint">
+  <div class="header-hint dev-overlay" style="display: none;">
     <kbd>tab</kbd> headers · <kbd>`</kbd> button style
   </div>
 
@@ -798,6 +798,22 @@
           controls.classList.add(buttonStyles[currentButtonStyle]);
         }
       }
+
+      // Escape toggles dev overlays
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.dev-overlay').forEach(el => {
+          el.style.display = el.style.display === 'none' ? '' : 'none';
+        });
+      }
+    });
+
+    // Listen for parent messages
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.type === 'toggleDevOverlays') {
+        document.querySelectorAll('.dev-overlay').forEach(el => {
+          el.style.display = el.style.display === 'none' ? '' : 'none';
+        });
+      }
     });
 
     // Demo accordion toggle
@@ -817,6 +833,7 @@
     }
 
     // ========== LIFEBRUSH (embedded directly, no iframe) ==========
+    // Using p5.js built-in mouseX/mouseY (no custom tracking needed)
     let lb_cols, lb_rows;
     let lb_resolution;
     let lb_grid;
@@ -829,32 +846,6 @@
     let lb_isInitialized = false;
     let lb_isPlaying = false;
     let lb_playInterval = null;
-
-    // Track mouse position
-    let lb_trackedMouseX = -1;
-    let lb_trackedMouseY = -1;
-    let lb_isMouseOver = false;
-
-    // Start document-level mouse tracking immediately (before canvas exists)
-    // This ensures hover works without requiring focus/click
-    document.addEventListener('mousemove', (e) => {
-      const container = document.getElementById('lifebrush-holder');
-      if (!container) return;
-
-      const r = container.getBoundingClientRect();
-      const x = e.clientX - r.left;
-      const y = e.clientY - r.top;
-
-      if (x >= 0 && x <= r.width && y >= 0 && y <= r.height) {
-        lb_trackedMouseX = x;
-        lb_trackedMouseY = y;
-        lb_isMouseOver = true;
-      } else {
-        lb_isMouseOver = false;
-        lb_trackedMouseX = -1;
-        lb_trackedMouseY = -1;
-      }
-    }, { passive: true });
 
     class LifeLayer {
       constructor(grid, resolution, col) {
@@ -912,34 +903,15 @@
       if (!lb_isInitialized) {
         lb_canvas = createCanvas(rect.width, 400);
         lb_canvas.parent('lifebrush-holder');
-        lb_canvas.elt.setAttribute('tabindex', '0');
-        lb_canvas.elt.style.display = 'block';
 
-        // Native mouse tracking - attach to canvas element directly
-        const canvasEl = lb_canvas.elt;
+        // Prevent touch scrolling
+        lb_canvas.elt.style.touchAction = 'none';
 
-        canvasEl.addEventListener('mousemove', (e) => {
-          const r = canvasEl.getBoundingClientRect();
-          lb_trackedMouseX = e.clientX - r.left;
-          lb_trackedMouseY = e.clientY - r.top;
-          lb_isMouseOver = true;
-        }, { passive: true });
+        // Prevent context menu on right-click
+        lb_canvas.elt.addEventListener('contextmenu', (e) => e.preventDefault());
 
-        canvasEl.addEventListener('mouseenter', () => {
-          lb_isMouseOver = true;
-        }, { passive: true });
-
-        canvasEl.addEventListener('mouseleave', () => {
-          lb_isMouseOver = false;
-          lb_trackedMouseX = -1;
-          lb_trackedMouseY = -1;
-        }, { passive: true });
-
-        canvasEl.addEventListener('contextmenu', (e) => {
-          e.preventDefault();
-        });
-
-        canvasEl.addEventListener('mousedown', (e) => {
+        // Prevent middle-click default behavior
+        lb_canvas.elt.addEventListener('mousedown', (e) => {
           if (e.button === 1) e.preventDefault();
         });
 
@@ -967,10 +939,12 @@
         }
       }
 
-      // Hover-draw: paint using tracked mouse position
-      if (lb_isMouseOver && lb_trackedMouseX >= 0 && lb_trackedMouseY >= 0) {
-        let touchCol = floor(lb_trackedMouseX / lb_resolution);
-        let touchRow = floor(lb_trackedMouseY / lb_resolution);
+      // Hover-draw: check if mouse is over canvas using p5's built-in mouseX/mouseY
+      let overCanvas = mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height;
+
+      if (overCanvas) {
+        let touchCol = floor(mouseX / lb_resolution);
+        let touchRow = floor(mouseY / lb_resolution);
         if (touchCol >= 0 && touchCol < lb_cols && touchRow >= 0 && touchRow < lb_rows) {
           if (lb_grid[touchCol][touchRow] == 0) {
             lb_grid[touchCol][touchRow] = 1;

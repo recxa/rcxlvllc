@@ -103,7 +103,7 @@
 </head>
 <body>
 <canvas id="renderCanvas"></canvas>
-<div class="hint">click = focus · scroll = zoom · drag = orbit · R = reset · ` = settings</div>
+<div class="hint dev-overlay" style="display: none;">click = focus · scroll = zoom · drag = orbit · R = reset · ` = settings</div>
 
 <div id="info-panel">
   <div id="info-panel-header">
@@ -444,61 +444,61 @@
   const planets = [];
   const bodyMap = { 'central': central };
 
-  // Planet configs
+  // Planet configs (distances increased by 20%)
   const planetConfigs = [
-    { id: 'rcx01', orbitRadius: 7,  size: 1.0,  color: '#e8c547', speed: 0.5,  inclination: 0.05, phase: 0 },
-    { id: 'rcx02', orbitRadius: 11, size: 0.9,  color: '#47a8e8', speed: 0.35, inclination: 0.15, phase: 2.1 },
-    { id: 'rcx03', orbitRadius: 15, size: 0.75, color: '#e87847', speed: 0.25, inclination: -0.1, phase: 4.2 },
-    { id: 'rcx04', orbitRadius: 19, size: 0.85, color: '#47e878', speed: 0.18, inclination: 0.2,  phase: 1.0 },
-    { id: 'rcx05', orbitRadius: 24, size: 0.65, color: '#a847e8', speed: 0.12, inclination: -0.05, phase: 5.5 }
+    { id: 'rcx01', orbitRadius: 8.4,  size: 1.0,  color: '#e8c547', speed: 0.5,  inclination: 0.05, phase: 0 },
+    { id: 'rcx02', orbitRadius: 13.2, size: 0.9,  color: '#47a8e8', speed: 0.35, inclination: 0.15, phase: 2.1 },
+    { id: 'rcx03', orbitRadius: 18,   size: 0.75, color: '#e87847', speed: 0.25, inclination: -0.1, phase: 4.2 },
+    { id: 'rcx04', orbitRadius: 22.8, size: 0.85, color: '#47e878', speed: 0.18, inclination: 0.2,  phase: 1.0 },
+    { id: 'rcx05', orbitRadius: 28.8, size: 0.65, color: '#a847e8', speed: 0.12, inclination: -0.05, phase: 5.5 }
   ];
 
-  // Moon configs for each planet
+  // Moon configs for each planet (distances increased by 20%)
   const moonConfigs = {
     'rcx01': [
-      { id: 'rcx01_demos', orbitRadius: 1.8, size: 0.2, color: '#aaa', speed: 1.0 },
-      { id: 'rcx01_code', orbitRadius: 2.4, size: 0.15, color: '#8af', speed: 0.8, inclination: 0.2 },
-      { id: 'rcx01_readme', orbitRadius: 3.0, size: 0.18, color: '#fa8', speed: 0.6, inclination: -0.15 }
+      { id: 'rcx01_demos', orbitRadius: 2.16, size: 0.2, color: '#aaa', speed: 1.0 },
+      { id: 'rcx01_code', orbitRadius: 2.88, size: 0.15, color: '#8af', speed: 0.8, inclination: 0.2 },
+      { id: 'rcx01_readme', orbitRadius: 3.6, size: 0.18, color: '#fa8', speed: 0.6, inclination: -0.15 }
     ],
     'rcx02': [
-      { id: 'rcx02_demos', orbitRadius: 1.6, size: 0.18, color: '#aaa', speed: 1.1 },
-      { id: 'rcx02_stream', orbitRadius: 2.2, size: 0.14, color: '#a6f', speed: 0.9, inclination: 0.25 },
-      { id: 'rcx02_code', orbitRadius: 2.8, size: 0.15, color: '#8af', speed: 0.7, inclination: -0.1 },
-      { id: 'rcx02_readme', orbitRadius: 3.3, size: 0.16, color: '#fa8', speed: 0.55 }
+      { id: 'rcx02_demos', orbitRadius: 1.92, size: 0.18, color: '#aaa', speed: 1.1 },
+      { id: 'rcx02_stream', orbitRadius: 2.64, size: 0.14, color: '#a6f', speed: 0.9, inclination: 0.25 },
+      { id: 'rcx02_code', orbitRadius: 3.36, size: 0.15, color: '#8af', speed: 0.7, inclination: -0.1 },
+      { id: 'rcx02_readme', orbitRadius: 3.96, size: 0.16, color: '#fa8', speed: 0.55 }
     ],
     'rcx03': [
-      { id: 'rcx03_demos', orbitRadius: 1.5, size: 0.16, color: '#aaa', speed: 1.2 },
-      { id: 'rcx03_code', orbitRadius: 2.1, size: 0.14, color: '#8af', speed: 0.85, inclination: 0.15 },
-      { id: 'rcx03_readme', orbitRadius: 2.6, size: 0.15, color: '#fa8', speed: 0.65, inclination: -0.2 }
+      { id: 'rcx03_demos', orbitRadius: 1.8, size: 0.16, color: '#aaa', speed: 1.2 },
+      { id: 'rcx03_code', orbitRadius: 2.52, size: 0.14, color: '#8af', speed: 0.85, inclination: 0.15 },
+      { id: 'rcx03_readme', orbitRadius: 3.12, size: 0.15, color: '#fa8', speed: 0.65, inclination: -0.2 }
     ],
     'rcx04': [
-      { id: 'rcx04_lifebrush', orbitRadius: 1.7, size: 0.22, color: '#4e8', speed: 0.9 },
-      { id: 'rcx04_readme', orbitRadius: 2.4, size: 0.16, color: '#fa8', speed: 0.7, inclination: 0.2 }
+      { id: 'rcx04_lifebrush', orbitRadius: 2.04, size: 0.22, color: '#4e8', speed: 0.9 },
+      { id: 'rcx04_readme', orbitRadius: 2.88, size: 0.16, color: '#fa8', speed: 0.7, inclination: 0.2 }
     ],
     'rcx05': [
-      { id: 'rcx05_demo', orbitRadius: 1.4, size: 0.14, color: '#aaa', speed: 1.0 },
-      { id: 'rcx05_code', orbitRadius: 1.9, size: 0.12, color: '#8af', speed: 0.8, inclination: 0.1 },
-      { id: 'rcx05_readme', orbitRadius: 2.4, size: 0.13, color: '#fa8', speed: 0.6, inclination: -0.15 }
+      { id: 'rcx05_demo', orbitRadius: 1.68, size: 0.14, color: '#aaa', speed: 1.0 },
+      { id: 'rcx05_code', orbitRadius: 2.28, size: 0.12, color: '#8af', speed: 0.8, inclination: 0.1 },
+      { id: 'rcx05_readme', orbitRadius: 2.88, size: 0.13, color: '#fa8', speed: 0.6, inclination: -0.15 }
     ]
   };
 
-  // Sub-moon configs (for demo folders)
+  // Sub-moon configs (for demo folders) (distances increased by 20%)
   const subMoonConfigs = {
     'rcx01_demos': [
-      { id: 'rcx01_demo1', orbitRadius: 0.5, size: 0.06, color: '#888', speed: 1.5 },
-      { id: 'rcx01_demo2', orbitRadius: 0.65, size: 0.06, color: '#888', speed: 1.3, phase: 1.5 },
-      { id: 'rcx01_demo3', orbitRadius: 0.8, size: 0.06, color: '#888', speed: 1.1, phase: 3.0 },
-      { id: 'rcx01_demo4', orbitRadius: 0.95, size: 0.07, color: '#9a9', speed: 0.9, phase: 4.5 }
+      { id: 'rcx01_demo1', orbitRadius: 0.6, size: 0.06, color: '#888', speed: 1.5 },
+      { id: 'rcx01_demo2', orbitRadius: 0.78, size: 0.06, color: '#888', speed: 1.3, phase: 1.5 },
+      { id: 'rcx01_demo3', orbitRadius: 0.96, size: 0.06, color: '#888', speed: 1.1, phase: 3.0 },
+      { id: 'rcx01_demo4', orbitRadius: 1.14, size: 0.07, color: '#9a9', speed: 0.9, phase: 4.5 }
     ],
     'rcx02_demos': [
-      { id: 'rcx02_demo1', orbitRadius: 0.45, size: 0.05, color: '#888', speed: 1.6 },
-      { id: 'rcx02_demo2', orbitRadius: 0.58, size: 0.05, color: '#888', speed: 1.4, phase: 1.57 },
-      { id: 'rcx02_demo3', orbitRadius: 0.71, size: 0.05, color: '#888', speed: 1.2, phase: 3.14 },
-      { id: 'rcx02_demo4', orbitRadius: 0.84, size: 0.05, color: '#888', speed: 1.0, phase: 4.71 }
+      { id: 'rcx02_demo1', orbitRadius: 0.54, size: 0.05, color: '#888', speed: 1.6 },
+      { id: 'rcx02_demo2', orbitRadius: 0.7, size: 0.05, color: '#888', speed: 1.4, phase: 1.57 },
+      { id: 'rcx02_demo3', orbitRadius: 0.85, size: 0.05, color: '#888', speed: 1.2, phase: 3.14 },
+      { id: 'rcx02_demo4', orbitRadius: 1.0, size: 0.05, color: '#888', speed: 1.0, phase: 4.71 }
     ],
     'rcx03_demos': [
-      { id: 'rcx03_demo1', orbitRadius: 0.4, size: 0.05, color: '#888', speed: 1.5 },
-      { id: 'rcx03_demo2', orbitRadius: 0.55, size: 0.05, color: '#888', speed: 1.2, phase: 3.14 }
+      { id: 'rcx03_demo1', orbitRadius: 0.48, size: 0.05, color: '#888', speed: 1.5 },
+      { id: 'rcx03_demo2', orbitRadius: 0.66, size: 0.05, color: '#888', speed: 1.2, phase: 3.14 }
     ]
   };
 
@@ -542,6 +542,7 @@
 
   // Update orbit ring visibility based on focused body
   // Shows rings for immediate children of focused body
+  // For terminal bodies (no children), retain parent's sibling rings
   function updateOrbitRingVisibility(focusedMesh) {
     // Hide all orbit rings first
     planets.forEach(p => {
@@ -561,11 +562,21 @@
         if (p.orbitRing) p.orbitRing.setEnabled(true);
       });
     } else if (focusedMesh._bodyRef) {
-      // Focused on a celestial body: show its children's rings
       const body = focusedMesh._bodyRef;
-      body.children.forEach(child => {
-        if (child.orbitRing) child.orbitRing.setEnabled(true);
-      });
+
+      if (body.children.length > 0) {
+        // Has children: show children's rings
+        body.children.forEach(child => {
+          if (child.orbitRing) child.orbitRing.setEnabled(true);
+        });
+      } else {
+        // Terminal body (no children): show sibling rings (parent's children)
+        if (body.parentBody) {
+          body.parentBody.children.forEach(sibling => {
+            if (sibling.orbitRing) sibling.orbitRing.setEnabled(true);
+          });
+        }
+      }
     }
   }
 
@@ -796,6 +807,12 @@
       case 'visibility':
         // Existing visibility handling
         break;
+      case 'toggleDevOverlays':
+        // Toggle dev overlays visibility
+        document.querySelectorAll('.dev-overlay').forEach(el => {
+          el.style.display = el.style.display === 'none' ? '' : 'none';
+        });
+        break;
     }
   });
 
@@ -987,6 +1004,11 @@
   window.addEventListener('keydown', (e) => {
     if (e.key === 'r' || e.key === 'R') {
       resetView();
+    } else if (e.key === 'Escape') {
+      // Toggle dev overlays visibility
+      document.querySelectorAll('.dev-overlay').forEach(el => {
+        el.style.display = el.style.display === 'none' ? '' : 'none';
+      });
     }
   });
 

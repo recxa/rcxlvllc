@@ -1,4 +1,6 @@
 // sketch.js - Lifebrush with immediate hover-draw
+// Using p5.js built-in mouseX/mouseY (no custom tracking needed)
+
 let cols, rows;
 let resolution;
 let grid;
@@ -11,32 +13,6 @@ let isMobile;
 let bottomBarHeight = 80;
 let canvas;
 let isInitialized = false;
-
-// Track mouse position via native events
-let trackedMouseX = -1;
-let trackedMouseY = -1;
-let isMouseOver = false;
-
-// Start document-level mouse tracking immediately (before canvas exists)
-// This ensures hover works without requiring focus/click
-document.addEventListener('mousemove', (e) => {
-  const container = document.getElementById('lifebrush-container');
-  if (!container) return;
-
-  const r = container.getBoundingClientRect();
-  const x = e.clientX - r.left;
-  const y = e.clientY - r.top;
-
-  if (x >= 0 && x <= r.width && y >= 0 && y <= r.height) {
-    trackedMouseX = x;
-    trackedMouseY = y;
-    isMouseOver = true;
-  } else {
-    isMouseOver = false;
-    trackedMouseX = -1;
-    trackedMouseY = -1;
-  }
-}, { passive: true });
 
 class LifeLayer {
   constructor(grid, resolution, color) {
@@ -92,34 +68,15 @@ function draw() {
     const rect = container.getBoundingClientRect();
     canvas = createCanvas(rect.width, rect.height);
     canvas.parent('lifebrush-container');
-    canvas.elt.setAttribute('tabindex', '0');
 
-    // Native mouse tracking (works immediately without focus)
-    const canvasEl = canvas.elt;
-    canvasEl.style.display = 'block';
+    // Prevent touch scrolling on mobile
+    canvas.elt.style.touchAction = 'none';
 
-    canvasEl.addEventListener('mousemove', (e) => {
-      const r = canvasEl.getBoundingClientRect();
-      trackedMouseX = e.clientX - r.left;
-      trackedMouseY = e.clientY - r.top;
-      isMouseOver = true;
-    }, { passive: true });
+    // Prevent context menu on right-click
+    canvas.elt.addEventListener('contextmenu', (e) => e.preventDefault());
 
-    canvasEl.addEventListener('mouseenter', () => {
-      isMouseOver = true;
-    }, { passive: true });
-
-    canvasEl.addEventListener('mouseleave', () => {
-      isMouseOver = false;
-      trackedMouseX = -1;
-      trackedMouseY = -1;
-    }, { passive: true });
-
-    canvasEl.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-    });
-
-    canvasEl.addEventListener('mousedown', (e) => {
+    // Prevent middle-click default behavior
+    canvas.elt.addEventListener('mousedown', (e) => {
       if (e.button === 1) e.preventDefault();
     });
 
@@ -135,10 +92,12 @@ function draw() {
 
   background(0);
 
+  // Draw saved layers
   for (let layer of layers) {
     layer.draw();
   }
 
+  // Draw current grid
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
       let x = i * resolution;
@@ -151,17 +110,20 @@ function draw() {
     }
   }
 
+  // Mobile bottom bar
   if (isMobile) {
     fill(brushColor);
     noStroke();
     rect(0, height - bottomBarHeight, width, bottomBarHeight);
   }
 
-  // Hover-draw: paint using tracked mouse position (works without focus)
-  if (isMouseOver && trackedMouseX >= 0 && trackedMouseY >= 0) {
-    if (!isMobile || trackedMouseY < height - bottomBarHeight) {
-      let touchCol = floor(trackedMouseX / resolution);
-      let touchRow = floor(trackedMouseY / resolution);
+  // Hover-draw: check if mouse is over canvas using p5's built-in mouseX/mouseY
+  let overCanvas = mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height;
+
+  if (overCanvas) {
+    if (!isMobile || mouseY < height - bottomBarHeight) {
+      let touchCol = floor(mouseX / resolution);
+      let touchRow = floor(mouseY / resolution);
       if (touchCol >= 0 && touchCol < cols && touchRow >= 0 && touchRow < rows) {
         if (grid[touchCol][touchRow] == 0) {
           grid[touchCol][touchRow] = 1;
@@ -169,8 +131,10 @@ function draw() {
         }
       }
     }
-  } else if (isMobile && touches.length > 0) {
-    // Touch fallback for mobile
+  }
+
+  // Touch fallback for mobile
+  if (isMobile && touches.length > 0) {
     let touchPos = getTouchPos();
     if (touchPos.y < height - bottomBarHeight) {
       let touchCol = floor(touchPos.x / resolution);
@@ -184,6 +148,7 @@ function draw() {
     }
   }
 
+  // Auto-evolve after threshold
   if (activatedCount >= activationThreshold) {
     applyGameOfLifeRules();
     activatedCount = 0;
