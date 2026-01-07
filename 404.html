@@ -4,7 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>rcx shell</title>
-    <link rel="stylesheet" href="./core/style.css" />
+    <!-- IMPORTANT: Use absolute paths so this works from any URL depth (e.g., /rcx/01/readme) -->
+    <link rel="stylesheet" href="/core/style.css" />
     <style>
       /* Welcome Overlay */
       .welcome-overlay {
@@ -119,7 +120,7 @@
     <div class="container">
       <aside class="sidebar">
         <ul id="tree"><li>Loading…</li></ul>
-        <div class="version-tag">v0.1.0</div>
+        <div class="version-tag dev-overlay" style="display: none;">v0.1.2</div>
       </aside>
 
       <div class="content">
@@ -127,14 +128,15 @@
       </div>
     </div>
 
-    <script type="module" src="./core/externals.js"></script>
-    <script src="./core/windows.js"></script>
-    <script src="./core/sidebar-effects.js"></script>
-    <script src="./core/manifest-bridge.js"></script>
-    <script src="./core/sidebar.js"></script>
-    <script src="./core/viewer.js"></script>
-    <script src="./core/bus.js"></script>
-    <script type="module" src="./core/router.js"></script>
+    <!-- IMPORTANT: Use absolute paths so this works from any URL depth -->
+    <script type="module" src="/core/externals.js"></script>
+    <script src="/core/windows.js"></script>
+    <script src="/core/sidebar-effects.js"></script>
+    <script src="/core/manifest-bridge.js"></script>
+    <script src="/core/sidebar.js"></script>
+    <script src="/core/viewer.js"></script>
+    <script src="/core/bus.js"></script>
+    <script type="module" src="/core/router.js"></script>
     <script>
       // Welcome Overlay Logic
       function dismissWelcome() {
@@ -147,7 +149,8 @@
 
       function goToTour() {
         dismissWelcome();
-        // Navigate to tour page
+        // Navigate to tour page and update URL
+        history.pushState({}, '', '/tour');
         if (window.viewer && window.viewer.show) {
           window.viewer.show('tour');
         } else {
@@ -185,14 +188,26 @@
         }
       });
 
-      // Keyboard shortcut: 'e' to toggle sidebar effects settings
+      // Keyboard shortcuts
       window.addEventListener('keydown', (e) => {
+        // Don't trigger if typing in an input
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
         if (e.key === 'e' || e.key === 'E') {
-          // Don't trigger if typing in an input
-          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
           if (window.SidebarEffects) {
             window.SidebarEffects.toggle();
           }
+        } else if (e.key === 'Escape') {
+          // Toggle dev overlays visibility (including in iframes)
+          document.querySelectorAll('.dev-overlay').forEach(el => {
+            el.style.display = el.style.display === 'none' ? '' : 'none';
+          });
+          // Also notify iframes
+          document.querySelectorAll('iframe').forEach(iframe => {
+            try {
+              iframe.contentWindow.postMessage({ type: 'toggleDevOverlays' }, '*');
+            } catch (e) {}
+          });
         }
       });
     </script>

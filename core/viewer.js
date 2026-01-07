@@ -15,7 +15,7 @@
   });
 
   async function boot() {
-    const res = await fetch('./manifest.json', { cache: 'no-store' });
+    const res = await fetch('/manifest.json', { cache: 'no-store' });
     if (!res.ok) throw new Error(`manifest fetch ${res.status}`);
     const manifest = await res.json();
 
