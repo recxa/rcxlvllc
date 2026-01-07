@@ -47,18 +47,13 @@ import { externalUrls } from './externals.js';
       });
     });
 
-    // initial load (skip refresh routing complexities for now)
-    const startId = pathToId(location.pathname) || 'home';
-    if (nodeMap[startId] && nodeMap[startId].type === 'page') {
-      window.viewer.show(startId);
-    } else {
-      window.viewer.show('home');
-    }
+    // NOTE: Initial page load is handled by viewer.js (single source of truth)
+    // Router only handles navigation clicks and back/forward
 
     // back/forward
     window.addEventListener('popstate', () => {
       const id = pathToId(location.pathname) || 'home';
-      window.viewer.show(id);
+      if (window.viewer) window.viewer.show(id);
     });
   }
 

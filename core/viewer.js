@@ -49,15 +49,25 @@
     // Listen for messages from iframes (especially home/planet view)
     window.addEventListener('message', handleIframeMessage);
 
-    if (iframes.has('home')) {
+    // Connect home frame to bridge
+    if (homeFrame && window.ManifestBridge) {
+      window.ManifestBridge.setPlanetFrame(homeFrame);
+    }
+
+    // Determine initial page from URL path (let viewer be the single source of truth)
+    const initialPage = getPageFromPath(location.pathname);
+    if (iframes.has(initialPage)) {
+      show(initialPage);
+    } else if (iframes.has('home')) {
       show('home');
-      // Connect home frame to bridge
-      if (window.ManifestBridge) {
-        window.ManifestBridge.setPlanetFrame(homeFrame);
-      }
     } else {
       viewerEl.textContent = 'No home page found.';
     }
+  }
+
+  function getPageFromPath(path) {
+    const clean = path.replace(/^\/+/, '').replace(/\/+$/, '');
+    return clean.length ? clean : 'home';
   }
 
   function handleIframeMessage(event) {
