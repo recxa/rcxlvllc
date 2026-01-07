@@ -35,7 +35,7 @@ const SettingsPanel = (() => {
       fadeEndDistance: 1.1
     },
     orbit: {
-      timeScale: 0.08
+      timeScale: 0.02
     },
     // ============ VISUAL STYLE ============
     visual: {
@@ -111,7 +111,7 @@ const SettingsPanel = (() => {
       post: {
         // FX order - effects applied in this order (drag to reorder in UI)
         fxOrder: ['pixelate', 'dither', 'colorAdjust', 'scanlines', 'crt', 'bloom', 'chromaticAberration', 'grain', 'vignette', 'glitch'],
-        pixelate: 3,              // pixelation level (0=off, 2-16) - default 3px
+        pixelate: 2,              // pixelation level (0=off, 2-16) - default 2px
         scanlines: 0,             // scanline intensity (0-1)
         scanlineScale: 2,         // scanline size
         crt: false,               // CRT curvature
@@ -157,14 +157,14 @@ const SettingsPanel = (() => {
       },
       // STAR/CENTRAL
       star: {
-        glow: 0.5,
+        glow: 0,
         glowColor: "#335577",
         glowSize: 2,
         corona: false,
         coronaRays: 8,
         coronaLength: 0.5,
-        pulse: 0.1,
-        pulseSpeed: 0.5,
+        pulse: 0.02,
+        pulseSpeed: 0.2,
       },
       // BACKGROUND
       background: {
@@ -183,9 +183,7 @@ const SettingsPanel = (() => {
       // PER-PLANET OVERRIDES
       // Keys are body IDs, values are partial settings that override globals
       overrides: {
-        // Example:
-        // 'rcx01': { geometry: { segments: 8 }, post: { pixelate: 4 } },
-        // 'rcx02': { shading: { mode: 'toon' }, color: { hueShift: 30 } },
+        'central': { geometry: { type: 'octahedron' } },
       },
     }
   };

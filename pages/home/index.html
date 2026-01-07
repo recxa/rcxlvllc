@@ -170,8 +170,7 @@
       actions: [
         { label: 'readme', type: 'page', target: 'readme-02' },
         { label: 'demos', type: 'expand', target: 'sec-02-demos' },
-        { label: 'stream', type: 'link', target: 'stream-02' },
-        { label: 'code', type: 'link', target: 'git-02' }
+        { label: 'stream', type: 'link', target: 'stream-02' }
       ]
     },
     'rcx03': {
@@ -234,7 +233,6 @@
       ]
     },
     'rcx02_stream': { title: 'stream', subtitle: 'live channel', actions: [{ label: 'open', type: 'link', target: 'stream-02' }] },
-    'rcx02_code': { title: 'code', subtitle: 'source repository', actions: [{ label: 'open', type: 'link', target: 'git-02' }] },
     'rcx02_readme': { title: 'readme', subtitle: 'documentation', actions: [{ label: 'open', type: 'page', target: 'readme-02' }] },
     'rcx03_demos': {
       title: 'demos',
@@ -271,7 +269,7 @@
     'central': 'rcx',
     'rcx01': 'sec-01', 'rcx02': 'sec-02', 'rcx03': 'sec-03', 'rcx04': 'sec-04', 'rcx05': 'sec-05',
     'rcx01_demos': 'sec-01-demos', 'rcx01_code': 'git-01', 'rcx01_readme': 'readme-01',
-    'rcx02_demos': 'sec-02-demos', 'rcx02_stream': 'stream-02', 'rcx02_code': 'git-02', 'rcx02_readme': 'readme-02',
+    'rcx02_demos': 'sec-02-demos', 'rcx02_stream': 'stream-02', 'rcx02_readme': 'readme-02',
     'rcx03_demos': 'sec-03-demos', 'rcx03_code': 'git-03', 'rcx03_readme': 'readme-03',
     'rcx04_lifebrush': 'lifebrush', 'rcx04_readme': 'readme-04',
     'rcx05_demo': 'video-05-demo', 'rcx05_code': 'git-05', 'rcx05_readme': 'readme-05',
@@ -293,7 +291,7 @@
   const scene = new BABYLON.Scene(engine);
   scene.clearColor = new BABYLON.Color4(0.02, 0.02, 0.03, 1.0);
 
-  const camera = new BABYLON.ArcRotateCamera("camera", Math.PI * 0.25, Math.PI * 0.35, 35, BABYLON.Vector3.Zero(), scene);
+  const camera = new BABYLON.ArcRotateCamera("camera", 0, 0.01, 42, BABYLON.Vector3.Zero(), scene);
   camera.minZ = 0.01;
   camera.panningSensibility = 0;
   camera.attachControl(canvas, true);
@@ -463,8 +461,7 @@
     'rcx02': [
       { id: 'rcx02_demos', orbitRadius: 1.92, size: 0.18, color: '#aaa', speed: 1.1 },
       { id: 'rcx02_stream', orbitRadius: 2.64, size: 0.14, color: '#a6f', speed: 0.9, inclination: 0.25 },
-      { id: 'rcx02_code', orbitRadius: 3.36, size: 0.15, color: '#8af', speed: 0.7, inclination: -0.1 },
-      { id: 'rcx02_readme', orbitRadius: 3.96, size: 0.16, color: '#fa8', speed: 0.55 }
+      { id: 'rcx02_readme', orbitRadius: 3.36, size: 0.16, color: '#fa8', speed: 0.7, inclination: -0.1 }
     ],
     'rcx03': [
       { id: 'rcx03_demos', orbitRadius: 1.8, size: 0.16, color: '#aaa', speed: 1.2 },
@@ -594,8 +591,8 @@
   let hoveredBody = null;
   let transitioning = false;
   let transitionProgress = 0;
-  let transitionStart = { target: BABYLON.Vector3.Zero(), radius: 35 };
-  let transitionEnd = { target: BABYLON.Vector3.Zero(), radius: 35 };
+  let transitionStart = { target: BABYLON.Vector3.Zero(), radius: 42 };
+  let transitionEnd = { target: BABYLON.Vector3.Zero(), radius: 42 };
   let pendingScrollDelta = 0;
   let sidebarHighlightedBody = null;
   let planetOpenedFolders = new Set(); // Track folders opened via planet clicks (not sidebar)
@@ -626,7 +623,6 @@
     'rcx01_readme': ['rcx01', 'readme'],
     'rcx02_demos': ['rcx02', 'demos'],
     'rcx02_stream': ['rcx02', 'stream'],
-    'rcx02_code': ['rcx02', 'code'],
     'rcx02_readme': ['rcx02', 'readme'],
     'rcx03_demos': ['rcx03', 'demos'],
     'rcx03_code': ['rcx03', 'code'],
@@ -929,7 +925,7 @@
     transitionStart.target = camera.target.clone();
     transitionStart.radius = camera.radius;
     transitionEnd.target = central.getAbsolutePosition().clone();
-    transitionEnd.radius = 35;
+    transitionEnd.radius = 42;
     focusTarget = central;
     transitioning = true;
     transitionProgress = 0;
