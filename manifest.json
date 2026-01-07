@@ -48,7 +48,6 @@
               ]
             },
             { "type": "link", "id": "stream-02", "title": "📲 stream" },
-            { "type": "link", "id": "git-02",    "title": "💻 code" },
             { "type": "page", "id": "readme-02", "title": "📃 README", "iframeSrc": "/pages/readme-02/index.html" }
           ]
         },

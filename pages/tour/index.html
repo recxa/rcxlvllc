@@ -22,7 +22,7 @@
     .container {
       max-width: 800px;
       margin: 0 auto;
-      padding: 48px 24px 80px;
+      padding: 32px 24px 80px;
     }
 
     /* Header / About */
@@ -318,6 +318,10 @@
       border-radius: 3px;
       font-size: 12px;
       color: #b8bcc4;
+    }
+
+    .lifebrush-controls-desc {
+      text-align: center;
     }
 
     /* Development sections (for rcx01 journey) */
@@ -673,7 +677,7 @@
         a real-time AV installation that recursively scrapes youtube for recently uploaded 0-view videos. the setup consists of a TV on a wooden desk, and a styrofoam head affixed to a wooden stick, duct taped to a wooden chair in front of the desk. a webcam is dug into the eye region of the head facing the TV, creating a feedback loop backdrop. videos are foreground-extracted and displayed on top of the head-cam backdrop, allowing multiple videos to overlap. using OCR, the webcam scans the screen for text, which it uses as the search prompt for the next youtube scrape. another webcam sits on top of the TV, pointed down at the desk where an open bag of bananagrams lies. passerbys are encouraged to steer the feedback loop by spelling out words or phrases on the desk with the bananagram tiles, which are foreground-extracted and thrown into the visual mix with the rest of the video feeds, incorporating itself into the OCR strings. i am currently saving up for a used computer that can host a persistent livestream of the program.
       </p>
       <div class="project-actions">
-        <a href="https://github.com/recxa/rcx02" target="_blank" class="btn btn-primary">code</a>
+        <a href="https://www.twitch.tv/recxa_lovelace" target="_blank" class="btn btn-primary">stream</a>
         <button class="btn btn-toggle" onclick="toggleDemos(this, 'demos-02')">
           <span class="arrow">></span> explore demos
         </button>
@@ -779,10 +783,8 @@
         <a href="javascript:void(0)" onclick="lifebrushReset()">reset</a>
         <a href="javascript:void(0)" onclick="lifebrushSave()">save</a>
       </div>
-      <p class="project-description">
-        a game of life drawing tool.
-        <br><br>
-        <code>hover</code> - paint · <code>click</code> - place layer · <code>middle click</code> - evolve 1 generation · <code>right click</code> - randomize brush
+      <p class="project-description lifebrush-controls-desc">
+        <code>lmb</code> paint &nbsp;&nbsp;&nbsp;&nbsp; <code>rmb</code> randomize brush &nbsp;&nbsp;&nbsp;&nbsp; <code>middle click</code> evolve 1 generation
       </p>
       <div class="project-actions">
         <!-- No additional demos for lifebrush -->

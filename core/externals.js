@@ -18,7 +18,6 @@ const externalUrls = {
   'paper-01': '/[DRAFT] Recxa Lovelace BeatDown Paper.pdf',
 
   'git-01': 'https://github.com/recxa/rcx01',
-  'git-02': 'https://github.com/recxa/rcx02',
   'git-03': 'https://github.com/recxa/rcx03',
   'git-05': 'https://github.com/recxa/rcx05',
 
