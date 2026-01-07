@@ -26,6 +26,7 @@
               ]
             },
             { "type": "link", "id": "git-01",    "title": "💻 code" },
+            { "type": "link", "id": "paper-01",  "title": "📄 draft paper" },
             { "type": "page", "id": "readme-01", "title": "📃 README", "iframeSrc": "/pages/readme-01/index.html" }
           ]
         },

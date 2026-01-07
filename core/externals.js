@@ -15,6 +15,8 @@ const externalUrls = {
 
   'video-05-demo': 'https://youtu.be/pAJ_MM6agng?si=zeqQ_spAJ5S-VjY1',
 
+  'paper-01': '/[DRAFT] Recxa Lovelace BeatDown Paper.pdf',
+
   'git-01': 'https://github.com/recxa/rcx01',
   'git-02': 'https://github.com/recxa/rcx02',
   'git-03': 'https://github.com/recxa/rcx03',

@@ -534,10 +534,6 @@
         a keyboard-only sampler inspired by video game control philosophy. the meat of the keyboard is segmented into two 4x4 grids. the left grid controls sample sources, each row corresponding to a drum loop and each column an instrumental loop. the x,y position of your keyboard input within the grid determines the active sample-source combination. when multiple samples overlap, they are meshed together using non-negative matrix factorization. the right grid is a bank of 16 jump points, which the user can set, trigger, or clear at any time. jump points can be set for drum and instrument tracks jointly or independently, allowing for improvised yet complex sample flips. tempo is controlled by flying an asteroids-style ship on a 2d plane with arrow keys. the user can record vocal loops at any time, even while changing tempo, and it will remain rhythmically and harmonically synced to the sample as if recorded directly onto a spinning vinyl record (with the side effect of a natural formant shift).
       </p>
 
-      <p class="project-description">
-        the interface was designed to encourage users of any skill level to share control and influence over the beat. currently, i am working on a back-end system that utilizes stem separation and a LoopMaker-inspired segmentation to give users a one-click pipeline for loading new samples without any DAW experience. for more information, see my draft paper for the downbeat detection component of that system.
-      </p>
-
       <!-- Development journey -->
       <div class="dev-section">
         <p class="dev-label">initial prototype — 12/04/23</p>
@@ -580,6 +576,10 @@
           a formal study of 9 participants using the instrument with no prior instructions. using keylog and screen capture analysis, i evaluate the 'discoverability' of each control scheme. some features are discovered and understood immediately, others are stumbled upon by accident, others are never found at all. in response to this, i adjusted the problematic keybinds and introduced more visual feedback, yielding improved results in subsequent informal tests.
         </p>
       </div>
+
+      <p class="project-description">
+        currently, i am working on a back-end system that utilizes stem separation and a LoopMaker-inspired segmentation to give users a one-click pipeline for loading new samples without any DAW experience. for more information, see my <a href="javascript:void(0)" onclick="window.parent.WindowManager.openPDF('/[DRAFT] Recxa Lovelace BeatDown Paper.pdf', 'draft paper')" style="color: #8ab4d4; text-decoration: underline; cursor: pointer;">draft paper</a> for the downbeat detection component of that system.
+      </p>
 
       <div class="project-actions">
         <a href="https://github.com/recxa/rcx01" target="_blank" class="btn btn-primary">code</a>

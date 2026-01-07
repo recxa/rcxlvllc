@@ -475,6 +475,16 @@
     });
   }
 
+  // Open PDF in window (fit to width, taller default)
+  function openPDF(url, title = 'Document') {
+    return createWindow({
+      title,
+      url,
+      width: 800,
+      height: 600,
+    });
+  }
+
   // Expose API
   window.WindowManager = {
     create: createWindow,
@@ -482,6 +492,7 @@
     closeAll,
     bringToFront,
     openYouTube,
+    openPDF,
     extractYouTubeId,
   };
 })();

@@ -52,10 +52,13 @@ import { externalUrls } from './externals.js';
           const url = node.url || externalUrls[id];
 
           if (url) {
+            const title = li.textContent || id;
             // Check if it's a YouTube link and use WindowManager if available
             if (window.WindowManager && window.WindowManager.extractYouTubeId(url)) {
-              const title = li.textContent || id;
               window.WindowManager.openYouTube(url, title);
+            } else if (window.WindowManager && url.toLowerCase().endsWith('.pdf')) {
+              // Open PDFs in window viewer
+              window.WindowManager.openPDF(url, title);
             } else {
               // open in a new tab with no opener for safety
               const w = window.open(url, '_blank', 'noopener,noreferrer');
