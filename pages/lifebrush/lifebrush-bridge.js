@@ -2,10 +2,8 @@
   try { parent.postMessage({ type: 'ready', pageId: 'lifebrush' }, '*'); } catch {}
 
   function focusCanvas() {
-    const c = window.persistentCanvas && window.persistentCanvas.elt
-           || document.querySelector('#lifebrush-container canvas');
+    const c = document.querySelector('#lifebrush-container canvas');
     if (c) {
-      // make sure it can receive focus, then focus it
       if (!c.hasAttribute('tabindex')) c.setAttribute('tabindex', '0');
       try { c.focus(); } catch {}
     }

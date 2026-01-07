@@ -39,24 +39,6 @@
       margin: 0 0 16px 0;
     }
 
-    .header h1 .punctuation {
-      color: #667;
-    }
-
-    .header h1 .name {
-      background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: rainbow-shift 3s linear infinite;
-    }
-
-    @keyframes rainbow-shift {
-      0% { background-position: 0% center; }
-      100% { background-position: 200% center; }
-    }
-
     /* Header versions */
     .header-version { display: none; }
     .header-version.active { display: block; }
@@ -67,18 +49,7 @@
       margin: 0;
     }
 
-    /* Version A: Current rainbow */
-    .hv-rainbow h1 .name {
-      background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: rainbow-shift 3s linear infinite;
-    }
-    .hv-rainbow h1 .punctuation { color: #667; }
-
-    /* Version B: Minimal */
+    /* Version A: Minimal */
     .hv-minimal h1 {
       font-size: 32px;
       letter-spacing: 8px;
@@ -230,58 +201,107 @@
       height: 100%;
     }
 
-    /* Lifebrush controls - Style A: Styled buttons (default) */
+    /* Lifebrush controls - base styles (outside canvas) */
     .lifebrush-controls {
       display: flex;
       justify-content: center;
       gap: 12px;
-      padding: 10px;
-      background: #0a0a0c;
-      border-top: 1px solid #1a1c20;
+      padding: 12px 0;
+      margin-bottom: 20px;
     }
 
-    .lifebrush-controls.style-a button {
+    .lifebrush-controls a {
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* Style A: Styled buttons */
+    .lifebrush-controls.style-a a {
       background: #1a1c20;
       border: 1px solid #2a2d33;
       color: #9a9da4;
       padding: 6px 14px;
-      font: inherit;
       font-size: 11px;
-      cursor: pointer;
       border-radius: 3px;
       transition: background 0.15s, color 0.15s;
     }
 
-    .lifebrush-controls.style-a button:hover {
+    .lifebrush-controls.style-a a:hover {
       background: #252830;
       color: #c8ccd4;
     }
 
-    /* Lifebrush controls - Style B: Plain links */
-    .lifebrush-controls.style-b {
-      background: transparent;
-      border-top: none;
-      padding: 8px 0;
-    }
-
-    .lifebrush-controls.style-b button {
+    /* Style B: Plain muted links */
+    .lifebrush-controls.style-b a {
       background: none;
       border: none;
       color: #556;
       padding: 0;
-      font: inherit;
       font-size: 11px;
-      cursor: pointer;
-      text-decoration: none;
     }
 
-    .lifebrush-controls.style-b button:hover {
+    .lifebrush-controls.style-b a:hover {
       color: #9a9da4;
       text-decoration: underline;
     }
 
-    .lifebrush-controls.style-b .separator {
-      color: #333;
+    /* Style C: Ugly blue hyperlinks (codecademy lesson 1 style) */
+    .lifebrush-controls.style-c {
+      justify-content: space-around;
+      width: 80%;
+      margin: 0 auto 20px;
+    }
+
+    .lifebrush-controls.style-c a {
+      color: #0000EE;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+
+    .lifebrush-controls.style-c a:visited {
+      color: #551A8B;
+    }
+
+    .lifebrush-controls.style-c a:hover {
+      color: #551A8B;
+    }
+
+    .lifebrush-controls.style-c a:active {
+      color: #EE0000;
+    }
+
+    /* Style D: White hyperlinks */
+    .lifebrush-controls.style-d {
+      justify-content: space-around;
+      width: 80%;
+      margin: 0 auto 20px;
+    }
+
+    .lifebrush-controls.style-d a {
+      color: #FFFFFF;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+
+    .lifebrush-controls.style-d a:hover {
+      color: #CCCCCC;
+    }
+
+    /* Style E: Text-colored hyperlinks */
+    .lifebrush-controls.style-e {
+      justify-content: space-around;
+      width: 80%;
+      margin: 0 auto 20px;
+    }
+
+    .lifebrush-controls.style-e a {
+      color: #9a9da4;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+
+    .lifebrush-controls.style-e a:hover {
+      color: #c8ccd4;
     }
 
     /* Description */
@@ -437,19 +457,44 @@
       color: #444;
       font-size: 12px;
     }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+      background: #0a0a0c;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0d0d10;
+      border-left: 1px solid #1a1c20;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #2a2d33;
+      border: 2px solid #0d0d10;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3a3d43;
+    }
+
+    ::-webkit-scrollbar-thumb:active {
+      background: #4a4d53;
+    }
+
+    /* Firefox scrollbar */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #2a2d33 #0d0d10;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <!-- Header / About -->
     <header class="header">
-      <!-- Version A: Rainbow -->
-      <div id="hv-rainbow" class="header-version hv-rainbow">
-        <h1>Hello<span class="punctuation">();</span> I'm <span class="name">recxa</span>.</h1>
-        <p class="tagline">creative coding, interactive sound, experimental tools</p>
-      </div>
-
-      <!-- Version B: Minimal -->
+      <!-- Version A: Minimal -->
       <div id="hv-minimal" class="header-version hv-minimal">
         <h1><span class="name">recxa</span></h1>
         <p class="tagline">creative coding, interactive sound, experimental tools</p>
@@ -661,12 +706,12 @@
       </div>
       <div class="demo-container">
         <div id="lifebrush-holder"></div>
-        <div id="lifebrush-controls" class="lifebrush-controls style-a">
-          <button onclick="lifebrushForward()">forward</button>
-          <button id="lifebrush-play-btn" onclick="lifebrushPlay()">play</button>
-          <button onclick="lifebrushReset()">reset</button>
-          <button onclick="lifebrushSave()">save</button>
-        </div>
+      </div>
+      <div id="lifebrush-controls" class="lifebrush-controls style-a">
+        <a href="javascript:void(0)" onclick="lifebrushForward()">forward</a>
+        <a href="javascript:void(0)" id="lifebrush-play-btn" onclick="lifebrushPlay()">play</a>
+        <a href="javascript:void(0)" onclick="lifebrushReset()">reset</a>
+        <a href="javascript:void(0)" onclick="lifebrushSave()">save</a>
       </div>
       <p class="project-description">
         a browser-based drawing tool where your strokes come alive. draw on the canvas, and after a few cells are lit, conway's game of life takes over—your drawing evolves, mutates, and settles into new forms. save layers, change colors, let patterns stack and interact. the grid wraps at the edges (toroidal topology), so patterns that drift off one side reappear on the other.
@@ -710,11 +755,12 @@
   <script>
     // Header version switching
     // 'hv-none' is first/default - no header, straight to content
-    const headerVersions = ['hv-none', 'hv-rainbow', 'hv-minimal', 'hv-terminal', 'hv-understated', 'hv-coords'];
+    const headerVersions = ['hv-none', 'hv-minimal', 'hv-terminal', 'hv-understated', 'hv-coords'];
     let currentHeader = 0;
 
     // Lifebrush button styles (toggle with backtick)
-    const buttonStyles = ['style-a', 'style-b'];
+    // a=styled, b=plain, c=blue hyperlink, d=white hyperlink, e=text-color hyperlink
+    const buttonStyles = ['style-a', 'style-b', 'style-c', 'style-d', 'style-e'];
     let currentButtonStyle = 0;
 
     // Initialize: set hv-none as active and hide header

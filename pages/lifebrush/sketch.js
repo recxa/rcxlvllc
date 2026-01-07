@@ -1,4 +1,4 @@
-// sketch.js - Original lifebrush with hover-draw
+// sketch.js - Lifebrush with immediate hover-draw
 let cols, rows;
 let resolution;
 let grid;
@@ -12,19 +12,10 @@ let bottomBarHeight = 80;
 let canvas;
 let isInitialized = false;
 
-// Track mouse position via native events AND postMessage from parent
+// Track mouse position via native events
 let trackedMouseX = -1;
 let trackedMouseY = -1;
 let isMouseOver = false;
-
-// Listen for mouse coordinates from parent page (solves iframe focus issue)
-window.addEventListener('message', (e) => {
-  if (e.data && e.data.type === 'mousePosition') {
-    trackedMouseX = e.data.x;
-    trackedMouseY = e.data.y;
-    isMouseOver = e.data.over;
-  }
-});
 
 class LifeLayer {
   constructor(grid, resolution, color) {
@@ -69,76 +60,54 @@ class LifeLayer {
 function setup() {
   isInitialized = false;
   isMobile = /Mobi|Android/i.test(navigator.userAgent);
-  if (!window.savedBrushColor) {
-    window.savedBrushColor = color(random(255), random(255), random(255));
-  }
-  brushColor = window.savedBrushColor;
+  brushColor = color(random(255), random(255), random(255));
 }
 
 function draw() {
   const container = document.getElementById('lifebrush-container');
-  if (container.style.display !== 'none' && !isInitialized) {
+  if (!container) return;
+
+  if (!isInitialized) {
     const rect = container.getBoundingClientRect();
-    if (!window.persistentCanvas) {
-      canvas = createCanvas(rect.width, rect.height);
-      window.persistentCanvas = canvas;
-      canvas.parent('lifebrush-container');
+    canvas = createCanvas(rect.width, rect.height);
+    canvas.parent('lifebrush-container');
+    canvas.elt.setAttribute('tabindex', '0');
 
-      canvas.elt.setAttribute('tabindex', '0');
+    // Native mouse tracking (works immediately without focus)
+    canvas.elt.addEventListener('mousemove', (e) => {
+      const r = canvas.elt.getBoundingClientRect();
+      trackedMouseX = e.clientX - r.left;
+      trackedMouseY = e.clientY - r.top;
+      isMouseOver = true;
+    });
 
-      // Native mouse tracking (works without focus)
-      canvas.elt.addEventListener('mousemove', (e) => {
-        const rect = canvas.elt.getBoundingClientRect();
-        trackedMouseX = e.clientX - rect.left;
-        trackedMouseY = e.clientY - rect.top;
-        isMouseOver = true;
-      });
+    canvas.elt.addEventListener('mouseenter', () => {
+      isMouseOver = true;
+    });
 
-      canvas.elt.addEventListener('mouseenter', () => {
-        isMouseOver = true;
-      });
+    canvas.elt.addEventListener('mouseleave', () => {
+      isMouseOver = false;
+      trackedMouseX = -1;
+      trackedMouseY = -1;
+    });
 
-      canvas.elt.addEventListener('mouseleave', () => {
-        isMouseOver = false;
-        trackedMouseX = -1;
-        trackedMouseY = -1;
-      });
+    canvas.elt.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
 
-      canvas.elt.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-      });
+    canvas.elt.addEventListener('mousedown', (e) => {
+      if (e.button === 1) e.preventDefault();
+    });
 
-      if (isMobile) {
-        canvas.elt.addEventListener('touchstart', preventDefaultTouch, {passive: false});
-        canvas.elt.addEventListener('touchmove', preventDefaultTouch, {passive: false});
-        canvas.elt.addEventListener('touchend', preventDefaultTouch, {passive: false});
-      }
-
-      if (!window.persistentGrid) {
-        initializeSimulation(randomResolution());
-      } else {
-        grid = window.persistentGrid;
-        next = make2DArray(grid.length, grid[0].length);
-        resolution = window.savedResolution;
-        cols = grid.length;
-        rows = grid[0].length;
-        layers = window.savedLayers || [];
-      }
-    } else {
-      canvas = window.persistentCanvas;
-      grid = window.persistentGrid;
-      layers = window.savedLayers || [];
-      resolution = window.savedResolution;
-      brushColor = window.savedBrushColor;
-      resizeCanvas(rect.width, rect.height);
+    if (isMobile) {
+      canvas.elt.addEventListener('touchstart', preventDefaultTouch, {passive: false});
+      canvas.elt.addEventListener('touchmove', preventDefaultTouch, {passive: false});
+      canvas.elt.addEventListener('touchend', preventDefaultTouch, {passive: false});
     }
 
+    initializeSimulation(randomResolution());
     isInitialized = true;
-    window.isLifebrushInitialized = true;
-    canvas.elt.focus();
   }
-
-  if (!isInitialized) return;
 
   background(0);
 
@@ -199,14 +168,18 @@ function draw() {
 
 function mousePressed() {
   if (!isMobile || mouseY < height - bottomBarHeight) {
-    if (mouseButton === LEFT) {
+    if (mouseButton === CENTER) {
+      // Middle click: progress layers
+      progressLayers();
+      return false;
+    } else if (mouseButton === LEFT) {
+      // Left click: save layer + new size (same color)
       saveStateToLayers();
       initializeSimulation(randomResolution());
-      canvas.elt.focus();
     } else if (mouseButton === RIGHT) {
+      // Right click: full reset (new color + new size)
       randomizeBrushColor();
       initializeSimulation(randomResolution());
-      canvas.elt.focus();
       return false;
     }
   } else {
@@ -249,7 +222,7 @@ function keyPressed() {
 
 function windowResized() {
   const container = document.getElementById('lifebrush-container');
-  if (container.style.display !== 'none' && isInitialized) {
+  if (isInitialized && container) {
     const rect = container.getBoundingClientRect();
     resizeCanvas(rect.width, rect.height);
   }
@@ -267,45 +240,35 @@ function getTouchPos() {
 }
 
 function saveStateToLayers() {
-  let newLayer = new LifeLayer(grid, resolution, brushColor);
-  layers.push(newLayer);
-  window.persistentGrid = grid.map(arr => arr.slice());
-  window.savedResolution = resolution;
-  window.savedLayers = layers;
-  window.savedBrushColor = brushColor;
+  if (hasContent()) {
+    let newLayer = new LifeLayer(grid, resolution, brushColor);
+    layers.push(newLayer);
+  }
+}
+
+function hasContent() {
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      if (grid[i][j] === 1) return true;
+    }
+  }
+  return false;
 }
 
 function randomizeBrushColor() {
   brushColor = color(random(255), random(255), random(255));
-  window.savedBrushColor = brushColor;
 }
 
 function fullReset() {
-  window.persistentCanvas = null;
-  window.persistentGrid = null;
-  window.savedResolution = null;
-  window.savedLayers = null;
-  window.savedBrushColor = null;
-  window.isLifebrushInitialized = false;
   layers = [];
-  background(0);
-  setup();
+  randomizeBrushColor();
   initializeSimulation(randomResolution());
-}
-
-function resetCanvas() {
-  layers = window.savedLayers || [];
-  window.persistentGrid = null;
-  window.savedResolution = null;
-  window.savedLayers = [];
-  background(0);
 }
 
 function progressLayers() {
   for (let layer of layers) {
     layer.stepForward();
   }
-  window.savedLayers = layers;
 }
 
 function randomResolution() {
@@ -325,9 +288,6 @@ function initializeSimulation(res) {
       grid[i][j] = 0;
     }
   }
-
-  window.savedResolution = resolution;
-  window.persistentGrid = grid;
 }
 
 function make2DArray(cols, rows) {
@@ -372,8 +332,4 @@ function applyGameOfLifeRules() {
   let temp = grid;
   grid = next;
   next = temp;
-  window.persistentGrid = grid;
 }
-
-window.resetCanvas = resetCanvas;
-window.isLifebrushInitialized = false;
